@@ -10,6 +10,9 @@ dependencies:
   flutter:
     sdk: flutter
 
+  http: ^0.13.3
+  web_socket_channel: ^2.1.0
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
