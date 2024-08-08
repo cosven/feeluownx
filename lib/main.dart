@@ -30,7 +30,8 @@ class App extends StatelessWidget {
 }
 
 class Client {
-  final String url = 'http://192.168.31.106:23332';
+  // final String url = 'http://192.168.31.106:23332';
+  final String url = 'http://10.0.2.2:23332';
   int rpcRequestId = 0;
 
   Future<Map<String, dynamic>?> jsonRpc(String method,
@@ -63,7 +64,8 @@ class Client {
 }
 
 class PubsubClient {
-  final String url = 'ws://192.168.31.106:23332/signal/v1';
+  // final String url = 'ws://192.168.31.106:23332/signal/v1';
+  final String url = 'ws://10.0.2.2:23332/signal/v1';
   WebSocketChannel? channel;
 
   void connect() {

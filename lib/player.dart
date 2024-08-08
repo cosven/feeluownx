@@ -6,16 +6,40 @@ import 'package:feeluownx/main.dart';
 class AudioPlayerHandler extends BaseAudioHandler {
   final Client client;
 
-  AudioPlayerHandler(this.client);
+  AudioPlayerHandler(this.client) {
+    initPlaybackState();
+  }
+
+  void initPlaybackState() {
+    playbackState.add(PlaybackState(
+      controls: [
+        MediaControl.play,
+        MediaControl.skipToNext,
+        MediaControl.skipToPrevious,
+        MediaControl.stop
+      ],
+      androidCompactActionIndices: const [0, 1, 2],
+      processingState: AudioProcessingState.ready,
+      playing: false,
+      updatePosition: const Duration(milliseconds: 0),
+      speed: 1.0,
+      queueIndex: 0,
+    ));
+  }
 
   @override
   Future<void> play() {
-    return client.jsonRpc('app.player.play');
+    return client.jsonRpc('app.player.toggle');
   }
 
   @override
   Future<void> pause() {
-    return client.jsonRpc('app.player.pause');
+    return client.jsonRpc('app.player.toggle');
+  }
+
+  @override
+  Future<void> stop() {
+    return client.jsonRpc('app.player.stop');
   }
 
   @override
@@ -58,9 +82,12 @@ class AudioPlayerHandler extends BaseAudioHandler {
             artwork_ = artwork_.replaceFirst('https', 'http');
           }
           print('artwork changed to: $artwork_');
+          List<dynamic> artists = metadata['artists'];
           mediaItem.add(MediaItem(
               id: metadata['uri'],
               title: metadata['title'],
+              artist: artists.join(","),
+              album: metadata['album'],
               artUri: Uri.parse(artwork_)));
         }
       } catch (e) {
