@@ -64,7 +64,6 @@ class AudioPlayerHandler extends BaseAudioHandler {
         String topic = js['topic'];
         String data = js['data']!;
         if (topic == 'player.state_changed') {
-          print('pubsub: player state changed');
           List<dynamic> args = json.decode(data);
           int state = args[0];
           if (state == 1) {
@@ -99,6 +98,13 @@ class AudioPlayerHandler extends BaseAudioHandler {
           mediaItem.add(mediaItem.value?.copyWith(
               duration:
                   Duration(milliseconds: (durationSeconds * 1000).round())));
+        } else if (topic == 'player.seeked') {
+          print("seeked ====== $data");
+          List<dynamic> args = json.decode(data);
+          int positionSeconds = args[0];
+          playbackState.add(playbackState.value.copyWith(
+              updatePosition:
+                  Duration(milliseconds: (positionSeconds * 1000).round())));
         }
       } catch (e) {
         print('handle message error: $e');
