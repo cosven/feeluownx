@@ -78,8 +78,10 @@ class AudioPlayerHandler extends BaseAudioHandler {
           Map<String, dynamic> metadata = args[0];
           print(metadata);
           String artwork_ = metadata['artwork'];
+          Map<String, String> artHeaders = {};
           if (metadata['source'] == 'netease') {
             artwork_ = artwork_.replaceFirst('https', 'http');
+            artHeaders['user-agent'] = 'Mozilla/5.0 (X11; Linux x86_64; rv:129.0) Gecko/20100101 Firefox/129.0';
           }
           print('artwork changed to: $artwork_');
           List<dynamic> artists = metadata['artists'];
@@ -88,7 +90,9 @@ class AudioPlayerHandler extends BaseAudioHandler {
               title: metadata['title'],
               artist: artists.join(","),
               album: metadata['album'],
-              artUri: Uri.parse(artwork_)));
+              artUri: Uri.parse(artwork_),
+              artHeaders: artHeaders,
+          ));
         }
       } catch (e) {
         print('handle message error: $e');
