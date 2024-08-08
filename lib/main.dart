@@ -1,12 +1,17 @@
 import 'dart:ffi';
 
+import 'package:audio_service/audio_service.dart';
+import 'package:feeluownx/player.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:web_socket_channel/web_socket_channel.dart';
 import 'dart:convert';
 
+late AudioHandler _audioHandler;
 
-void main() => runApp(const App());
+Future<void> main() async {
+  runApp(const App());
+}
 
 class App extends StatelessWidget {
   const App({super.key});
@@ -25,10 +30,12 @@ class App extends StatelessWidget {
 }
 
 class Client {
-  final String url = 'http://192.168.31.106:23332';
+  // final String url = 'http://192.168.31.106:23332';
+  final String url = 'http://10.0.2.2:23332';
   int rpcRequestId = 0;
 
-  Future<Map<String, dynamic>?> jsonRpc(String method, {List<dynamic>? args}) async {
+  Future<Map<String, dynamic>?> jsonRpc(String method,
+      {List<dynamic>? args}) async {
     Map<String, dynamic> payload = {
       'jsonrpc': '2.0',
       'id': rpcRequestId,
@@ -57,7 +64,8 @@ class Client {
 }
 
 class PubsubClient {
-  final String url = 'ws://192.168.31.106:23332/signal/v1';
+  // final String url = 'ws://192.168.31.106:23332/signal/v1';
+  final String url = 'ws://10.0.2.2:23332/signal/v1';
   WebSocketChannel? channel;
 
   void connect() {
@@ -75,7 +83,6 @@ class PubsubClient {
   }
 }
 
-
 class PlayerControlPanel extends StatefulWidget {
   const PlayerControlPanel({super.key});
 
@@ -84,19 +91,20 @@ class PlayerControlPanel extends StatefulWidget {
 }
 
 class _PlayerControlPanelState extends State<PlayerControlPanel> {
-  int playerState = 1;  // 2:playing, 1:paused
+  int playerState = 1; // 2:playing, 1:paused
   String artwork = '';
 
   final Client client = Client();
   final PubsubClient pubsubClient = PubsubClient();
+  late AudioPlayerHandler _handler;
 
   @override
   void initState() {
     super.initState();
-
     pubsubClient.connect();
     pubsubClient.stream?.listen(
       (message) {
+        _handler.handleMessage(message);
         // print('recv pubsub msg: $message');
         Map<String, dynamic> js = {};
         try {
@@ -120,7 +128,7 @@ class _PlayerControlPanelState extends State<PlayerControlPanel> {
               List<dynamic> args = json.decode(data);
               Map<String, dynamic> metadata = args[0];
               String artwork_ = metadata['artwork'];
-              if (metadata['source'] == 'netease'){
+              if (metadata['source'] == 'netease') {
                 artwork_ = artwork_.replaceFirst('https', 'http');
               }
               print('artwork changed to: $artwork_');
@@ -140,6 +148,19 @@ class _PlayerControlPanelState extends State<PlayerControlPanel> {
         print('Websocket error: $error');
       },
     );
+    initAudioHandler();
+  }
+
+  Future<void> initAudioHandler() async {
+    _handler = AudioPlayerHandler(client);
+    _audioHandler = await AudioService.init(
+      builder: () => _handler,
+      config: const AudioServiceConfig(
+        androidNotificationChannelId: 'io.github.feeluown',
+        androidNotificationChannelName: 'FeelUOwn',
+        androidNotificationOngoing: true,
+      ),
+    );
   }
 
   @override
@@ -157,39 +178,37 @@ class _PlayerControlPanelState extends State<PlayerControlPanel> {
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: <Widget>[
-
-        artwork.isNotEmpty ? Image.network(
-          artwork,
-          errorBuilder: (context, exception, stackTrack) => Text("fetch artwork failed")
-        ): Text('No artwork'),
-
-        Row (
+        artwork.isNotEmpty
+            ? Image.network(artwork,
+                errorBuilder: (context, exception, stackTrack) =>
+                    Text("fetch artwork failed"))
+            : Text('No artwork'),
+        Row(
           mainAxisAlignment: MainAxisAlignment.center,
           mainAxisSize: MainAxisSize.max,
           children: [
-          IconButton(
-            icon: const Icon(Icons.skip_previous_rounded),
-            onPressed: () {
-              client.jsonRpc('app.playlist.previous');
-            },
-          ),
-
-          IconButton(
-            icon: Icon(_isPlaying() ? Icons.pause_rounded : Icons.play_arrow_rounded),
-            tooltip: 'Toggle',
-            onPressed: () {
-              client.jsonRpc('app.player.toggle');
-            }
-          ),
-
-          IconButton(
-            icon: const Icon(Icons.skip_next_rounded),
-            onPressed: () {
-              client.jsonRpc('app.playlist.next');
-            },
-          ),
-
-        ],)
+            IconButton(
+              icon: const Icon(Icons.skip_previous_rounded),
+              onPressed: () {
+                client.jsonRpc('app.playlist.previous');
+              },
+            ),
+            IconButton(
+                icon: Icon(_isPlaying()
+                    ? Icons.pause_rounded
+                    : Icons.play_arrow_rounded),
+                tooltip: 'Toggle',
+                onPressed: () {
+                  client.jsonRpc('app.player.toggle');
+                }),
+            IconButton(
+              icon: const Icon(Icons.skip_next_rounded),
+              onPressed: () {
+                client.jsonRpc('app.playlist.next');
+              },
+            ),
+          ],
+        )
       ],
     );
   }
