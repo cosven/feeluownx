@@ -80,19 +80,25 @@ class AudioPlayerHandler extends BaseAudioHandler {
           String artwork_ = metadata['artwork'];
           Map<String, String> artHeaders = {};
           if (metadata['source'] == 'netease') {
-            artwork_ = artwork_.replaceFirst('https', 'http');
-            artHeaders['user-agent'] = 'Mozilla/5.0 (X11; Linux x86_64; rv:129.0) Gecko/20100101 Firefox/129.0';
+            artHeaders['user-agent'] =
+                'Mozilla/5.0 (X11; Linux x86_64; rv:129.0) Gecko/20100101 Firefox/129.0';
           }
           print('artwork changed to: $artwork_');
           List<dynamic> artists = metadata['artists'];
           mediaItem.add(MediaItem(
-              id: metadata['uri'],
-              title: metadata['title'],
-              artist: artists.join(","),
-              album: metadata['album'],
-              artUri: Uri.parse(artwork_),
-              artHeaders: artHeaders,
+            id: metadata['uri'],
+            title: metadata['title'],
+            artist: artists.join(","),
+            album: metadata['album'],
+            artUri: Uri.parse(artwork_),
+            artHeaders: artHeaders,
           ));
+        } else if (topic == 'player.duration_changed') {
+          List<dynamic> args = json.decode(data);
+          double durationSeconds = args[0];
+          mediaItem.add(mediaItem.value?.copyWith(
+              duration:
+                  Duration(milliseconds: (durationSeconds * 1000).round())));
         }
       } catch (e) {
         print('handle message error: $e');
