@@ -96,9 +96,9 @@ class AudioPlayerHandler extends BaseAudioHandler {
             artUri: Uri.parse(artwork_),
             artHeaders: artHeaders,
           ));
-          // currently there is no buffering state change event, so we assume media is buffering when metadata is changed until player state changed to playing.
+          // currently there is no buffering state change event, so we assume media is ready when metadata is changed until player state changed to playing.
           playbackState.add(playbackState.value
-              .copyWith(processingState: AudioProcessingState.buffering));
+              .copyWith(processingState: AudioProcessingState.ready));
         } else if (topic == 'player.duration_changed') {
           List<dynamic> args = json.decode(data);
           dynamic durationSeconds = args[0];
