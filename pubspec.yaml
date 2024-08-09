@@ -12,6 +12,7 @@ dependencies:
   flutter:
     sdk: flutter
 
+  get_it: ^7.7.0
   http: ^0.13.3
   web_socket_channel: ^2.1.0
 

@@ -1,12 +1,14 @@
 import 'dart:convert';
 
 import 'package:audio_service/audio_service.dart';
-import 'package:feeluownx/main.dart';
+import 'package:feeluownx/global.dart';
+
+import 'client.dart';
 
 class AudioPlayerHandler extends BaseAudioHandler {
-  final Client client;
+  final Client client = Global.getIt<Client>();
 
-  AudioPlayerHandler(this.client) {
+  AudioPlayerHandler() {
     initPlaybackState();
   }
 
@@ -70,7 +72,8 @@ class AudioPlayerHandler extends BaseAudioHandler {
             playbackState.add(playbackState.value.copyWith(playing: false));
           } else if (state == 2) {
             // currently there is no buffering state change event, so we assume media is ready when player state changed to playing.
-            playbackState.add(playbackState.value.copyWith(playing: true, processingState: AudioProcessingState.ready));
+            playbackState.add(playbackState.value.copyWith(
+                playing: true, processingState: AudioProcessingState.ready));
           }
         } else if (topic == 'player.metadata_changed') {
           print('pubsub: player metadata changed');
@@ -94,7 +97,8 @@ class AudioPlayerHandler extends BaseAudioHandler {
             artHeaders: artHeaders,
           ));
           // currently there is no buffering state change event, so we assume media is buffering when metadata is changed until player state changed to playing.
-          playbackState.add(playbackState.value.copyWith(processingState: AudioProcessingState.buffering));
+          playbackState.add(playbackState.value
+              .copyWith(processingState: AudioProcessingState.buffering));
         } else if (topic == 'player.duration_changed') {
           List<dynamic> args = json.decode(data);
           double durationSeconds = args[0];
