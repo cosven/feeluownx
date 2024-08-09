@@ -11,6 +11,7 @@ import 'global.dart';
 late AudioHandler _audioHandler;
 
 Future<void> main() async {
+  await Global.init();
   runApp(const App());
 }
 
