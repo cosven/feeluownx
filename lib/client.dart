@@ -58,7 +58,7 @@ class PubsubClient {
 
   Future<void> initClient() async {
     String? ip = (await prefs.getString(settingsKeyDaemonIp)) ?? "127.0.0.1";
-    url = "ws://$ip:23332";
+    url = "ws://$ip:23332/signal/v1";
   }
 
   Future<void> connect() async {
