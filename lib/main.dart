@@ -2,6 +2,7 @@ import 'dart:ffi';
 
 import 'package:audio_service/audio_service.dart';
 import 'package:feeluownx/player.dart';
+import 'package:feeluownx/settings.dart';
 import 'package:flutter/material.dart';
 import 'dart:convert';
 
@@ -36,7 +37,7 @@ class App extends StatelessWidget {
               Center(
                 child: PlayerControlPanel(),
               ),
-              Center(),
+              SettingPanel(),
             ]),
           )),
       // auto dark mode follows system settings
@@ -65,54 +66,55 @@ class _PlayerControlPanelState extends State<PlayerControlPanel> {
   @override
   void initState() {
     super.initState();
-    pubsubClient.connect();
-    pubsubClient.stream?.listen(
-      (message) {
-        _handler.handleMessage(message);
-        // print('recv pubsub msg: $message');
-        Map<String, dynamic> js = {};
-        try {
-          js = json.decode(message);
-        } catch (e) {
-          print('decode message failed: $e');
-        }
-        if (js.isNotEmpty) {
+    pubsubClient.connect().then((result) {
+      pubsubClient.stream?.listen(
+        (message) {
+          _handler.handleMessage(message);
+          // print('recv pubsub msg: $message');
+          Map<String, dynamic> js = {};
           try {
-            String topic = js['topic'];
-            String data = js['data']!;
-            if (topic == 'player.state_changed') {
-              print('pubsub: player state changed');
-              List<dynamic> args = json.decode(data);
-              int state = args[0];
-              setState(() {
-                playerState = state;
-              });
-            } else if (topic == 'player.metadata_changed') {
-              print('pubsub: player metadata changed');
-              List<dynamic> args = json.decode(data);
-              Map<String, dynamic> metadata = args[0];
-              String artwork_ = metadata['artwork'];
-              if (metadata['source'] == 'netease') {
-                artwork_ = artwork_.replaceFirst('https', 'http');
-              }
-              print('artwork changed to: $artwork_');
-              setState(() {
-                artwork = artwork_;
-              });
-            }
+            js = json.decode(message);
           } catch (e) {
-            print('handle message error: $e');
+            print('decode message failed: $e');
           }
-        }
-      },
-      onDone: () {
-        print('Websocket closed.');
-      },
-      onError: (error) {
-        print('Websocket error: $error');
-      },
-    );
-    initAudioHandler();
+          if (js.isNotEmpty) {
+            try {
+              String topic = js['topic'];
+              String data = js['data']!;
+              if (topic == 'player.state_changed') {
+                print('pubsub: player state changed');
+                List<dynamic> args = json.decode(data);
+                int state = args[0];
+                setState(() {
+                  playerState = state;
+                });
+              } else if (topic == 'player.metadata_changed') {
+                print('pubsub: player metadata changed');
+                List<dynamic> args = json.decode(data);
+                Map<String, dynamic> metadata = args[0];
+                String artwork_ = metadata['artwork'];
+                if (metadata['source'] == 'netease') {
+                  artwork_ = artwork_.replaceFirst('https', 'http');
+                }
+                print('artwork changed to: $artwork_');
+                setState(() {
+                  artwork = artwork_;
+                });
+              }
+            } catch (e) {
+              print('handle message error: $e');
+            }
+          }
+        },
+        onDone: () {
+          print('Websocket closed.');
+        },
+        onError: (error) {
+          print('Websocket error: $error');
+        },
+      );
+      initAudioHandler();
+    });
   }
 
   Future<void> initAudioHandler() async {

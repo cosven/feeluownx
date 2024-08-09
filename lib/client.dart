@@ -1,12 +1,24 @@
 import 'dart:convert';
 
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 import 'package:http/http.dart' as http;
 
 class Client {
-  // final String url = 'http://192.168.31.106:23332';
-  final String url = 'http://10.0.2.2:23332';
+  static const String settingsKeyDaemonIp = "settings_ip_address";
+  final SharedPreferencesAsync prefs = SharedPreferencesAsync();
+
+  String url = "";
   int rpcRequestId = 0;
+
+  Client() {
+    initClient();
+  }
+
+  Future<void> initClient() async {
+    String? ip = (await prefs.getString(settingsKeyDaemonIp)) ?? "127.0.0.1";
+    url = "http://$ip:23332";
+  }
 
   Future<Map<String, dynamic>?> jsonRpc(String method,
       {List<dynamic>? args}) async {
@@ -38,11 +50,19 @@ class Client {
 }
 
 class PubsubClient {
-  // final String url = 'ws://192.168.31.106:23332/signal/v1';
-  final String url = 'ws://10.0.2.2:23332/signal/v1';
+  static const String settingsKeyDaemonIp = "settings_ip_address";
+  final SharedPreferencesAsync prefs = SharedPreferencesAsync();
+
+  String url = "";
   WebSocketChannel? channel;
 
-  void connect() {
+  Future<void> initClient() async {
+    String? ip = (await prefs.getString(settingsKeyDaemonIp)) ?? "127.0.0.1";
+    url = "ws://$ip:23332";
+  }
+
+  Future<void> connect() async {
+    await initClient();
     channel = WebSocketChannel.connect(Uri.parse(url));
   }
 
