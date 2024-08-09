@@ -19,7 +19,7 @@ class AudioPlayerHandler extends BaseAudioHandler {
         MediaControl.stop
       ],
       androidCompactActionIndices: const [0, 1, 2],
-      processingState: AudioProcessingState.ready,
+      processingState: AudioProcessingState.idle,
       playing: false,
       updatePosition: const Duration(milliseconds: 0),
       speed: 1.0,
@@ -69,7 +69,8 @@ class AudioPlayerHandler extends BaseAudioHandler {
           if (state == 1) {
             playbackState.add(playbackState.value.copyWith(playing: false));
           } else if (state == 2) {
-            playbackState.add(playbackState.value.copyWith(playing: true));
+            // currently there is no buffering state change event, so we assume media is ready when player state changed to playing.
+            playbackState.add(playbackState.value.copyWith(playing: true, processingState: AudioProcessingState.ready));
           }
         } else if (topic == 'player.metadata_changed') {
           print('pubsub: player metadata changed');
@@ -92,6 +93,8 @@ class AudioPlayerHandler extends BaseAudioHandler {
             artUri: Uri.parse(artwork_),
             artHeaders: artHeaders,
           ));
+          // currently there is no buffering state change event, so we assume media is buffering when metadata is changed until player state changed to playing.
+          playbackState.add(playbackState.value.copyWith(processingState: AudioProcessingState.buffering));
         } else if (topic == 'player.duration_changed') {
           List<dynamic> args = json.decode(data);
           double durationSeconds = args[0];
