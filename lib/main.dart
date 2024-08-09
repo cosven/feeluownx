@@ -21,12 +21,24 @@ class App extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      home: Scaffold(
-        appBar: AppBar(title: const Text('FeelUOwn')),
-        body: const Center(
-          child: PlayerControlPanel(),
-        ),
-      ),
+      home: DefaultTabController(
+          length: 2,
+          child: Scaffold(
+            appBar: AppBar(
+              title: const Text('FeelUOwn'),
+              bottom: const TabBar(tabs: [
+                Tab(icon: Icon(Icons.home)),
+                Tab(icon: Icon(Icons.settings)),
+              ]),
+              bottomOpacity: .8,
+            ),
+            body: const TabBarView(children: [
+              Center(
+                child: PlayerControlPanel(),
+              ),
+              Center(),
+            ]),
+          )),
       // auto dark mode follows system settings
       themeMode: ThemeMode.system,
       theme: ThemeData.light(useMaterial3: true),
