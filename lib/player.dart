@@ -101,7 +101,7 @@ class AudioPlayerHandler extends BaseAudioHandler {
               .copyWith(processingState: AudioProcessingState.buffering));
         } else if (topic == 'player.duration_changed') {
           List<dynamic> args = json.decode(data);
-          double durationSeconds = args[0];
+          dynamic durationSeconds = args[0];
           mediaItem.add(mediaItem.value?.copyWith(
               duration:
                   Duration(milliseconds: (durationSeconds * 1000).round())));
