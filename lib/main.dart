@@ -25,6 +25,10 @@ class App extends StatelessWidget {
           child: PlayerControlPanel(),
         ),
       ),
+      // auto dark mode follows system settings
+      themeMode: ThemeMode.system,
+      theme: ThemeData.light(useMaterial3: true),
+      darkTheme: ThemeData.dark(useMaterial3: true),
     );
   }
 }
