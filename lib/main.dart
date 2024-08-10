@@ -3,6 +3,7 @@ import 'dart:ffi';
 import 'package:audio_service/audio_service.dart';
 import 'package:feeluownx/player.dart';
 import 'package:feeluownx/playlist_ui.dart';
+import 'package:feeluownx/search.dart';
 import 'package:feeluownx/settings.dart';
 import 'package:flutter/material.dart';
 import 'dart:convert';
@@ -24,13 +25,14 @@ class App extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       home: DefaultTabController(
-          length: 3,
+          length: 4,
           child: Scaffold(
             appBar: AppBar(
               title: const Text('FeelUOwn'),
               bottom: const TabBar(tabs: [
                 Tab(icon: Icon(Icons.home)),
                 Tab(icon: Icon(Icons.list)),
+                Tab(icon: Icon(Icons.search)),
                 Tab(icon: Icon(Icons.settings)),
               ]),
               bottomOpacity: .8,
@@ -40,6 +42,7 @@ class App extends StatelessWidget {
                 child: PlayerControlPanel(),
               ),
               PlaylistView(),
+              SearchPage(),
               SettingPanel(),
             ]),
           )),
