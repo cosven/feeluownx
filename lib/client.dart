@@ -16,12 +16,12 @@ class Client {
   }
 
   Future<void> initClient() async {
-    String? ip = (await prefs.getString(settingsKeyDaemonIp)) ?? "127.0.0.1";
+    String? ip =
+        (await prefs.getString(settingsKeyDaemonIp)) ?? "127.0.0.1";
     url = "http://$ip:23332";
   }
 
-  Future<Map<String, dynamic>?> jsonRpc(String method,
-      {List<dynamic>? args}) async {
+  Future<Object?> jsonRpc(String method, {List<dynamic>? args}) async {
     Map<String, dynamic> payload = {
       'jsonrpc': '2.0',
       'id': rpcRequestId,
@@ -57,7 +57,8 @@ class PubsubClient {
   WebSocketChannel? channel;
 
   Future<void> initClient() async {
-    String? ip = (await prefs.getString(settingsKeyDaemonIp)) ?? "127.0.0.1";
+    String? ip =
+        (await prefs.getString(settingsKeyDaemonIp)) ?? "127.0.0.1";
     url = "ws://$ip:23332/signal/v1";
   }
 
