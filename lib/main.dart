@@ -2,6 +2,7 @@ import 'dart:ffi';
 
 import 'package:audio_service/audio_service.dart';
 import 'package:feeluownx/player.dart';
+import 'package:feeluownx/playlist_ui.dart';
 import 'package:feeluownx/settings.dart';
 import 'package:flutter/material.dart';
 import 'dart:convert';
@@ -9,7 +10,7 @@ import 'dart:convert';
 import 'client.dart';
 import 'global.dart';
 
-late AudioHandler _audioHandler;
+AudioHandler? _audioHandler;
 
 Future<void> main() async {
   await Global.init();
@@ -23,12 +24,13 @@ class App extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       home: DefaultTabController(
-          length: 2,
+          length: 3,
           child: Scaffold(
             appBar: AppBar(
               title: const Text('FeelUOwn'),
               bottom: const TabBar(tabs: [
                 Tab(icon: Icon(Icons.home)),
+                Tab(icon: Icon(Icons.list)),
                 Tab(icon: Icon(Icons.settings)),
               ]),
               bottomOpacity: .8,
@@ -37,6 +39,7 @@ class App extends StatelessWidget {
               Center(
                 child: PlayerControlPanel(),
               ),
+              PlaylistView(),
               SettingPanel(),
             ]),
           )),
@@ -116,14 +119,15 @@ class _PlayerControlPanelState extends State<PlayerControlPanel> {
 
   Future<void> initAudioHandler() async {
     _handler = Global.getIt<AudioPlayerHandler>();
-    _audioHandler = await AudioService.init(
-      builder: () => _handler,
-      config: const AudioServiceConfig(
-        androidNotificationChannelId: 'io.github.feeluown',
-        androidNotificationChannelName: 'FeelUOwn',
-        androidNotificationOngoing: true,
-      ),
-    );
+    // 好像还是不行，这个地方有点问题
+    _audioHandler ??= await AudioService.init(
+        builder: () => _handler,
+        config: const AudioServiceConfig(
+          androidNotificationChannelId: 'io.github.feeluown',
+          androidNotificationChannelName: 'FeelUOwn',
+          androidNotificationOngoing: true,
+        ),
+      );
   }
 
   @override
