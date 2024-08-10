@@ -93,9 +93,6 @@ class _PlayerControlPanelState extends State<PlayerControlPanel> {
                 List<dynamic> args = json.decode(data);
                 Map<String, dynamic> metadata = args[0];
                 String artwork_ = metadata['artwork'];
-                if (metadata['source'] == 'netease') {
-                  artwork_ = artwork_.replaceFirst('https', 'http');
-                }
                 print('artwork changed to: $artwork_');
                 setState(() {
                   artwork = artwork_;
