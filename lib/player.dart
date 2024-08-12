@@ -7,9 +7,16 @@ import 'client.dart';
 
 class AudioPlayerHandler extends BaseAudioHandler {
   final Client client = Global.getIt<Client>();
+  final PubsubClient pubsubClient = Global.getIt<PubsubClient>();
+
+  void Function(dynamic event)? onData;
 
   AudioPlayerHandler() {
-    initPlaybackState();
+    pubsubClient.connect().then((result) {
+      pubsubClient.stream?.listen(onWebsocketData,
+          onError: onWebsocketError, onDone: onWebsocketDone);
+      initPlaybackState();
+    });
   }
 
   void initPlaybackState() {
@@ -117,5 +124,23 @@ class AudioPlayerHandler extends BaseAudioHandler {
         print('handle message error: $e');
       }
     }
+  }
+
+  /// 接收 WebSocket 消息
+  Future<void> onWebsocketData(event) async {
+    onData!(event);
+    return await handleMessage(event);
+  }
+
+  void listen(void Function(dynamic event) onData) {
+    this.onData = onData;
+  }
+
+  onWebsocketError(Object o, StackTrace trace) {
+    print(trace);
+  }
+
+  void onWebsocketDone() {
+    print("Websocket closed.");
   }
 }
