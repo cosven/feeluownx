@@ -5,6 +5,8 @@ import 'package:feeluownx/player.dart';
 import 'package:feeluownx/playlist_ui.dart';
 import 'package:feeluownx/settings.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'dart:convert';
 
 import 'client.dart';
@@ -23,15 +25,17 @@ class App extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      localizationsDelegates: AppLocalizations.localizationsDelegates,
+      supportedLocales: AppLocalizations.supportedLocales,
       home: DefaultTabController(
           length: 3,
           child: Scaffold(
-            appBar: AppBar(
+            bottomNavigationBar: AppBar(
               title: const Text('FeelUOwn'),
               bottom: const TabBar(tabs: [
-                Tab(icon: Icon(Icons.home)),
-                Tab(icon: Icon(Icons.list)),
-                Tab(icon: Icon(Icons.settings)),
+                Tab(icon: Icon(Icons.home), text: "Home"),
+                Tab(icon: Icon(Icons.list), text: "Playing"),
+                Tab(icon: Icon(Icons.settings), text: "Settings"),
               ]),
               bottomOpacity: .8,
             ),
@@ -121,13 +125,13 @@ class _PlayerControlPanelState extends State<PlayerControlPanel> {
     _handler = Global.getIt<AudioPlayerHandler>();
     // 好像还是不行，这个地方有点问题
     _audioHandler ??= await AudioService.init(
-        builder: () => _handler,
-        config: const AudioServiceConfig(
-          androidNotificationChannelId: 'io.github.feeluown',
-          androidNotificationChannelName: 'FeelUOwn',
-          androidNotificationOngoing: true,
-        ),
-      );
+      builder: () => _handler,
+      config: const AudioServiceConfig(
+        androidNotificationChannelId: 'io.github.feeluown',
+        androidNotificationChannelName: 'FeelUOwn',
+        androidNotificationOngoing: true,
+      ),
+    );
   }
 
   @override
