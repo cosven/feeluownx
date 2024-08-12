@@ -11,8 +11,24 @@ class AudioPlayerHandler extends BaseAudioHandler {
 
   void Function(dynamic event)? onData;
 
+  final Map<int, String> connectionStatusMap = {0: "已断开", 1: "已连接", 2: "异常"};
+
+  /// 0: 断开 1: 已连接 2: 错误
+  int connectionStatus = 0;
+  String connectionMsg = "";
+
+  String getConnectionStatusMsg() {
+    return connectionStatusMap[connectionStatus] ?? "";
+  }
+
   AudioPlayerHandler() {
+    init();
+  }
+
+  void init() {
     pubsubClient.connect().then((result) {
+      connectionStatus = 1;
+      connectionMsg = "";
       pubsubClient.stream?.listen(onWebsocketData,
           onError: onWebsocketError, onDone: onWebsocketDone);
       initPlaybackState();
@@ -137,10 +153,14 @@ class AudioPlayerHandler extends BaseAudioHandler {
   }
 
   onWebsocketError(Object o, StackTrace trace) {
+    connectionStatus = 2;
+    connectionMsg = trace.toString();
     print(trace);
   }
 
   void onWebsocketDone() {
+    connectionStatus = 0;
+    connectionMsg = "";
     print("Websocket closed.");
   }
 }

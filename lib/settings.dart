@@ -1,3 +1,5 @@
+import 'package:feeluownx/global.dart';
+import 'package:feeluownx/player.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_settings_ui/flutter_settings_ui.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -13,6 +15,7 @@ class SettingState extends State<SettingPanel> {
   static const String settingsKeyDaemonIp = "settings_ip_address";
 
   final SharedPreferencesAsync prefs = SharedPreferencesAsync();
+  final AudioPlayerHandler handler = Global.getIt<AudioPlayerHandler>();
 
   @override
   Widget build(BuildContext context) {
@@ -28,8 +31,8 @@ class SettingState extends State<SettingPanel> {
                 return Text(snapshot.hasData ? snapshot.data! : "");
               }),
           onPressed: (BuildContext context) async {
-            String? value = await showInputDialog(context, const Text("Instance IP"),
-                "The IP Address of FeelUOwn daemon");
+            String? value = await showInputDialog(context,
+                const Text("Instance IP"), "The IP Address of FeelUOwn daemon");
             if (value != null) {
               setState(() {
                 prefs.setString(settingsKeyDaemonIp, value);
@@ -37,11 +40,23 @@ class SettingState extends State<SettingPanel> {
             }
           },
         ),
+        SettingsTile(
+          title: const Text("WebSocket status"),
+          description: Text(
+              "${handler.getConnectionStatusMsg()} ${handler.connectionMsg} (Click to reconnect)"),
+          leading: const Icon(Icons.private_connectivity),
+          onPressed: (BuildContext context) {
+            if (handler.connectionStatus != 1) {
+              handler.init();
+            }
+          },
+        ),
       ])
     ]);
   }
 
-  Future<String?> showInputDialog(BuildContext context, Text title, String hintText) async {
+  Future<String?> showInputDialog(
+      BuildContext context, Text title, String hintText) async {
     TextEditingController controller = TextEditingController();
     return await showDialog(
         context: context,
