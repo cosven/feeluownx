@@ -5,7 +5,6 @@ import 'package:feeluownx/player.dart';
 import 'package:feeluownx/playlist_ui.dart';
 import 'package:feeluownx/settings.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'dart:convert';
 
@@ -68,7 +67,7 @@ class _PlayerControlPanelState extends State<PlayerControlPanel> {
 
   final Client client = Global.getIt<Client>();
   final PubsubClient pubsubClient = Global.getIt<PubsubClient>();
-  late AudioPlayerHandler _handler;
+  late final AudioPlayerHandler _handler = Global.getIt<AudioPlayerHandler>();
 
   @override
   void initState() {
@@ -117,21 +116,7 @@ class _PlayerControlPanelState extends State<PlayerControlPanel> {
           print('Websocket error: $error');
         },
       );
-      initAudioHandler();
     });
-  }
-
-  Future<void> initAudioHandler() async {
-    _handler = Global.getIt<AudioPlayerHandler>();
-    // 好像还是不行，这个地方有点问题
-    _audioHandler ??= await AudioService.init(
-      builder: () => _handler,
-      config: const AudioServiceConfig(
-        androidNotificationChannelId: 'io.github.feeluown',
-        androidNotificationChannelName: 'FeelUOwn',
-        androidNotificationOngoing: true,
-      ),
-    );
   }
 
   @override
