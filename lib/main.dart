@@ -18,39 +18,48 @@ Future<void> main() async {
   runApp(const App());
 }
 
-class App extends StatelessWidget {
+class App extends StatefulWidget {
   const App({super.key});
+
+  @override
+  State<StatefulWidget> createState() => AppState();
+}
+
+class AppState extends State<App> {
+  int currentIndex = 0;
+  final List<Widget> children = [
+    const PlayerControlPanel(),
+    const PlaylistView(),
+    const SettingPanel(),
+  ];
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       localizationsDelegates: AppLocalizations.localizationsDelegates,
       supportedLocales: AppLocalizations.supportedLocales,
-      home: DefaultTabController(
-          length: 3,
-          child: Scaffold(
-            bottomNavigationBar: AppBar(
-              title: const Text('FeelUOwn'),
-              bottom: const TabBar(tabs: [
-                Tab(icon: Icon(Icons.home), text: "Home"),
-                Tab(icon: Icon(Icons.list), text: "Playing"),
-                Tab(icon: Icon(Icons.settings), text: "Settings"),
-              ]),
-              bottomOpacity: .8,
-            ),
-            body: const TabBarView(children: [
-              Center(
-                child: PlayerControlPanel(),
-              ),
-              PlaylistView(),
-              SettingPanel(),
-            ]),
-          )),
+      home: Scaffold(
+        appBar: AppBar(
+          title: const Text('FeelUOwn'),
+        ),
+        body: children[currentIndex],
+        bottomNavigationBar: BottomNavigationBar(items: const [
+          BottomNavigationBarItem(icon: Icon(Icons.home), label: "Home"),
+          BottomNavigationBarItem(icon: Icon(Icons.list), label: "Playing"),
+          BottomNavigationBarItem(icon: Icon(Icons.settings), label: "Settings")
+        ], currentIndex: currentIndex, onTap: onTabChange),
+      ),
       // auto dark mode follows system settings
       themeMode: ThemeMode.system,
       theme: ThemeData.light(useMaterial3: true),
       darkTheme: ThemeData.dark(useMaterial3: true),
     );
+  }
+
+  void onTabChange(int index) {
+    setState(() {
+      currentIndex = index;
+    });
   }
 }
 
