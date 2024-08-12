@@ -71,41 +71,43 @@ class _PlayerControlPanelState extends State<PlayerControlPanel> {
   @override
   void initState() {
     super.initState();
-    _handler.listen((message) {
-      print("listen ===== $message");
-      // print('recv pubsub msg: $message');
-      Map<String, dynamic> js = {};
+    _handler.listen(handleWebsocketMsg);
+  }
+
+  void handleWebsocketMsg(dynamic message) {
+    print("listen ===== $message");
+    // print('recv pubsub msg: $message');
+    Map<String, dynamic> js = {};
+    try {
+      js = json.decode(message);
+    } catch (e) {
+      print('decode message failed: $e');
+    }
+    if (js.isNotEmpty) {
       try {
-        js = json.decode(message);
-      } catch (e) {
-        print('decode message failed: $e');
-      }
-      if (js.isNotEmpty) {
-        try {
-          String topic = js['topic'];
-          String data = js['data']!;
-          if (topic == 'player.state_changed') {
-            print('pubsub: player state changed');
-            List<dynamic> args = json.decode(data);
-            int state = args[0];
-            setState(() {
-              playerState = state;
-            });
-          } else if (topic == 'player.metadata_changed') {
-            print('pubsub: player metadata changed');
-            List<dynamic> args = json.decode(data);
-            Map<String, dynamic> metadata = args[0];
-            String artwork_ = metadata['artwork'];
-            print('artwork changed to: $artwork_');
-            setState(() {
-              artwork = artwork_;
-            });
-          }
-        } catch (e) {
-          print('handle message error: $e');
+        String topic = js['topic'];
+        String data = js['data']!;
+        if (topic == 'player.state_changed') {
+          print('pubsub: player state changed');
+          List<dynamic> args = json.decode(data);
+          int state = args[0];
+          setState(() {
+            playerState = state;
+          });
+        } else if (topic == 'player.metadata_changed') {
+          print('pubsub: player metadata changed');
+          List<dynamic> args = json.decode(data);
+          Map<String, dynamic> metadata = args[0];
+          String artwork_ = metadata['artwork'];
+          print('artwork changed to: $artwork_');
+          setState(() {
+            artwork = artwork_;
+          });
         }
+      } catch (e) {
+        print('handle message error: $e');
       }
-    });
+    }
   }
 
   @override
