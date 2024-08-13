@@ -51,4 +51,4 @@ jobs:
     - uses: actions/upload-artifact@v4
       with:
         name: release-apks
-        path: build/app/outputs/apk/release/
+        path: build/app/outputs/apk/release/*-signed.apk
