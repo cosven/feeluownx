@@ -82,6 +82,11 @@ class AudioPlayerHandler extends BaseAudioHandler with SeekHandler {
   }
 
   @override
+  Future<void> playFromUri(Uri uri, [Map<String, dynamic>? extras]) {
+    return client.jsonRpc('lambda: app.playlist.play_model(resolve("$uri"))');
+  }
+
+  @override
   Future<void> seek(Duration position) async {
     int mills = position.inMilliseconds;
     client.jsonRpc("lambda: app.player.position = $mills");
