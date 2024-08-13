@@ -18,6 +18,8 @@ dependencies:
   get_it: ^7.7.0
   http: ^0.13.3
   intl: any
+  optimize_battery: ^0.0.4
+  permission_handler: ^11.3.1
   shared_preferences: ^2.3.1
   web_socket_channel: ^2.1.0
 

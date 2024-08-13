@@ -2,6 +2,8 @@ import 'package:feeluownx/global.dart';
 import 'package:feeluownx/player.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_settings_ui/flutter_settings_ui.dart';
+import 'package:optimize_battery/optimize_battery.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class SettingPanel extends StatefulWidget {
@@ -46,12 +48,64 @@ class SettingState extends State<SettingPanel> {
               "${handler.getConnectionStatusMsg()} ${handler.connectionMsg} (Click to reconnect)"),
           leading: const Icon(Icons.private_connectivity),
           onPressed: (BuildContext context) {
+            Permission.notification.isPermanentlyDenied
+                .then((bool value) async {
+              if (context.mounted) {
+                ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                    content: Text("Please enable notification permission")));
+              }
+              await openAppSettings();
+            });
+            Permission.notification.isDenied.then((bool value) async {
+              await Permission.notification.request();
+            });
             if (handler.connectionStatus != 1) {
               handler.init();
             }
           },
         ),
-      ])
+      ]),
+      SettingsSection(title: const Text("Permissions"), tiles: [
+        SettingsTile(
+            title: const Text("Notification"),
+            leading: const Icon(Icons.notifications),
+            value: FutureBuilder(
+                future: Permission.notification.isGranted,
+                builder: (BuildContext context, AsyncSnapshot<bool> snapshot) {
+                  if (snapshot.data == null) {
+                    return const Text("点击授权");
+                  }
+                  return Text(snapshot.data! ? "已授权" : "点击授权");
+                }),
+            onPressed: (BuildContext context) {
+              Permission.notification.isPermanentlyDenied
+                  .then((bool value) async {
+                if (context.mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                      content: Text("Please enable notification permission")));
+                  await openAppSettings();
+                }
+              });
+              Permission.notification.isDenied.then((bool value) async {
+                await Permission.notification.request();
+              });
+            }),
+        SettingsTile(
+          title: const Text("Background"),
+          leading: const Icon(Icons.battery_4_bar),
+          value: FutureBuilder(
+              future: OptimizeBattery.isIgnoringBatteryOptimizations(),
+              builder: (BuildContext context, AsyncSnapshot<bool> snapshot) {
+                if (snapshot.data == null) {
+                  return const Text("点击授权");
+                }
+                return Text(snapshot.data! ? "已授权" : "点击授权");
+              }),
+          onPressed: (BuildContext context) {
+            OptimizeBattery.stopOptimizingBatteryUsage();
+          },
+        )
+      ]),
     ]);
   }
 
