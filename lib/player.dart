@@ -11,6 +11,9 @@ class AudioPlayerHandler extends BaseAudioHandler with SeekHandler {
 
   void Function(dynamic event)? onData;
 
+  Map<String, dynamic>? currentMetadata;
+  int? currentState;
+
   final Map<int, String> connectionStatusMap = {0: "已断开", 1: "已连接", 2: "异常"};
 
   /// 0: 断开 1: 已连接 2: 错误
@@ -98,6 +101,7 @@ class AudioPlayerHandler extends BaseAudioHandler with SeekHandler {
         if (topic == 'player.state_changed') {
           List<dynamic> args = json.decode(data);
           int state = args[0];
+          currentState = state;
           if (state == 1) {
             playbackState.add(playbackState.value.copyWith(playing: false));
           } else if (state == 2) {
@@ -109,7 +113,7 @@ class AudioPlayerHandler extends BaseAudioHandler with SeekHandler {
           print('pubsub: player metadata changed');
           List<dynamic> args = json.decode(data);
           Map<String, dynamic> metadata = args[0];
-          print(metadata);
+          currentMetadata = metadata;
           String artwork_ = metadata['artwork'];
           Map<String, String> artHeaders = {};
           if (metadata['source'] == 'netease') {

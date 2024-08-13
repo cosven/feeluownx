@@ -89,6 +89,17 @@ class _PlayerControlPanelState extends State<PlayerControlPanel> {
   @override
   void initState() {
     super.initState();
+    if (_handler.currentMetadata != null) {
+      String artwork_ = _handler.currentMetadata!['artwork'];
+      setState(() {
+        artwork = artwork_;
+      });
+    }
+    if (_handler.currentState != null) {
+      setState(() {
+        playerState = _handler.currentState!;
+      });
+    }
     _handler.listen(handleWebsocketMsg);
   }
 
