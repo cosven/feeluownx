@@ -5,7 +5,7 @@ import 'package:feeluownx/global.dart';
 
 import 'client.dart';
 
-class AudioPlayerHandler extends BaseAudioHandler {
+class AudioPlayerHandler extends BaseAudioHandler with SeekHandler {
   final Client client = Global.getIt<Client>();
   final PubsubClient pubsubClient = Global.getIt<PubsubClient>();
 
@@ -43,6 +43,7 @@ class AudioPlayerHandler extends BaseAudioHandler {
         MediaControl.skipToPrevious,
         MediaControl.stop
       ],
+      systemActions: const {MediaAction.seek},
       androidCompactActionIndices: const [0, 1, 2],
       processingState: AudioProcessingState.idle,
       playing: false,
@@ -75,6 +76,12 @@ class AudioPlayerHandler extends BaseAudioHandler {
   @override
   Future<void> skipToNext() {
     return client.jsonRpc('app.playlist.next');
+  }
+
+  @override
+  Future<void> seek(Duration position) async {
+    int mills = position.inMilliseconds;
+    client.jsonRpc("lambda: app.player.position = $mills");
   }
 
   Future<void> handleMessage(message) async {
