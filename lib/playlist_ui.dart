@@ -21,7 +21,7 @@ class _PlaylistState extends State<PlaylistView> {
 
   Future<void> _fetchPlaylist() async {
     List<dynamic>? songs1 =
-        (await client.jsonRpc('app.playlist.list')) as List<dynamic>?;
+    (await client.jsonRpc('app.playlist.list')) as List<dynamic>?;
     if (songs1 == null) {
       return;
     }
@@ -44,11 +44,15 @@ class _PlaylistState extends State<PlaylistView> {
                 // Run the following command before using this feature.
                 //   fuo exec "from feeluown.library import resolve"
                 // TODO: implement deserialization in the feeluown daemon.
-                client.jsonRpc('lambda: app.playlist.play_model(resolve("$uri"))');
+                client.jsonRpc(
+                    'lambda: app.playlist.play_model(resolve("$uri"))');
               },
-              child: Container(
-                height: 50,
-                child: Text('${songs[index]['title']}'),
+              child: Card(
+                margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                child: Padding(
+                  padding: const EdgeInsets.all(10),
+                  child: Text('${songs[index]['title']}'),
+                ),
               ));
         });
   }

@@ -3,6 +3,7 @@ import 'dart:ffi';
 import 'package:audio_service/audio_service.dart';
 import 'package:feeluownx/player.dart';
 import 'package:feeluownx/playlist_ui.dart';
+import 'package:feeluownx/search.dart';
 import 'package:feeluownx/settings.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
@@ -48,6 +49,14 @@ class AppState extends State<App> {
           BottomNavigationBarItem(icon: Icon(Icons.list), label: "Playing"),
           BottomNavigationBarItem(icon: Icon(Icons.settings), label: "Settings")
         ], currentIndex: currentIndex, onTap: onTabChange),
+        floatingActionButton: Builder(
+            builder: (context) => FloatingActionButton(
+                onPressed: () async {
+                  await showSearch(
+                      context: context,
+                      delegate: Global.getIt<SongSearchDelegate>());
+                },
+                child: const Icon(Icons.search))),
       ),
       // auto dark mode follows system settings
       themeMode: ThemeMode.system,
