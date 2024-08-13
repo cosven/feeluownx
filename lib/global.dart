@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:audio_service/audio_service.dart';
 import 'package:feeluownx/client.dart';
 import 'package:feeluownx/player.dart';
+import 'package:feeluownx/search.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 
@@ -16,6 +17,7 @@ class Global {
     getIt.registerSingleton<PubsubClient>(PubsubClient());
     getIt.registerSingleton<AudioPlayerHandler>(AudioPlayerHandler());
     getIt.registerSingleton<AudioHandler>(await initAudioHandler());
+    getIt.registerSingleton<SongSearchDelegate>(SongSearchDelegate());
     HttpOverrides.global = _HttpOverrides();
   }
 

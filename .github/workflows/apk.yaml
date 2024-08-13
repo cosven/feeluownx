@@ -6,6 +6,7 @@ on:
   push:
     branches:
     - master
+  workflow_dispatch:
     
 # on: push    # Default will running for every branch.
     
@@ -37,8 +38,8 @@ jobs:
     - name: Create key.properties
       run: |
         echo "storePassword=${{ secrets.KEYSTORE_PASSWORD }}" > android/key.properties
-        echo "keyPassword=${{ secrets.KEY_PASSWORD }}" >> android/key.properties
-        echo "keyAlias=${{ secrets.KEY_ALIAS }}" >> android/key.properties
+        echo "keyPassword=${{ secrets.KEYSTORE_KEY_PASSWORD }}" >> android/key.properties
+        echo "keyAlias=${{ secrets.KEYSTORE_KEY_ALIAS }}" >> android/key.properties
         echo "storeFile=keystore.jks" >> android/key.properties
     
     # Build apk.
