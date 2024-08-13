@@ -151,7 +151,11 @@ class AudioPlayerHandler extends BaseAudioHandler with SeekHandler {
 
   /// 接收 WebSocket 消息
   Future<void> onWebsocketData(event) async {
-    onData!(event);
+    try {
+      onData!(event);
+    } catch (err) {
+      print("onWebsocketData error: $err");
+    }
     return await handleMessage(event);
   }
 
