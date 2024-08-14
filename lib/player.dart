@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:audio_service/audio_service.dart';
+import 'package:feeluownx/bean/player_state.dart';
 import 'package:feeluownx/global.dart';
 
 import 'client.dart';
@@ -9,10 +10,7 @@ class AudioPlayerHandler extends BaseAudioHandler with SeekHandler {
   final Client client = Global.getIt<Client>();
   final PubsubClient pubsubClient = Global.getIt<PubsubClient>();
 
-  void Function(dynamic event)? onData;
-
-  Map<String, dynamic>? currentMetadata;
-  int? currentState;
+  PlayerState playerState = PlayerState();
 
   final Map<int, String> connectionStatusMap = {0: "已断开", 1: "已连接", 2: "异常"};
 
@@ -106,7 +104,7 @@ class AudioPlayerHandler extends BaseAudioHandler with SeekHandler {
         if (topic == 'player.state_changed') {
           List<dynamic> args = json.decode(data);
           int state = args[0];
-          currentState = state;
+          playerState.setPlayState(state);
           if (state == 1) {
             playbackState.add(playbackState.value.copyWith(playing: false));
           } else if (state == 2) {
@@ -118,7 +116,7 @@ class AudioPlayerHandler extends BaseAudioHandler with SeekHandler {
           print('pubsub: player metadata changed');
           List<dynamic> args = json.decode(data);
           Map<String, dynamic> metadata = args[0];
-          currentMetadata = metadata;
+          playerState.setMetadata(metadata);
           String artwork_ = metadata['artwork'];
           Map<String, String> artHeaders = {};
           if (metadata['source'] == 'netease') {
@@ -160,16 +158,7 @@ class AudioPlayerHandler extends BaseAudioHandler with SeekHandler {
 
   /// 接收 WebSocket 消息
   Future<void> onWebsocketData(event) async {
-    try {
-      onData!(event);
-    } catch (err) {
-      print("onWebsocketData error: $err");
-    }
     return await handleMessage(event);
-  }
-
-  void listen(void Function(dynamic event) onData) {
-    this.onData = onData;
   }
 
   onWebsocketError(Object o, StackTrace trace) {

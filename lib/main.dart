@@ -7,8 +7,10 @@ import 'package:feeluownx/search.dart';
 import 'package:feeluownx/settings.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:provider/provider.dart';
 import 'dart:convert';
 
+import 'bean/player_state.dart';
 import 'client.dart';
 import 'global.dart';
 
@@ -80,63 +82,12 @@ class PlayerControlPanel extends StatefulWidget {
 }
 
 class _PlayerControlPanelState extends State<PlayerControlPanel> {
-  int playerState = 1; // 2:playing, 1:paused
-  String artwork = '';
-
   final Client client = Global.getIt<Client>();
   late final AudioPlayerHandler _handler = Global.getIt<AudioPlayerHandler>();
 
   @override
   void initState() {
     super.initState();
-    if (_handler.currentMetadata != null) {
-      String artwork_ = _handler.currentMetadata!['artwork'];
-      setState(() {
-        artwork = artwork_;
-      });
-    }
-    if (_handler.currentState != null) {
-      setState(() {
-        playerState = _handler.currentState!;
-      });
-    }
-    _handler.listen(handleWebsocketMsg);
-  }
-
-  void handleWebsocketMsg(dynamic message) {
-    print("listen ===== $message");
-    // print('recv pubsub msg: $message');
-    Map<String, dynamic> js = {};
-    try {
-      js = json.decode(message);
-    } catch (e) {
-      print('decode message failed: $e');
-    }
-    if (js.isNotEmpty) {
-      try {
-        String topic = js['topic'];
-        String data = js['data']!;
-        if (topic == 'player.state_changed') {
-          print('pubsub: player state changed');
-          List<dynamic> args = json.decode(data);
-          int state = args[0];
-          setState(() {
-            playerState = state;
-          });
-        } else if (topic == 'player.metadata_changed') {
-          print('pubsub: player metadata changed');
-          List<dynamic> args = json.decode(data);
-          Map<String, dynamic> metadata = args[0];
-          String artwork_ = metadata['artwork'];
-          print('artwork changed to: $artwork_');
-          setState(() {
-            artwork = artwork_;
-          });
-        }
-      } catch (e) {
-        print('handle message error: $e');
-      }
-    }
   }
 
   @override
@@ -145,46 +96,55 @@ class _PlayerControlPanelState extends State<PlayerControlPanel> {
   }
 
   bool _isPlaying() {
-    return playerState == 2;
+    return _handler.playerState.playState == 2;
   }
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: <Widget>[
-        artwork.isNotEmpty
-            ? Image.network(artwork,
-                errorBuilder: (context, exception, stackTrack) =>
-                    Text("fetch artwork failed"))
-            : Text('No artwork'),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          mainAxisSize: MainAxisSize.max,
-          children: [
-            IconButton(
-              icon: const Icon(Icons.skip_previous_rounded),
-              onPressed: () {
-                client.jsonRpc('app.playlist.previous');
-              },
-            ),
-            IconButton(
-                icon: Icon(_isPlaying()
-                    ? Icons.pause_rounded
-                    : Icons.play_arrow_rounded),
-                tooltip: 'Toggle',
-                onPressed: () {
-                  client.jsonRpc('app.player.toggle');
-                }),
-            IconButton(
-              icon: const Icon(Icons.skip_next_rounded),
-              onPressed: () {
-                client.jsonRpc('app.playlist.next');
-              },
-            ),
-          ],
-        )
-      ],
-    );
+    return ChangeNotifierProvider(
+        create: (_) => _handler.playerState,
+        child: Consumer<PlayerState>(builder: (_, playerState, __) {
+          print("=== playerState changed notify $playerState");
+          String artwork = "";
+          if (playerState.metadata != null) {
+            String artwork = playerState.metadata!['artwork'];
+          }
+          return Column(
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              artwork.isNotEmpty
+                  ? Image.network(artwork,
+                      errorBuilder: (context, exception, stackTrack) =>
+                          const Text("fetch artwork failed"))
+                  : const Text('No artwork'),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                mainAxisSize: MainAxisSize.max,
+                children: [
+                  IconButton(
+                    icon: const Icon(Icons.skip_previous_rounded),
+                    onPressed: () {
+                      client.jsonRpc('app.playlist.previous');
+                    },
+                  ),
+                  IconButton(
+                      icon: Icon(_isPlaying()
+                          ? Icons.pause_rounded
+                          : Icons.play_arrow_rounded),
+                      tooltip: 'Toggle',
+                      onPressed: () {
+                        client.jsonRpc('app.player.toggle');
+                      }),
+                  IconButton(
+                    icon: const Icon(Icons.skip_next_rounded),
+                    onPressed: () {
+                      client.jsonRpc('app.playlist.next');
+                    },
+                  ),
+                ],
+              )
+            ],
+          );
+        }));
   }
 }
