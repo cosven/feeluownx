@@ -104,10 +104,9 @@ class _PlayerControlPanelState extends State<PlayerControlPanel> {
     return ChangeNotifierProvider(
         create: (_) => _handler.playerState,
         child: Consumer<PlayerState>(builder: (_, playerState, __) {
-          print("=== playerState changed notify $playerState");
           String artwork = "";
           if (playerState.metadata != null) {
-            String artwork = playerState.metadata!['artwork'];
+            artwork = playerState.metadata?['artwork'];
           }
           return Column(
             mainAxisSize: MainAxisSize.min,
