@@ -47,18 +47,17 @@ class SettingState extends State<SettingPanel> {
           description: Text(
               "${handler.getConnectionStatusMsg()} ${handler.connectionMsg} (Click to reconnect)"),
           leading: const Icon(Icons.private_connectivity),
-          onPressed: (BuildContext context) {
-            Permission.notification.isPermanentlyDenied
-                .then((bool value) async {
+          onPressed: (BuildContext context) async {
+            if (await Permission.notification.isPermanentlyDenied) {
               if (context.mounted) {
                 ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
                     content: Text("Please enable notification permission")));
               }
               await openAppSettings();
-            });
-            Permission.notification.isDenied.then((bool value) async {
+            }
+            if (await Permission.notification.isDenied) {
               await Permission.notification.request();
-            });
+            }
             if (handler.connectionStatus != 1) {
               handler.init();
             }
@@ -77,18 +76,21 @@ class SettingState extends State<SettingPanel> {
                   }
                   return Text(snapshot.data! ? "已授权" : "点击授权");
                 }),
-            onPressed: (BuildContext context) {
-              Permission.notification.isPermanentlyDenied
-                  .then((bool value) async {
+            onPressed: (BuildContext context) async {
+              if (await Permission.notification.isPermanentlyDenied) {
                 if (context.mounted) {
                   ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
                       content: Text("Please enable notification permission")));
-                  await openAppSettings();
                 }
-              });
-              Permission.notification.isDenied.then((bool value) async {
+                await openAppSettings();
+              }
+              if (await Permission.notification.isDenied) {
                 await Permission.notification.request();
-              });
+              }
+              if (await Permission.notification.isGranted && context.mounted) {
+                ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                    content: Text("Permission has been granted")));
+              }
             }),
         SettingsTile(
           title: const Text("Background"),
