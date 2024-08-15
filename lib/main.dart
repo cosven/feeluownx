@@ -101,8 +101,8 @@ class _PlayerControlPanelState extends State<PlayerControlPanel> {
 
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider(
-        create: (_) => _handler.playerState,
+    return ChangeNotifierProvider.value(
+        value: _handler.playerState,
         child: Consumer<PlayerState>(builder: (_, playerState, __) {
           String artwork = "";
           if (playerState.metadata != null) {
