@@ -122,8 +122,8 @@ class _PlayerControlPanelState extends State<PlayerControlPanel> {
                 children: [
                   IconButton(
                     icon: const Icon(Icons.skip_previous_rounded),
-                    onPressed: () {
-                      client.jsonRpc('app.playlist.previous');
+                    onPressed: () async {
+                      await _handler.skipToPrevious();
                     },
                   ),
                   IconButton(
@@ -131,13 +131,13 @@ class _PlayerControlPanelState extends State<PlayerControlPanel> {
                           ? Icons.pause_rounded
                           : Icons.play_arrow_rounded),
                       tooltip: 'Toggle',
-                      onPressed: () {
-                        client.jsonRpc('app.player.toggle');
+                      onPressed: () async {
+                        await _handler.play();
                       }),
                   IconButton(
                     icon: const Icon(Icons.skip_next_rounded),
-                    onPressed: () {
-                      client.jsonRpc('app.playlist.next');
+                    onPressed: () async {
+                      await _handler.skipToNext();
                     },
                   ),
                 ],
