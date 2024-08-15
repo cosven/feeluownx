@@ -86,7 +86,7 @@ class AudioPlayerHandler extends BaseAudioHandler with SeekHandler {
 
   @override
   Future<void> seek(Duration position) async {
-    int mills = position.inMilliseconds;
+    int mills = position.inSeconds;
     client.jsonRpc("lambda: setattr(app.player, 'position', $mills)");
   }
 
