@@ -90,6 +90,28 @@ class AudioPlayerHandler extends BaseAudioHandler with SeekHandler {
     client.jsonRpc("lambda: setattr(app.player, 'position', $mills)");
   }
 
+  @override
+  Future<List<MediaItem>> search(String query,
+      [Map<String, dynamic>? extras]) async {
+    Object? data =
+        await client.jsonRpc("lambda: list(app.library.search('$query'))");
+    if (data == null) {
+      return [];
+    }
+    List<MediaItem> songListMerged = [];
+    List<dynamic> dataList = data as List<dynamic>;
+    for (dynamic data in dataList) {
+      Map<String, dynamic> dataMap = data as Map<String, dynamic>;
+      if (dataMap['songs'] == null) {
+        continue;
+      }
+      List<MediaItem> songList =
+          mapSongToMediaItem(dataMap['songs'] as List<dynamic>);
+      songListMerged.addAll(songList);
+    }
+    return songListMerged;
+  }
+
   Future<void> handleMessage(message) async {
     Map<String, dynamic> js = {};
     try {
@@ -171,5 +193,20 @@ class AudioPlayerHandler extends BaseAudioHandler with SeekHandler {
     connectionStatus = 0;
     connectionMsg = "";
     print("Websocket closed.");
+  }
+
+  List<MediaItem> mapSongToMediaItem(List<dynamic> dataList) {
+    List<MediaItem> items = [];
+    for (dynamic value in dataList) {
+      items.add(MediaItem(
+          id: value['uri'] ?? '',
+          title: value['title'] ?? '',
+          artist: value['artists_name'] ?? '',
+          extras: {
+            'provider': value['provider'] ?? '',
+            'uri': value['uri'] ?? ''
+          }));
+    }
+    return items;
   }
 }

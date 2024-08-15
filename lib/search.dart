@@ -1,3 +1,4 @@
+import 'package:audio_service/audio_service.dart';
 import 'package:feeluownx/player.dart';
 import 'package:flutter/material.dart';
 
@@ -33,25 +34,15 @@ class SongSearchDelegate extends SearchDelegate<String> {
   @override
   Widget buildResults(BuildContext context) {
     return FutureBuilder(
-        future: client.jsonRpc("lambda: list(app.library.search('$query'))"),
+        future: handler.search(query),
         builder: (context, snapshot) {
           print(snapshot.data);
           if (snapshot.data == null) {
             return ListView();
           }
-          List<dynamic> songListMerged = [];
-          List<dynamic> dataList = snapshot.data! as List<dynamic>;
-          for (dynamic data in dataList) {
-            Map<String, dynamic> dataMap = data as Map<String, dynamic>;
-            if (dataMap['songs'] == null) {
-              continue;
-            }
-            List<dynamic> songList = dataMap['songs'] as List<dynamic>;
-            songListMerged.addAll(songList);
-          }
-          print("======== $songListMerged");
+          List<MediaItem> songList = snapshot.data!;
           return ListView.builder(
-              itemCount: songListMerged.length,
+              itemCount: songList.length,
               itemBuilder: (context, index) {
                 return Card(
                   margin:
@@ -62,18 +53,19 @@ class SongSearchDelegate extends SearchDelegate<String> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(songListMerged[index]['title'],
+                          Text(songList[index].title,
                               style: const TextStyle(
                                   fontWeight: FontWeight.w600, fontSize: 16)),
-                          Text(songListMerged[index]['artists_name'],
+                          Text(songList[index].artist ?? '',
                               style: const TextStyle(fontSize: 14)),
-                          Text(songListMerged[index]['provider'],
-                              style: const TextStyle(fontSize: 10, color: Colors.grey)),
+                          Text(songList[index].extras?['provider'] ?? '',
+                              style: const TextStyle(
+                                  fontSize: 10, color: Colors.grey)),
                         ],
                       ),
                     ),
                     onTap: () {
-                      String uri = songListMerged[index]['uri'] as String;
+                      String uri = songList[index].extras?['uri'] ?? '';
                       // Run the following command before using this feature.
                       //   fuo exec "from feeluown.library import resolve"
                       // TODO: implement deserialization in the feeluown daemon.
