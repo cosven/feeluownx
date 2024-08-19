@@ -10,9 +10,29 @@ class SongSearchDelegate extends SearchDelegate<String> {
   final Client client = Global.getIt<Client>();
   final AudioPlayerHandler handler = Global.getIt<AudioPlayerHandler>();
 
+  String searchType = "song";
+
   @override
   List<Widget>? buildActions(BuildContext context) {
     return [
+      DropdownMenu(
+          dropdownMenuEntries: const [
+            DropdownMenuEntry(value: "song", label: "Song", leadingIcon: Icon(Icons.music_note)),
+            DropdownMenuEntry(value: "playlist", label: "Playlist", leadingIcon: Icon(Icons.playlist_play_sharp)),
+          ],
+          initialSelection: searchType,
+          enableSearch: false,
+          enableFilter: false,
+          requestFocusOnTap: false,
+          leadingIcon: const Icon(Icons.filter_alt),
+          label: const Text('Type'),
+          inputDecorationTheme: const InputDecorationTheme(
+            filled: true,
+            contentPadding: EdgeInsets.symmetric(vertical: 5.0),
+          ),
+          onSelected: (value) {
+            searchType = value ?? "song";
+          }),
       IconButton(
         icon: const Icon(Icons.clear),
         onPressed: () {
