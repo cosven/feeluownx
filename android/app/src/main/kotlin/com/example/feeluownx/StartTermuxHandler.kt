@@ -26,4 +26,8 @@ class StartTermuxHandler(private val context: Context) : MethodChannel.MethodCal
             result.notImplemented();
         }
     }
+
+    companion object {
+        const val CHANNEL = "channel.feeluown/start_termux"
+    }
 }
