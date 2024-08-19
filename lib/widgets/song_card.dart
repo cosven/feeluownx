@@ -1,5 +1,6 @@
 import 'package:audio_service/audio_service.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 import '../global.dart';
 import '../player.dart';
@@ -38,6 +39,36 @@ class SongCard extends StatelessWidget {
           //   fuo exec "from feeluown.library import resolve"
           // TODO: implement deserialization in the feeluown daemon.
           handler.playFromUri(Uri.parse(uri));
+        },
+        onLongPress: () async {
+          await showModalBottomSheet(
+              isScrollControlled: false,
+              context: context,
+              builder: (context) {
+                return SizedBox(height: 200, child: ListView(children: [
+                  const SizedBox(height: 10),
+                  ListTile(
+                      title: const Text("Copy URI"),
+                      leading: const Icon(Icons.copy),
+                      onTap: () async {
+                        await Clipboard.setData(ClipboardData(
+                            text: mediaItem.extras?['uri'] ?? ''));
+                        if (context.mounted) {
+                          Navigator.of(context).pop();
+                        }
+                      }),
+                  ListTile(
+                      title: const Text("Copy Title - Artists"),
+                      leading: const Icon(Icons.copy),
+                      onTap: () async {
+                        await Clipboard.setData(ClipboardData(
+                            text: "${mediaItem.title} - ${mediaItem.artist ?? ''}"));
+                        if (context.mounted) {
+                          Navigator.of(context).pop();
+                        }
+                      }),
+                ]));
+              });
         },
       ),
     );
