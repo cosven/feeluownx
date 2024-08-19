@@ -1,6 +1,9 @@
+import 'dart:io';
+
 import 'package:feeluownx/global.dart';
 import 'package:feeluownx/player.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_settings_ui/flutter_settings_ui.dart';
 import 'package:optimize_battery/optimize_battery.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -19,9 +22,11 @@ class SettingState extends State<SettingPanel> {
   final SharedPreferencesAsync prefs = SharedPreferencesAsync();
   final AudioPlayerHandler handler = Global.getIt<AudioPlayerHandler>();
 
+  static const startInTermux = MethodChannel('channel.feeluown/start_termux');
+
   @override
   Widget build(BuildContext context) {
-    return SettingsList(sections: [
+    List<AbstractSettingsSection> sections = [
       SettingsSection(tiles: [
         SettingsTile(
           title: const Text("Instance IP"),
@@ -64,7 +69,10 @@ class SettingState extends State<SettingPanel> {
           },
         ),
       ]),
-      SettingsSection(title: const Text("Permissions"), tiles: [
+    ];
+    if (Platform.isAndroid || Platform.isIOS) {
+      // show permission section only on supported platform
+      sections.add(SettingsSection(title: const Text("PERMISSIONS"), tiles: [
         SettingsTile(
             title: const Text("Notification"),
             leading: const Icon(Icons.notifications),
@@ -107,8 +115,26 @@ class SettingState extends State<SettingPanel> {
             OptimizeBattery.stopOptimizingBatteryUsage();
           },
         )
-      ]),
-    ]);
+      ]));
+    }
+    if (Platform.isAndroid) {
+      sections.add(SettingsSection(title: const Text("ANDROID ONLY"), tiles: [
+        SettingsTile(
+            title: const Text("Run fuo in Termux"),
+            leading: const Icon(Icons.restart_alt),
+            onPressed: (BuildContext context) async {
+              try {
+                await startInTermux.invokeMethod<void>('startInTermux');
+              } on PlatformException catch (e) {
+                if (context.mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text("Failed to run in Termux")));
+                }
+              }
+            }),
+      ]));
+    }
+    return SettingsList(sections: sections);
   }
 
   Future<String?> showInputDialog(
