@@ -1,5 +1,6 @@
 import 'package:audio_service/audio_service.dart';
 import 'package:feeluownx/player.dart';
+import 'package:feeluownx/widgets/song_card.dart';
 import 'package:flutter/material.dart';
 
 import 'client.dart';
@@ -36,7 +37,6 @@ class SongSearchDelegate extends SearchDelegate<String> {
     return FutureBuilder(
         future: handler.search(query),
         builder: (context, snapshot) {
-          print(snapshot.data);
           if (snapshot.data == null) {
             return ListView();
           }
@@ -44,35 +44,7 @@ class SongSearchDelegate extends SearchDelegate<String> {
           return ListView.builder(
               itemCount: songList.length,
               itemBuilder: (context, index) {
-                return Card(
-                  margin:
-                      const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                  child: InkWell(
-                    child: Padding(
-                      padding: const EdgeInsets.all(10),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(songList[index].title,
-                              style: const TextStyle(
-                                  fontWeight: FontWeight.w600, fontSize: 16)),
-                          Text(songList[index].artist ?? '',
-                              style: const TextStyle(fontSize: 14)),
-                          Text(songList[index].extras?['provider'] ?? '',
-                              style: const TextStyle(
-                                  fontSize: 10, color: Colors.grey)),
-                        ],
-                      ),
-                    ),
-                    onTap: () {
-                      String uri = songList[index].extras?['uri'] ?? '';
-                      // Run the following command before using this feature.
-                      //   fuo exec "from feeluown.library import resolve"
-                      // TODO: implement deserialization in the feeluown daemon.
-                      handler.playFromUri(Uri.parse(uri));
-                    },
-                  ),
-                );
+                return SongCard(mediaItem: songList[index]);
               });
         });
   }
