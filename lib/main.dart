@@ -133,10 +133,10 @@ class _PlayerControlPanelState extends State<PlayerControlPanel>
             mainAxisSize: MainAxisSize.min,
             children: <Widget>[
               artwork.isNotEmpty
-                  ? Image.network(width: 200, artwork,
+                  ? Image.network(width: 200, height: 200, artwork,
                       errorBuilder: (context, exception, stackTrack) =>
-                          SvgPicture.asset('assets/music-square.svg', semanticsLabel: 'Fetch artwork error', alignment: Alignment.topCenter, width: 200))
-                  : SvgPicture.asset('assets/music-square.svg', semanticsLabel: 'No artwork', alignment: Alignment.topCenter, width: 200),
+                          SvgPicture.asset('assets/music-square.svg', semanticsLabel: 'Fetch artwork error', alignment: Alignment.topCenter, width: 200, height: 200))
+                  : SvgPicture.asset('assets/music-square.svg', semanticsLabel: 'No artwork', alignment: Alignment.topCenter, width: 200, height: 200),
               Text(playerState.metadata?['title'] ?? ''),
               Text(playerState.metadata?['artists_name'] ?? ''),
               Row(
