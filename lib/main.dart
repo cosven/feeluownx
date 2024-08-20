@@ -1,5 +1,6 @@
 import 'dart:ffi';
 
+import 'package:animations/animations.dart';
 import 'package:audio_service/audio_service.dart';
 import 'package:feeluownx/player.dart';
 import 'package:feeluownx/playlist_ui.dart';
@@ -45,7 +46,15 @@ class AppState extends State<App> {
         appBar: AppBar(
           title: const Text('FeelUOwn'),
         ),
-        body: children[currentIndex],
+        body: PageTransitionSwitcher(
+            duration: const Duration(milliseconds: 500),
+            transitionBuilder: (child, animation, secondaryAnimation) =>
+                SharedAxisTransition(
+                    animation: animation,
+                    secondaryAnimation: secondaryAnimation,
+                    transitionType: SharedAxisTransitionType.horizontal,
+                    child: child),
+            child: children[currentIndex]),
         bottomNavigationBar: BottomNavigationBar(items: const [
           BottomNavigationBarItem(icon: Icon(Icons.home), label: "Home"),
           BottomNavigationBarItem(icon: Icon(Icons.list), label: "Playing"),
@@ -81,13 +90,19 @@ class PlayerControlPanel extends StatefulWidget {
   State<PlayerControlPanel> createState() => _PlayerControlPanelState();
 }
 
-class _PlayerControlPanelState extends State<PlayerControlPanel> {
+class _PlayerControlPanelState extends State<PlayerControlPanel>
+    with SingleTickerProviderStateMixin {
   final Client client = Global.getIt<Client>();
   late final AudioPlayerHandler _handler = Global.getIt<AudioPlayerHandler>();
+
+  late AnimationController controller;
 
   @override
   void initState() {
     super.initState();
+    controller = AnimationController(vsync: this)
+      ..drive(Tween(begin: 0, end: 1))
+      ..duration = const Duration(milliseconds: 500);
   }
 
   @override
@@ -108,6 +123,11 @@ class _PlayerControlPanelState extends State<PlayerControlPanel> {
           if (playerState.metadata != null) {
             artwork = playerState.metadata?['artwork'];
           }
+          if (_isPlaying()) {
+            controller.forward();
+          } else {
+            controller.reverse();
+          }
           return Column(
             mainAxisSize: MainAxisSize.min,
             children: <Widget>[
@@ -127,9 +147,8 @@ class _PlayerControlPanelState extends State<PlayerControlPanel> {
                     },
                   ),
                   IconButton(
-                      icon: Icon(_isPlaying()
-                          ? Icons.pause_rounded
-                          : Icons.play_arrow_rounded),
+                      icon: AnimatedIcon(
+                          icon: AnimatedIcons.play_pause, progress: controller),
                       tooltip: 'Toggle',
                       onPressed: () async {
                         await _handler.play();

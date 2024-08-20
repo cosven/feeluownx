@@ -7,6 +7,7 @@ environment:
   sdk: '>=3.4.4 <4.0.0'
 
 dependencies:
+  animations: ^2.0.11
   audio_service: ^0.18.15
   audio_service_mpris: ^0.1.5
   flutter:
