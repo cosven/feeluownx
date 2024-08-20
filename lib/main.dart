@@ -8,6 +8,7 @@ import 'package:feeluownx/search.dart';
 import 'package:feeluownx/settings.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:provider/provider.dart';
 import 'dart:convert';
 
@@ -121,7 +122,7 @@ class _PlayerControlPanelState extends State<PlayerControlPanel>
         child: Consumer<PlayerState>(builder: (_, playerState, __) {
           String artwork = "";
           if (playerState.metadata != null) {
-            artwork = playerState.metadata?['artwork'];
+            artwork = playerState.metadata?['artwork'] ?? '';
           }
           if (_isPlaying()) {
             controller.forward();
@@ -132,10 +133,12 @@ class _PlayerControlPanelState extends State<PlayerControlPanel>
             mainAxisSize: MainAxisSize.min,
             children: <Widget>[
               artwork.isNotEmpty
-                  ? Image.network(artwork,
+                  ? Image.network(width: 200, artwork,
                       errorBuilder: (context, exception, stackTrack) =>
-                          const Text("fetch artwork failed"))
-                  : const Text('No artwork'),
+                          SvgPicture.asset('assets/music-square.svg', semanticsLabel: 'Fetch artwork error', alignment: Alignment.topCenter, width: 200))
+                  : SvgPicture.asset('assets/music-square.svg', semanticsLabel: 'No artwork', alignment: Alignment.topCenter, width: 200),
+              Text(playerState.metadata?['title'] ?? ''),
+              Text(playerState.metadata?['artists_name'] ?? ''),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 mainAxisSize: MainAxisSize.max,

@@ -212,6 +212,10 @@ class AudioPlayerHandler extends BaseAudioHandler with SeekHandler {
   }
 
   Future<void> initFuoCurrentPlayingInfo() async {
-    /// TODO: try to init current PlayerState and metadata before websocket push
+    Object? obj = await client.jsonRpc("lambda: app.playlist.current_song");
+    if (obj != null) {
+      playerState.metadata = obj as Map<String, dynamic>;
+      print(playerState.metadata);
+    }
   }
 }
