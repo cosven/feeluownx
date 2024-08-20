@@ -57,6 +57,9 @@ class SongSearchDelegate extends SearchDelegate<String> {
     return FutureBuilder(
         future: handler.search(query),
         builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: SizedBox(width: 30, height: 30, child: CircularProgressIndicator()));
+          }
           if (snapshot.data == null) {
             return ListView();
           }

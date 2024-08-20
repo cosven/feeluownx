@@ -48,6 +48,9 @@ class _PlaylistState extends State<PlaylistView> {
     return FutureBuilder(
         future: _fetchPlaylist(),
         builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: SizedBox(width: 30, height: 30, child: CircularProgressIndicator()));
+          }
           dynamic songs = snapshot.data;
           if (songs == null) {
             return ListView();
