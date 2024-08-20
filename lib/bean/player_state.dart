@@ -7,6 +7,9 @@ class PlayerState with ChangeNotifier {
   /// 当前播放状态  0: stopped, 1:paused, 2:playing
   int playState = 0;
 
+  /// 当前歌词行
+  String currentLyricsLine = "";
+
   void setPlayState(int value) {
     playState = value;
     notifyListeners();
@@ -14,6 +17,11 @@ class PlayerState with ChangeNotifier {
 
   void setMetadata(Map<String, dynamic> value) {
     metadata = value;
+    notifyListeners();
+  }
+
+  void setCurrentLyricsLine(String value) {
+    currentLyricsLine = value;
     notifyListeners();
   }
 }

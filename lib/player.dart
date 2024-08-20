@@ -172,6 +172,10 @@ class AudioPlayerHandler extends BaseAudioHandler with SeekHandler {
           playbackState.add(playbackState.value.copyWith(
               updatePosition:
                   Duration(milliseconds: (positionSeconds * 1000).round())));
+        } else if (topic == 'live_lyric') {
+          playerState.setCurrentLyricsLine(data);
+        } else {
+          print("Unhandled topic: $topic => $data");
         }
       } catch (e) {
         print('handle message error: $e');

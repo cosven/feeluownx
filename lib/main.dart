@@ -55,7 +55,10 @@ class AppState extends State<App> with SingleTickerProviderStateMixin {
         appBar: AppBar(
           title: const Text('FeelUOwn'),
         ),
-        body: TabBarView(controller: tabController, physics: const NeverScrollableScrollPhysics(), children: children),
+        body: TabBarView(
+            controller: tabController,
+            physics: const NeverScrollableScrollPhysics(),
+            children: children),
         bottomNavigationBar: BottomNavigationBar(items: const [
           BottomNavigationBarItem(icon: Icon(Icons.home), label: "Home"),
           BottomNavigationBarItem(icon: Icon(Icons.list), label: "Playing"),
@@ -129,43 +132,74 @@ class _PlayerControlPanelState extends State<PlayerControlPanel>
           } else {
             controller.reverse();
           }
-          return Column(
-            mainAxisSize: MainAxisSize.min,
-            children: <Widget>[
-              artwork.isNotEmpty
-                  ? Image.network(width: 200, height: 200, artwork,
-                      errorBuilder: (context, exception, stackTrack) =>
-                          SvgPicture.asset('assets/music-square.svg', semanticsLabel: 'Fetch artwork error', alignment: Alignment.topCenter, width: 200, height: 200))
-                  : SvgPicture.asset('assets/music-square.svg', semanticsLabel: 'No artwork', alignment: Alignment.topCenter, width: 200, height: 200),
-              Text(playerState.metadata?['title'] ?? ''),
-              Text(playerState.metadata?['artists_name'] ?? ''),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                mainAxisSize: MainAxisSize.max,
-                children: [
-                  IconButton(
-                    icon: const Icon(Icons.skip_previous_rounded),
-                    onPressed: () async {
-                      await _handler.skipToPrevious();
-                    },
-                  ),
-                  IconButton(
-                      icon: AnimatedIcon(
-                          icon: AnimatedIcons.play_pause, progress: controller),
-                      tooltip: 'Toggle',
-                      onPressed: () async {
-                        await _handler.play();
-                      }),
-                  IconButton(
-                    icon: const Icon(Icons.skip_next_rounded),
-                    onPressed: () async {
-                      await _handler.skipToNext();
-                    },
-                  ),
-                ],
-              )
-            ],
-          );
+          return ConstrainedBox(
+              constraints: const BoxConstraints.expand(),
+              child: Stack(alignment: Alignment.topCenter, children: [
+                Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: <Widget>[
+                    artwork.isNotEmpty
+                        ? Image.network(
+                            width: 200,
+                            height: 200,
+                            artwork,
+                            errorBuilder: (context, exception, stackTrack) =>
+                                SvgPicture.asset('assets/music-square.svg',
+                                    semanticsLabel: 'Fetch artwork error',
+                                    alignment: Alignment.topCenter,
+                                    width: 200,
+                                    height: 200))
+                        : SvgPicture.asset('assets/music-square.svg',
+                            semanticsLabel: 'No artwork',
+                            alignment: Alignment.topCenter,
+                            width: 200,
+                            height: 200),
+                    Text(playerState.metadata?['title'] ?? ''),
+                    Text(playerState.metadata?['artists_name'] ?? ''),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      mainAxisSize: MainAxisSize.max,
+                      children: [
+                        IconButton(
+                          icon: const Icon(Icons.skip_previous_rounded),
+                          onPressed: () async {
+                            await _handler.skipToPrevious();
+                          },
+                        ),
+                        IconButton(
+                            icon: AnimatedIcon(
+                                icon: AnimatedIcons.play_pause,
+                                progress: controller),
+                            tooltip: 'Toggle',
+                            onPressed: () async {
+                              await _handler.play();
+                            }),
+                        IconButton(
+                          icon: const Icon(Icons.skip_next_rounded),
+                          onPressed: () async {
+                            await _handler.skipToNext();
+                          },
+                        ),
+                      ],
+                    )
+                  ],
+                ),
+                Positioned(
+                    left: 0,
+                    right: 0,
+                    bottom: 0,
+                    child: Container(
+                        alignment: Alignment.center,
+                        padding: const EdgeInsets.symmetric(
+                            vertical: 8, horizontal: 12),
+                        decoration: const BoxDecoration(boxShadow: [
+                          BoxShadow(
+                              blurStyle: BlurStyle.outer,
+                              blurRadius: 4.0,
+                              offset: Offset(0, 4), color: Colors.black38)
+                        ]),
+                        child: Text(playerState.currentLyricsLine)))
+              ]));
         }));
   }
 }
