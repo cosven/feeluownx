@@ -188,10 +188,11 @@ class _PlayerControlPanelState extends State<PlayerControlPanel>
                     left: 0,
                     right: 0,
                     bottom: 0,
-                    child: Container(
-                        alignment: Alignment.center,
+                    child: Container (
+                        height: 38,
+                        alignment: Alignment.bottomCenter,
                         padding: const EdgeInsets.symmetric(
-                            vertical: 8, horizontal: 12),
+                            vertical: 10, horizontal: 15),
                         decoration: const BoxDecoration(boxShadow: [
                           BoxShadow(
                               blurStyle: BlurStyle.outer,
