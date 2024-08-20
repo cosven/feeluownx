@@ -38,6 +38,7 @@ class Client {
       },
       body: body,
     );
+    rpcRequestId ++;
     print('send rpc request: $body');
     if (response.statusCode == 200) {
       Map<String, dynamic> respBody = json.decode(response.body);

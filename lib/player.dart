@@ -33,6 +33,7 @@ class AudioPlayerHandler extends BaseAudioHandler with SeekHandler {
       pubsubClient.stream?.listen(onWebsocketData,
           onError: onWebsocketError, onDone: onWebsocketDone);
       initPlaybackState();
+      initFuoCurrentPlayingInfo();
     });
   }
 
@@ -208,5 +209,9 @@ class AudioPlayerHandler extends BaseAudioHandler with SeekHandler {
           }));
     }
     return items;
+  }
+
+  Future<void> initFuoCurrentPlayingInfo() async {
+    /// TODO: try to init current PlayerState and metadata before websocket push
   }
 }
