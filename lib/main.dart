@@ -29,13 +29,21 @@ class App extends StatefulWidget {
   State<StatefulWidget> createState() => AppState();
 }
 
-class AppState extends State<App> {
+class AppState extends State<App> with SingleTickerProviderStateMixin {
   int currentIndex = 0;
   final List<Widget> children = [
     const PlayerControlPanel(),
     const PlaylistView(),
     const SettingPanel(),
   ];
+
+  late TabController tabController;
+
+  @override
+  void initState() {
+    super.initState();
+    tabController = TabController(length: children.length, vsync: this);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -46,15 +54,7 @@ class AppState extends State<App> {
         appBar: AppBar(
           title: const Text('FeelUOwn'),
         ),
-        body: PageTransitionSwitcher(
-            duration: const Duration(milliseconds: 500),
-            transitionBuilder: (child, animation, secondaryAnimation) =>
-                SharedAxisTransition(
-                    animation: animation,
-                    secondaryAnimation: secondaryAnimation,
-                    transitionType: SharedAxisTransitionType.horizontal,
-                    child: child),
-            child: children[currentIndex]),
+        body: TabBarView(controller: tabController, physics: const NeverScrollableScrollPhysics(), children: children),
         bottomNavigationBar: BottomNavigationBar(items: const [
           BottomNavigationBarItem(icon: Icon(Icons.home), label: "Home"),
           BottomNavigationBarItem(icon: Icon(Icons.list), label: "Playing"),
@@ -78,7 +78,7 @@ class AppState extends State<App> {
 
   void onTabChange(int index) {
     setState(() {
-      currentIndex = index;
+      tabController.index = currentIndex = index;
     });
   }
 }
