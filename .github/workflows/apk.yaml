@@ -47,15 +47,9 @@ jobs:
       env:
         BUILD_TOOLS_VERSION: "30.0.3"
     
-    - name: Declare some variables # https://stackoverflow.com/a/61699863
-      id: vars
-      shell: bash
-      run: |
-        echo "sha_short=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
-        echo "revision=$(git rev-list --count HEAD)" >> $GITHUB_OUTPUT
     - name: Pre-Release
       uses: softprops/action-gh-release@v1
       with:
         files: build/app/outputs/apk/release/*-signed.apk
-        tag_name: r${{ steps.vars.output.revision }}-${{ steps.vars.outputs.sha_short }}
+        tag_name: nightly
         prerelease: true
