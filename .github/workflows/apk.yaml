@@ -51,8 +51,8 @@ jobs:
       id: vars
       shell: bash
       run: |
-        echo "::set-output name=sha_short::$(git rev-parse --short HEAD)"
-        echo "::set-output name=revision::$(git rev-list --count HEAD)"
+        echo "sha_short=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
+        echo "revision=$(git rev-list --count HEAD)" >> $GITHUB_OUTPUT
     - name: Pre-Release
       uses: softprops/action-gh-release@v1
       with:
