@@ -8,7 +8,8 @@ on:
     - master
   workflow_dispatch:
     
-# on: push    # Default will running for every branch.
+permissions:
+  contents: write
     
 jobs:
   build:
