@@ -6,6 +6,7 @@ import '../bean/player_state.dart';
 import '../client.dart';
 import '../global.dart';
 import '../player.dart';
+import 'fullscreen_player.dart';
 
 class PlayerControlPage extends StatefulWidget {
   const PlayerControlPage({super.key});
@@ -101,7 +102,21 @@ class _PlayerControlPageState extends State<PlayerControlPage>
                           },
                         ),
                       ],
-                    )
+                    ),
+                    MaterialButton(
+                        onPressed: () {
+                          showModalBottomSheet(
+                              isScrollControlled: false,
+                              isDismissible: false,
+                              enableDrag: false,
+                              showDragHandle: false,
+                              context: context,
+                              constraints: const BoxConstraints.expand(),
+                              builder: (context) {
+                                return const FullscreenPlayerPage();
+                              });
+                        },
+                        child: const Text("Test 全屏播放器"))
                   ],
                 ),
                 Positioned(
