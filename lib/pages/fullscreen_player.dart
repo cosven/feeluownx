@@ -8,6 +8,7 @@ import 'package:provider/provider.dart';
 import '../bean/player_state.dart';
 import '../global.dart';
 import '../player.dart';
+import '../widgets/player_info.dart';
 
 class FullscreenPlayerPage extends StatefulWidget {
   const FullscreenPlayerPage({super.key});
@@ -31,7 +32,12 @@ class FullscreenPlayerPageState extends State<FullscreenPlayerPage> {
           Map<String, String> artHeaders = {};
           artHeaders['user-agent'] =
               'Mozilla/5.0 (X11; Linux x86_64; rv:129.0) Gecko/20100101 Firefox/129.0';
-          ImageProvider image = NetworkImage(artwork, headers: artHeaders);
+          ImageProvider image;
+          if (artwork != '') {
+            image = NetworkImage(artwork, headers: artHeaders);
+          } else {
+            image = const AssetImage('assets/music-square.png');
+          }
           return Container(
               constraints: const BoxConstraints.expand(),
               decoration: BoxDecoration(
@@ -40,12 +46,19 @@ class FullscreenPlayerPageState extends State<FullscreenPlayerPage> {
                       fit: BoxFit.fitHeight,
                       alignment: Alignment.center)),
               child: BackdropFilter(
-                  filter: ImageFilter.blur(sigmaX: 60.0, sigmaY: 60.0),
+                  filter: ImageFilter.blur(sigmaX: 80.0, sigmaY: 80.0),
                   child: Container(
                       constraints: const BoxConstraints.expand(),
-                      decoration: BoxDecoration(
-                          color: Colors.black87.withOpacity(0)),
-                      child: const Text("ABCD"))));
+                      decoration:
+                          BoxDecoration(color: Colors.black87.withOpacity(.4)),
+                      child: Column(children: [
+                        PlayerInfo(playerState: playerState),
+                        MaterialButton(
+                            child: const Text("Back"),
+                            onPressed: () {
+                              Navigator.pop(context);
+                            })
+                      ]))));
         }));
   }
 }

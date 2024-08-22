@@ -105,16 +105,12 @@ class _PlayerControlPageState extends State<PlayerControlPage>
                     ),
                     MaterialButton(
                         onPressed: () {
-                          showModalBottomSheet(
-                              isScrollControlled: false,
-                              isDismissible: false,
-                              enableDrag: false,
-                              showDragHandle: false,
-                              context: context,
-                              constraints: const BoxConstraints.expand(),
-                              builder: (context) {
-                                return const FullscreenPlayerPage();
-                              });
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  fullscreenDialog: true,
+                                  builder: (context) =>
+                                      const FullscreenPlayerPage()));
                         },
                         child: const Text("Test 全屏播放器"))
                   ],
