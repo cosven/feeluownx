@@ -48,64 +48,67 @@ class PlayerInfoState extends State<PlayerInfo>
       controller.reverse();
     }
 
-    return Column(
-        mainAxisAlignment: MainAxisAlignment.start,
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          const SizedBox(height: 120),
-          Hero(
-              tag: "artworkImg",
-              child: artwork.isNotEmpty
-                  ? Image.network(
-                      width: 200,
-                      height: 200,
-                      artwork,
-                      errorBuilder: (context, exception, stackTrack) =>
-                          SvgPicture.asset('assets/music-square.svg',
-                              semanticsLabel: 'Fetch artwork error',
-                              alignment: Alignment.topCenter,
-                              width: 200,
-                              height: 200))
-                  : SvgPicture.asset('assets/music-square.svg',
-                      semanticsLabel: 'No artwork',
-                      alignment: Alignment.topCenter,
-                      width: 200,
-                      height: 200)),
-          const SizedBox(height: 20),
-          Text(widget.playerState.metadata?['title'] ?? '', style: style),
-          Text(widget.playerState.metadata?['artists_name'] ?? '',
-              style: style.apply(fontSizeFactor: .8)),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
+    return Expanded(
+        child: Column(
+            mainAxisAlignment: MainAxisAlignment.start,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              IconButton(
-                iconSize: 40,
-                color: Colors.white60,
-                icon: const Icon(Icons.skip_previous_rounded),
-                onPressed: () async {
-                  await handler.skipToPrevious();
-                },
+              const SizedBox(height: 120),
+              Hero(
+                  tag: "artworkImg",
+                  child: artwork.isNotEmpty
+                      ? Image.network(
+                          width: 200,
+                          height: 200,
+                          artwork,
+                          errorBuilder: (context, exception, stackTrack) =>
+                              SvgPicture.asset('assets/music-square.svg',
+                                  semanticsLabel: 'Fetch artwork error',
+                                  alignment: Alignment.topCenter,
+                                  width: 200,
+                                  height: 200))
+                      : SvgPicture.asset('assets/music-square.svg',
+                          semanticsLabel: 'No artwork',
+                          alignment: Alignment.topCenter,
+                          width: 200,
+                          height: 200)),
+              const SizedBox(height: 20),
+              Text(widget.playerState.metadata?['title'] ?? '', style: style),
+              Text(widget.playerState.metadata?['artists_name'] ?? '',
+                  style: style.apply(fontSizeFactor: .8)),
+              const Spacer(flex: 1),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  IconButton(
+                    iconSize: 40,
+                    color: Colors.white60,
+                    icon: const Icon(Icons.skip_previous_rounded),
+                    onPressed: () async {
+                      await handler.skipToPrevious();
+                    },
+                  ),
+                  IconButton(
+                    iconSize: 60,
+                    color: Colors.white60,
+                    icon: AnimatedIcon(
+                        icon: AnimatedIcons.play_pause, progress: controller),
+                    onPressed: () async {
+                      await handler.play();
+                    },
+                  ),
+                  IconButton(
+                    iconSize: 40,
+                    color: Colors.white60,
+                    icon: const Icon(Icons.skip_next_rounded),
+                    onPressed: () async {
+                      await handler.skipToNext();
+                    },
+                  ),
+                ],
               ),
-              IconButton(
-                iconSize: 60,
-                color: Colors.white60,
-                icon: AnimatedIcon(
-                    icon: AnimatedIcons.play_pause, progress: controller),
-                onPressed: () async {
-                  await handler.play();
-                },
-              ),
-              IconButton(
-                iconSize: 40,
-                color: Colors.white60,
-                icon: const Icon(Icons.skip_next_rounded),
-                onPressed: () async {
-                  await handler.skipToNext();
-                },
-              ),
-            ],
-          ),
-        ]);
+              const SizedBox(height: 60),
+            ]));
   }
 }

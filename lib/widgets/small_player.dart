@@ -53,7 +53,7 @@ class SmallPlayerState extends State<StatefulWidget> {
               },
               child: Container(
                   decoration:
-                      BoxDecoration(color: Colors.black87.withOpacity(0)),
+                      BoxDecoration(color: Theme.of(context).cardColor),
                   child: Row(
                       mainAxisAlignment: MainAxisAlignment.start,
                       crossAxisAlignment: CrossAxisAlignment.start,
