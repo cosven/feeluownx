@@ -103,22 +103,12 @@ class _PlayerControlPageState extends State<PlayerControlPage>
                         ),
                       ],
                     ),
-                    MaterialButton(
-                        onPressed: () {
-                          Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  fullscreenDialog: true,
-                                  builder: (context) =>
-                                      const FullscreenPlayerPage()));
-                        },
-                        child: const Text("Test 全屏播放器"))
                   ],
                 ),
                 Positioned(
                     left: 0,
                     right: 0,
-                    bottom: 0,
+                    bottom: 80,
                     child: Container(
                         height: 38,
                         alignment: Alignment.bottomCenter,

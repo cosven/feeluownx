@@ -53,22 +53,24 @@ class PlayerInfoState extends State<PlayerInfo>
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           const SizedBox(height: 120),
-          artwork.isNotEmpty
-              ? Image.network(
-                  width: 200,
-                  height: 200,
-                  artwork,
-                  errorBuilder: (context, exception, stackTrack) =>
-                      SvgPicture.asset('assets/music-square.svg',
-                          semanticsLabel: 'Fetch artwork error',
-                          alignment: Alignment.topCenter,
-                          width: 200,
-                          height: 200))
-              : SvgPicture.asset('assets/music-square.svg',
-                  semanticsLabel: 'No artwork',
-                  alignment: Alignment.topCenter,
-                  width: 200,
-                  height: 200),
+          Hero(
+              tag: "artworkImg",
+              child: artwork.isNotEmpty
+                  ? Image.network(
+                      width: 200,
+                      height: 200,
+                      artwork,
+                      errorBuilder: (context, exception, stackTrack) =>
+                          SvgPicture.asset('assets/music-square.svg',
+                              semanticsLabel: 'Fetch artwork error',
+                              alignment: Alignment.topCenter,
+                              width: 200,
+                              height: 200))
+                  : SvgPicture.asset('assets/music-square.svg',
+                      semanticsLabel: 'No artwork',
+                      alignment: Alignment.topCenter,
+                      width: 200,
+                      height: 200)),
           const SizedBox(height: 20),
           Text(widget.playerState.metadata?['title'] ?? '', style: style),
           Text(widget.playerState.metadata?['artists_name'] ?? '',

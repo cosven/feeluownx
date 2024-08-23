@@ -54,7 +54,7 @@ class FullscreenPlayerPageState extends State<FullscreenPlayerPage> {
                       child: Column(children: [
                         PlayerInfo(playerState: playerState),
                         MaterialButton(
-                            child: const Text("Back"),
+                            child: const Text("Back", style: TextStyle(color: Colors.white70)),
                             onPressed: () {
                               Navigator.pop(context);
                             })
