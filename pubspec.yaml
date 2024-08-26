@@ -40,6 +40,9 @@ flutter:
 
 flutter_launcher_icons:
   image_path: "assets/ic_launcher.png"
+  adaptive_icon_background: "#eaeddc"
+  adaptive_icon_foreground: "assets/ic_launcher_foreground.png"
+  remove_alpha_ios: true
   android:
     generate: true
     adaptive_icon_background: "#eaeddc"
