@@ -32,9 +32,29 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^3.0.0
+  flutter_launcher_icons: ^0.13.1
 
 flutter:
   uses-material-design: true
   generate: true
   assets:
     - assets/
+
+flutter_launcher_icons:
+  image_path: "assets/ic_launcher.png"
+  adaptive_icon_background: "#eaeddc"
+  adaptive_icon_foreground: "assets/ic_launcher_foreground.png"
+  remove_alpha_ios: true
+  android:
+    generate: true
+    adaptive_icon_background: "#eaeddc"
+    adaptive_icon_foreground: "assets/ic_launcher_foreground.png"
+  ios:
+    generate: true
+    remove_alpha_ios: true
+  web:
+    generate: true
+  windows:
+    generate: true
+  macos:
+    generate: true
