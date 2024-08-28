@@ -6,6 +6,7 @@ import 'package:flutter_svg/svg.dart';
 import 'package:provider/provider.dart';
 
 import '../bean/player_state.dart';
+import '../client.dart';
 import '../global.dart';
 import '../player.dart';
 import '../widgets/player_info.dart';
