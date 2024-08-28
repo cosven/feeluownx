@@ -53,11 +53,10 @@ class FullscreenPlayerPageState extends State<FullscreenPlayerPage> {
                           BoxDecoration(color: Colors.black87.withOpacity(.4)),
                       child: Column(children: [
                         PlayerInfo(playerState: playerState),
-                        MaterialButton(
-                            child: const Text("Back", style: TextStyle(color: Colors.white70)),
-                            onPressed: () {
-                              Navigator.pop(context);
-                            })
+                        IconButton(onPressed: () {
+                          Navigator.pop(context);
+                        }, icon: const Icon(Icons.expand_circle_down, color: Colors.white70, size: 40)),
+                        const SizedBox(height: 20),
                       ]))));
         }));
   }

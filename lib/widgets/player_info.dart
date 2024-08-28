@@ -72,10 +72,9 @@ class PlayerInfoState extends State<PlayerInfo>
                           alignment: Alignment.topCenter,
                           width: 200,
                           height: 200)),
-              const SizedBox(height: 20),
+              const SizedBox(height: 30),
               Text(widget.playerState.metadata?['title'] ?? '', style: style),
-              Text(widget.playerState.metadata?['artists_name'] ?? '',
-                  style: style.apply(fontSizeFactor: .8)),
+              Text(widget.playerState.metadata?['artists_name'] ?? '', style: style.apply(fontSizeFactor: .8)),
               const Spacer(flex: 1),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -108,7 +107,7 @@ class PlayerInfoState extends State<PlayerInfo>
                   ),
                 ],
               ),
-              const SizedBox(height: 60),
+              const SizedBox(height: 30),
             ]));
   }
 }
