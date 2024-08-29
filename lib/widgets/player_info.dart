@@ -48,8 +48,25 @@ class PlayerInfoState extends State<PlayerInfo>
     params['__type__'] = 'feeluown.library.BriefSongModel';
     params['source'] = handler.playerState.metadata?['source'] ?? '';
     params['identifier'] = uri.split('/').last ?? '';
-    Object? result = await client.jsonRpc("app.library.song_get_lyric",
-        args: [params]);
+    Object? result =
+        await client.jsonRpc("app.library.song_get_lyric", args: [params]);
+    print("Song upgrade: $result");
+    return result;
+  }
+
+  Future<Object?> getCurrentSongWebLink() async {
+    print("Song upgrade: ${handler.playerState.metadata}");
+    String identify = handler.playerState.metadata?['uri'] ?? '';
+    if (identify.isEmpty) {
+      return null;
+    }
+    String uri = handler.playerState.metadata?['uri'] ?? '';
+    Map<String, dynamic> params = {};
+    params['__type__'] = 'feeluown.library.BriefSongModel';
+    params['source'] = handler.playerState.metadata?['source'] ?? '';
+    params['identifier'] = uri.split('/').last ?? '';
+    Object? result =
+        await client.jsonRpc("app.library.song_get_web_url", args: [params]);
     print("Song upgrade: $result");
     return result;
   }
@@ -151,6 +168,7 @@ class PlayerInfoState extends State<PlayerInfo>
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 IconButton(
+                    tooltip: "Share URL",
                     onPressed: () async {
                       String uri = widget.playerState.metadata?['uri'] ?? '';
                       String title =
@@ -164,7 +182,24 @@ class PlayerInfoState extends State<PlayerInfo>
                       }
                     },
                     icon: const Icon(Icons.share,
-                        size: 30, color: Colors.white70))
+                        size: 30, color: Colors.white70)),
+                IconButton(
+                    tooltip: "Share Web URL",
+                    onPressed: () async {
+                      String title =
+                          widget.playerState.metadata?['title'] ?? '';
+                      Object? data = await getCurrentSongWebLink();
+                      print(data);
+                      if (data != null && data != '') {
+                        ShareResult result =
+                            await Share.share(data as String, subject: title);
+                        if (ShareResultStatus.success == result.status) {
+                          print("Share success");
+                        }
+                      }
+                    },
+                    icon: const Icon(Icons.link,
+                        size: 30, color: Colors.white70)),
               ]),
           const SizedBox(height: 30),
         ]));
