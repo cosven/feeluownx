@@ -73,7 +73,8 @@ class PlayerInfoState extends State<PlayerInfo>
 
   @override
   Widget build(BuildContext context) {
-    TextStyle style = const TextStyle(color: Colors.white70, fontSize: 22);
+    TextStyle style =
+        const TextStyle(color: Colors.white70, fontSize: 22, height: 1.2);
 
     String artwork = "";
     if (widget.playerState.metadata != null) {
@@ -125,10 +126,11 @@ class PlayerInfoState extends State<PlayerInfo>
                   scrollDirection: Axis.vertical,
                   reverse: false,
                   padding: const EdgeInsets.symmetric(
-                      horizontal: 0.0, vertical: 2.0),
+                      horizontal: 60.0, vertical: 4.0),
                   physics: const BouncingScrollPhysics(),
                   child: Text(data?['content'] ?? '',
-                      style: style.apply(fontSizeFactor: .6)),
+                      style:
+                          style.apply(fontSizeFactor: .7, heightFactor: 1.6)),
                 ));
               }),
           const SizedBox(height: 40),
