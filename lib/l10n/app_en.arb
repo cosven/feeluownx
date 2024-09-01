@@ -1,5 +1,13 @@
 {
   "home": "Home",
   "playing": "Playing",
-  "settings": "Settings"
+  "settings": "Settings",
+  "song": "Song",
+  "playlist": "Playlist",
+  "type": "Type",
+  "copyUri": "Copy URI",
+  "copyTitleArtist": "Copy [Title - Artists]",
+  "runFuoInTermux": "Run FeelUOwn in Termux",
+  "cancel": "Cancel",
+  "save": "Save"
 }
