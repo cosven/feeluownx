@@ -3,6 +3,7 @@ import 'package:feeluownx/player.dart';
 import 'package:feeluownx/widgets/song_card.dart';
 import 'package:feeluownx/widgets/playlist_card.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 import 'client.dart';
 import 'global.dart';
@@ -17,22 +18,22 @@ class SongSearchDelegate extends SearchDelegate<String> {
   List<Widget>? buildActions(BuildContext context) {
     return [
       DropdownMenu(
-          dropdownMenuEntries: const [
+          dropdownMenuEntries: [
             DropdownMenuEntry(
                 value: "song",
-                label: "Song",
-                leadingIcon: Icon(Icons.music_note)),
+                label: AppLocalizations.of(context)!.song,
+                leadingIcon: const Icon(Icons.music_note)),
             DropdownMenuEntry(
                 value: "playlist",
-                label: "Playlist",
-                leadingIcon: Icon(Icons.playlist_play_sharp)),
+                label: AppLocalizations.of(context)!.playlist,
+                leadingIcon: const Icon(Icons.playlist_play_sharp)),
           ],
           initialSelection: searchType,
           enableSearch: false,
           enableFilter: false,
           requestFocusOnTap: false,
           leadingIcon: const Icon(Icons.filter_alt),
-          label: const Text('Type'),
+          label: Text(AppLocalizations.of(context)!.type),
           inputDecorationTheme: const InputDecorationTheme(
             filled: true,
             contentPadding: EdgeInsets.symmetric(vertical: 5.0),

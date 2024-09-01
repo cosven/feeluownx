@@ -1,6 +1,7 @@
 import 'package:audio_service/audio_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 import '../global.dart';
 import '../player.dart';
@@ -48,7 +49,7 @@ class SongCard extends StatelessWidget {
                 return SizedBox(height: 200, child: ListView(children: [
                   const SizedBox(height: 10),
                   ListTile(
-                      title: const Text("Copy URI"),
+                      title: Text(AppLocalizations.of(context)!.copyUri),
                       leading: const Icon(Icons.copy),
                       onTap: () async {
                         await Clipboard.setData(ClipboardData(
@@ -58,7 +59,7 @@ class SongCard extends StatelessWidget {
                         }
                       }),
                   ListTile(
-                      title: const Text("Copy Title - Artists"),
+                      title: Text(AppLocalizations.of(context)!.copyTitleArtist),
                       leading: const Icon(Icons.copy),
                       onTap: () async {
                         await Clipboard.setData(ClipboardData(

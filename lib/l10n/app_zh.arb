@@ -1,5 +1,13 @@
 {
   "home": "首页",
   "playing": "播放列表",
-  "settings": "设置"
+  "settings": "设置",
+  "song": "歌曲",
+  "playlist": "歌单",
+  "type": "类型",
+  "copyUri": "复制URI",
+  "copyTitleArtist": "复制[标题 - 歌手名]",
+  "runFuoInTermux": "在 Termux 中运行 FeelUOwn",
+  "cancel": "取消",
+  "save": "保存"
 }

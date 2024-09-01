@@ -8,6 +8,7 @@ import 'package:flutter_settings_ui/flutter_settings_ui.dart';
 import 'package:optimize_battery/optimize_battery.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class SettingPanel extends StatefulWidget {
   const SettingPanel({super.key});
@@ -120,7 +121,7 @@ class SettingState extends State<SettingPanel> {
     if (Platform.isAndroid) {
       sections.add(SettingsSection(title: const Text("ANDROID ONLY"), tiles: [
         SettingsTile(
-            title: const Text("Run fuo in Termux"),
+            title: Text(AppLocalizations.of(context)!.runFuoInTermux),
             leading: const Icon(Icons.restart_alt),
             onPressed: (BuildContext context) async {
               try {
@@ -150,13 +151,13 @@ class SettingState extends State<SettingPanel> {
                 decoration: InputDecoration(hintText: hintText)),
             actions: [
               MaterialButton(
-                child: const Text('Cancel'),
+                child: Text(AppLocalizations.of(context)!.cancel),
                 onPressed: () {
                   Navigator.pop(context);
                 },
               ),
               MaterialButton(
-                child: const Text('Save'),
+                child: Text(AppLocalizations.of(context)!.save),
                 onPressed: () {
                   Navigator.pop(context, controller.text);
                 },
