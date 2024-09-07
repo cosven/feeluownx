@@ -4,7 +4,7 @@
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity
-            android:name="com.ryanheise.audioservice.AudioServiceActivity"
+            android:name="com.example.feeluownx.MainActivity"
             android:exported="true"
             android:launchMode="singleTop"
             android:taskAffinity=""

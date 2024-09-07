@@ -28,6 +28,6 @@ class StartTermuxHandler(private val context: Context) : MethodChannel.MethodCal
     }
 
     companion object {
-        const val CHANNEL = "channel.feeluown/start_termux"
+        const val CHANNEL = "channel.feeluown/termux"
     }
 }

@@ -23,7 +23,7 @@ class SettingState extends State<SettingPanel> {
   final SharedPreferencesAsync prefs = SharedPreferencesAsync();
   final AudioPlayerHandler handler = Global.getIt<AudioPlayerHandler>();
 
-  static const startInTermux = MethodChannel('channel.feeluown/start_termux');
+  static const startInTermux = MethodChannel('channel.feeluown/termux');
 
   @override
   Widget build(BuildContext context) {
