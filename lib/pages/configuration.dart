@@ -40,21 +40,19 @@ class ConfigurationPageState extends State<ConfigurationPage> {
               "${handler.getConnectionStatusMsg()} ${handler.connectionMsg} (Click to reconnect)",
           leading: const Icon(Icons.private_connectivity),
           onTap: () async {
-            setState(() async {
-              if (await Permission.notification.isPermanentlyDenied) {
-                if (context.mounted) {
-                  ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-                      content: Text("Please enable notification permission")));
-                }
-                await openAppSettings();
+            if (await Permission.notification.isPermanentlyDenied) {
+              if (context.mounted) {
+                ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                    content: Text("Please enable notification permission")));
               }
-              if (await Permission.notification.isDenied) {
-                await Permission.notification.request();
-              }
-              if (handler.connectionStatus != 1) {
-                handler.init();
-              }
-            });
+              await openAppSettings();
+            }
+            if (await Permission.notification.isDenied) {
+              await Permission.notification.request();
+            }
+            if (handler.connectionStatus != 1) {
+              handler.init();
+            }
           },
         )
       ]),
@@ -74,25 +72,22 @@ class ConfigurationPageState extends State<ConfigurationPage> {
                 leading: const Icon(Icons.notifications),
                 subtitle: subtitle,
                 onTap: () async {
-                  setState(() async {
-                    if (await Permission.notification.isPermanentlyDenied) {
-                      if (context.mounted) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                                content: Text(
-                                    "Please enable notification permission")));
-                      }
-                      await openAppSettings();
-                    }
-                    if (await Permission.notification.isDenied) {
-                      await Permission.notification.request();
-                    }
-                    if (await Permission.notification.isGranted &&
-                        context.mounted) {
+                  if (await Permission.notification.isPermanentlyDenied) {
+                    if (context.mounted) {
                       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-                          content: Text("Permission has been granted")));
+                          content:
+                              Text("Please enable notification permission")));
                     }
-                  });
+                    await openAppSettings();
+                  }
+                  if (await Permission.notification.isDenied) {
+                    await Permission.notification.request();
+                  }
+                  if (await Permission.notification.isGranted &&
+                      context.mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                        content: Text("Permission has been granted")));
+                  }
                 },
               );
             }),
@@ -108,9 +103,7 @@ class ConfigurationPageState extends State<ConfigurationPage> {
                 leading: const Icon(Icons.battery_4_bar),
                 subtitle: subtitle,
                 onTap: () async {
-                  setState(() async {
-                    await OptimizeBattery.stopOptimizingBatteryUsage();
-                  });
+                  await OptimizeBattery.stopOptimizingBatteryUsage();
                 },
               );
             }),
