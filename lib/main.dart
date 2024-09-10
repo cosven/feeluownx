@@ -1,15 +1,17 @@
 import 'package:dynamic_color/dynamic_color.dart';
+import 'package:feeluownx/pages/configuration.dart';
 import 'package:feeluownx/pages/playlist_ui.dart';
 import 'package:feeluownx/search.dart';
-import 'package:feeluownx/pages/settings.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:flutter_settings_screens/flutter_settings_screens.dart';
 
 import 'global.dart';
 import 'pages/player_control.dart';
 
 Future<void> main() async {
   await Global.init();
+  await Settings.init(cacheProvider: SharePreferenceCache());
   runApp(const App());
 }
 
@@ -25,7 +27,7 @@ class AppState extends State<App> with SingleTickerProviderStateMixin {
   final List<Widget> children = [
     const PlayerControlPage(),
     const PlaylistView(),
-    const SettingPanel(),
+    const ConfigurationPage(),
   ];
 
   late TabController tabController;

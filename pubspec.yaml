@@ -16,7 +16,7 @@ dependencies:
 
   flutter_localizations:
     sdk: flutter
-  flutter_settings_ui: ^3.0.1
+  flutter_settings_screens: ^0.3.4
   flutter_svg: ^2.0.9
   get_it: ^7.7.0
   http: ^0.13.3

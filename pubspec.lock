@@ -211,14 +211,14 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.0"
-  flutter_settings_ui:
+  flutter_settings_screens:
     dependency: "direct main"
     description:
-      name: flutter_settings_ui
-      sha256: dcc506fab724192594e5c232b6214a941abd6e7b5151626635b89258fadbc17c
+      name: flutter_settings_screens
+      sha256: b9e5ff87537fceeb67012560db6ef4bb0ff7d7a031e8184e1689538756ca99a0
       url: "https://pub.dev"
     source: hosted
-    version: "3.0.1"
+    version: "0.3.4"
   flutter_svg:
     dependency: "direct main"
     description:
