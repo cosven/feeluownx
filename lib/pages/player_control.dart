@@ -6,6 +6,7 @@ import '../bean/player_state.dart';
 import '../client.dart';
 import '../global.dart';
 import '../player.dart';
+import 'fullscreen_player.dart';
 
 class PlayerControlPage extends StatefulWidget {
   const PlayerControlPage({super.key});
@@ -101,13 +102,13 @@ class _PlayerControlPageState extends State<PlayerControlPage>
                           },
                         ),
                       ],
-                    )
+                    ),
                   ],
                 ),
                 Positioned(
                     left: 0,
                     right: 0,
-                    bottom: 0,
+                    bottom: 80,
                     child: Container(
                         height: 38,
                         alignment: Alignment.bottomCenter,

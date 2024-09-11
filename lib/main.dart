@@ -2,6 +2,7 @@ import 'package:dynamic_color/dynamic_color.dart';
 import 'package:feeluownx/pages/configuration.dart';
 import 'package:feeluownx/pages/playlist_ui.dart';
 import 'package:feeluownx/search.dart';
+import 'package:feeluownx/widgets/small_player.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_settings_screens/flutter_settings_screens.dart';
@@ -54,10 +55,14 @@ class AppState extends State<App> with SingleTickerProviderStateMixin {
           appBar: AppBar(
             title: const Text('FeelUOwn'),
           ),
-          body: TabBarView(
-              controller: tabController,
-              physics: const NeverScrollableScrollPhysics(),
-              children: children),
+          body: Stack(children: [
+            TabBarView(
+                controller: tabController,
+                physics: const NeverScrollableScrollPhysics(),
+                children: children),
+            const Positioned(
+                bottom: 0, left: 0, right: 0, child: SmallPlayerWidget())
+          ]),
           bottomNavigationBar: BottomNavigationBar(items: const [
             BottomNavigationBarItem(icon: Icon(Icons.home), label: "Home"),
             BottomNavigationBarItem(icon: Icon(Icons.list), label: "Playing"),
