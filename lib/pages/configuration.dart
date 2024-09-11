@@ -79,9 +79,11 @@ class ConfigurationPageState extends State<ConfigurationPage> {
                               Text("Please enable notification permission")));
                     }
                     await openAppSettings();
+                    setState(() {});
                   }
                   if (await Permission.notification.isDenied) {
                     await Permission.notification.request();
+                    setState(() {});
                   }
                   if (await Permission.notification.isGranted &&
                       context.mounted) {
@@ -104,6 +106,7 @@ class ConfigurationPageState extends State<ConfigurationPage> {
                 subtitle: subtitle,
                 onTap: () async {
                   await OptimizeBattery.stopOptimizingBatteryUsage();
+                  setState(() {});
                 },
               );
             }),
