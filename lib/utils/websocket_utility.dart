@@ -31,6 +31,7 @@ class WebSocketUtility {
   late Function onError; // 连接错误回调
   late Function onOpen; // 连接开启回调
   late Function onMessage; // 接收消息回调
+  late String uri;
 
   /// 初始化WebSocket
   void initWebSocket(
@@ -41,11 +42,12 @@ class WebSocketUtility {
     this.onOpen = onOpen;
     this.onMessage = onMessage;
     this.onError = onError;
-    openSocket(uri);
+    this.uri = uri;
+    openSocket();
   }
 
   /// 开启WebSocket连接
-  void openSocket(String uri) {
+  void openSocket() {
     // closeSocket();
     _webSocket = WebSocketChannel.connect(Uri.parse(uri));
     print('WebSocket连接成功: $uri');
