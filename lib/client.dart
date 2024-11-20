@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:feeluownx/utils/websocket_utility.dart';
 import 'package:flutter_settings_screens/flutter_settings_screens.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
@@ -16,7 +17,8 @@ class Client {
   }
 
   Future<void> initClient() async {
-    String? ip = Settings.getValue(settingsKeyDaemonIp, defaultValue: "127.0.0.1");
+    String? ip =
+        Settings.getValue(settingsKeyDaemonIp, defaultValue: "127.0.0.1");
     url = "http://$ip:23332";
   }
 
@@ -37,7 +39,7 @@ class Client {
       },
       body: body,
     );
-    rpcRequestId ++;
+    rpcRequestId++;
     print('send rpc request: $body');
     if (response.statusCode == 200) {
       Map<String, dynamic> respBody = json.decode(response.body);
@@ -56,12 +58,21 @@ class PubsubClient {
   WebSocketChannel? channel;
 
   Future<void> initClient() async {
-    String? ip = Settings.getValue(settingsKeyDaemonIp, defaultValue: "127.0.0.1");
+    String? ip =
+        Settings.getValue(settingsKeyDaemonIp, defaultValue: "127.0.0.1");
     url = "ws://$ip:23332/signal/v1";
   }
 
-  Future<void> connect() async {
+  Future<void> connect(
+      {required Function onMessage, required Function onError}) async {
     await initClient();
+    WebSocketUtility().initWebSocket(
+        uri: url,
+        onOpen: () {
+          WebSocketUtility().initHeartBeat();
+        },
+        onMessage: onMessage,
+        onError: onError);
     channel = WebSocketChannel.connect(Uri.parse(url));
   }
 
@@ -72,6 +83,6 @@ class PubsubClient {
   Stream<dynamic>? get stream => channel?.stream;
 
   void send(String message) {
-    channel?.sink.add(message);
+    WebSocketUtility().sendMessage(message);
   }
 }

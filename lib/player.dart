@@ -27,11 +27,11 @@ class AudioPlayerHandler extends BaseAudioHandler with SeekHandler {
   }
 
   void init() {
-    pubsubClient.connect().then((result) {
+    pubsubClient
+        .connect(onMessage: onWebsocketData, onError: onWebsocketError)
+        .then((result) {
       connectionStatus = 1;
       connectionMsg = "";
-      pubsubClient.stream?.listen(onWebsocketData,
-          onError: onWebsocketError, onDone: onWebsocketDone);
       initPlaybackState();
       initFuoCurrentPlayingInfo();
     });
