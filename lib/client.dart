@@ -88,7 +88,7 @@ class Client {
   }
 
   Future<String?> getAlbumCover(Map<String, dynamic> album) async {
-    Object? obj = await jsonRpc("lambda: app.library.album_upgrade", args: [album]);
+    Object? obj = await jsonRpc("app.library.album_upgrade", args: [album]);
     if (obj != null) {
       return (obj as Map<String, dynamic>)['cover'];
     }
