@@ -15,6 +15,7 @@ import 'package:logging/logging.dart';
 
 import 'global.dart';
 import 'pages/player_control.dart';
+import 'pages/home_page.dart';
 
 Future<void> main() async {
   Logger.root.level = Level.ALL;
@@ -39,6 +40,7 @@ class App extends StatefulWidget {
 class AppState extends State<App> with SingleTickerProviderStateMixin {
   int currentIndex = 0;
   final List<Widget> children = [
+    const HomePage(),
     const PlayerControlPage(),
     const PlaylistView(),
     const ConfigurationPage(),
@@ -76,12 +78,20 @@ class AppState extends State<App> with SingleTickerProviderStateMixin {
             const Positioned(
                 bottom: 0, left: 0, right: 0, child: SmallPlayerWidget())
           ]),
-          bottomNavigationBar: BottomNavigationBar(items: const [
-            BottomNavigationBarItem(icon: Icon(Icons.home), label: "Home"),
-            BottomNavigationBarItem(icon: Icon(Icons.list), label: "Playing"),
-            BottomNavigationBarItem(
-                icon: Icon(Icons.settings), label: "Settings")
-          ], currentIndex: currentIndex, onTap: onTabChange),
+          bottomNavigationBar: BottomNavigationBar(
+            items: const [
+              BottomNavigationBarItem(icon: Icon(Icons.home), label: "Home"),
+              BottomNavigationBarItem(icon: Icon(Icons.play_arrow), label: "Player"),
+              BottomNavigationBarItem(icon: Icon(Icons.list), label: "Playing"),
+              BottomNavigationBarItem(icon: Icon(Icons.settings), label: "Settings")
+            ],
+            currentIndex: currentIndex,
+            onTap: onTabChange,
+            type: BottomNavigationBarType.fixed,
+            selectedItemColor: Theme.of(context).colorScheme.primary,
+            unselectedItemColor: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
+            backgroundColor: Theme.of(context).colorScheme.surface,
+          ),
           floatingActionButton: Builder(
               builder: (context) => FloatingActionButton(
                   onPressed: () async {

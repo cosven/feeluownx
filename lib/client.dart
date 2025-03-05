@@ -58,6 +58,42 @@ class Client {
     }
     return null;
   }
+
+  /// Returns a list of albums from the library
+  ///
+  /// Each album is represented as a Map with the following structure:
+  /// ```dart
+  /// {
+  ///   "identifier": "8220",
+  ///   "source": "xxx",
+  ///   "name": "叶惠美",
+  ///   "artists_name": "周杰伦",
+  ///   "provider": "qqmusic",
+  ///   "uri": "fuo://xxx/albums/8220",
+  ///   "__type__": "feeluown.library.BriefAlbumModel"
+  /// }
+  /// ```
+  Future<List<Map<String, dynamic>>> listLibraryAlbums() async {
+    Object? obj = await jsonRpc("lambda: app.coll_mgr.get_coll_library().models");
+    if (obj != null) {
+      List<dynamic> list = obj as List<dynamic>;
+      return list
+          .where((item) =>
+              item is Map<String, dynamic> &&
+              item['__type__'] == 'feeluown.library.BriefAlbumModel')
+          .map((item) => item as Map<String, dynamic>)
+          .toList();
+    }
+    return [];
+  }
+
+  Future<String?> getAlbumCover(Map<String, dynamic> album) async {
+    Object? obj = await jsonRpc("lambda: app.library.album_upgrade", args: [album]);
+    if (obj != null) {
+      return (obj as Map<String, dynamic>)['cover'];
+    }
+    return null;
+  }
 }
 
 class PubsubClient {
