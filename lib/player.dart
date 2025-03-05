@@ -35,6 +35,7 @@ class AudioPlayerHandler extends BaseAudioHandler with SeekHandler {
       initPlaybackState();
       initFuoCurrentPlayingInfo();
     });
+    client.initClient();
   }
 
   void initPlaybackState() {
@@ -220,6 +221,8 @@ class AudioPlayerHandler extends BaseAudioHandler with SeekHandler {
     if (obj != null) {
       playerState.metadata = obj as Map<String, dynamic>;
       print(playerState.metadata);
+    } else {
+      print("get current song failed");
     }
   }
 }

@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:dynamic_color/dynamic_color.dart';
 import 'package:feeluownx/pages/configuration.dart';
 import 'package:feeluownx/pages/playlist_ui.dart';
@@ -6,13 +8,24 @@ import 'package:feeluownx/widgets/small_player.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_settings_screens/flutter_settings_screens.dart';
+// import 'package:serious_python/serious_python.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:media_kit/media_kit.dart';
+import 'package:logging/logging.dart';
 
 import 'global.dart';
 import 'pages/player_control.dart';
 
 Future<void> main() async {
+  Logger.root.level = Level.ALL;
+  MediaKit.ensureInitialized();
   await Global.init();
   await Settings.init(cacheProvider: SharePreferenceCache());
+  // final Directory appDocumentsDir = await getApplicationDocumentsDirectory();
+  // SeriousPython.run(
+  //   "app/app.zip",
+  //   environmentVariables: {"FEELUOWN_USER_HOME": appDocumentsDir.path}
+  // );
   runApp(const App());
 }
 

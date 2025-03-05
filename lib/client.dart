@@ -5,9 +5,11 @@ import 'package:flutter_settings_screens/flutter_settings_screens.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 import 'package:http/http.dart' as http;
+import 'package:logging/logging.dart';
 
 class Client {
   static const String settingsKeyDaemonIp = "settings_ip_address";
+  final _logger = Logger('Client');
 
   String url = "";
   int rpcRequestId = 0;
@@ -20,6 +22,13 @@ class Client {
     String? ip =
         Settings.getValue(settingsKeyDaemonIp, defaultValue: "127.0.0.1");
     url = "http://$ip:23332";
+  }
+
+  void reloadSettings() {
+    String? ip =
+        Settings.getValue(settingsKeyDaemonIp, defaultValue: "127.0.0.1");
+    url = "http://$ip:23332";
+    _logger.info("url: $url");
   }
 
   Future<Object?> jsonRpc(String method, {List<dynamic>? args}) async {
@@ -40,12 +49,12 @@ class Client {
       body: body,
     );
     rpcRequestId++;
-    print('send rpc request: $body');
+    _logger.info('send rpc request: $body');
     if (response.statusCode == 200) {
       Map<String, dynamic> respBody = json.decode(response.body);
       return respBody['result'];
     } else {
-      print('rpc failed, $response');
+      _logger.warning('rpc failed, $response');
     }
     return null;
   }
@@ -53,6 +62,7 @@ class Client {
 
 class PubsubClient {
   static const String settingsKeyDaemonIp = "settings_ip_address";
+  final _logger = Logger('PubsubClient');
 
   String url = "";
   WebSocketChannel? channel;
