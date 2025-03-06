@@ -67,85 +67,96 @@ class _HomePageState extends State<HomePage> {
       return const Center(child: Text('No albums found'));
     }
 
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Library Albums'),
-      ),
-      body: RefreshIndicator(
-        onRefresh: _loadAlbums,
-        child: GridView.builder(
-          padding: const EdgeInsets.all(16),
-          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: 2,
-            childAspectRatio: 0.8,
-            crossAxisSpacing: 16,
-            mainAxisSpacing: 16,
+    return RefreshIndicator(
+      onRefresh: _loadAlbums,
+      child: ListView(
+        children: [
+          const SizedBox(height: 48),  // 添加顶部间距
+          Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Text(
+              'Albums',
+              style: Theme.of(context).textTheme.headlineMedium,
+            ),
           ),
-          itemCount: albums.length,
-          itemBuilder: (context, index) {
-            final album = albums[index];
-            // 触发封面加载
-            _loadAlbumCover(album);
-            final coverUrl = albumCovers[album['identifier']];
+          SizedBox(
+            height: 220,
+            child: ListView.builder(
+              scrollDirection: Axis.horizontal,
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              itemCount: albums.length,
+              itemBuilder: (context, index) {
+                final album = albums[index];
+                _loadAlbumCover(album);
+                final coverUrl = albumCovers[album['identifier']];
 
-            return Card(
-              clipBehavior: Clip.antiAlias,
-              child: InkWell(
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => AlbumDetailPage(
-                        album: album,
-                        coverUrl: albumCovers[album['identifier']],
-                      ),
-                    ),
-                  );
-                },
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    Expanded(
-                      child: coverUrl != null
-                          ? Image.network(
-                              coverUrl,
-                              fit: BoxFit.cover,
-                              errorBuilder: (context, error, stackTrace) {
-                                return Container(
-                                  color: Colors.grey[300],
-                                  child: const Center(
-                                    child: Icon(Icons.error_outline, size: 48, color: Colors.grey),
-                                  ),
-                                );
-                              },
-                              loadingBuilder: (context, child, loadingProgress) {
-                                if (loadingProgress == null) return child;
-                                return Container(
-                                  color: Colors.grey[300],
-                                  child: const Center(
-                                    child: CircularProgressIndicator(),
-                                  ),
-                                );
-                              },
-                            )
-                          : Container(
-                              color: Colors.grey[300],
-                              child: const Center(
-                                child: Icon(Icons.album, size: 48, color: Colors.grey),
-                              ),
+                return Padding(
+                  padding: const EdgeInsets.only(right: 16),
+                  child: SizedBox(
+                    width: 160, // 固定宽度
+                    child: InkWell(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => AlbumDetailPage(
+                              album: album,
+                              coverUrl: coverUrl,
                             ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.all(8.0),
+                          ),
+                        );
+                      },
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
+                          // 专辑封面
+                          ClipRRect(
+                            borderRadius: BorderRadius.circular(8),
+                            child: AspectRatio(
+                              aspectRatio: 1,
+                              child: coverUrl != null
+                                  ? Image.network(
+                                      coverUrl,
+                                      fit: BoxFit.cover,
+                                      errorBuilder: (context, error, stackTrace) {
+                                        return Container(
+                                          color: Colors.grey[300],
+                                          child: const Center(
+                                            child: Icon(Icons.error_outline,
+                                                size: 48, color: Colors.grey),
+                                          ),
+                                        );
+                                      },
+                                      loadingBuilder:
+                                          (context, child, loadingProgress) {
+                                        if (loadingProgress == null) return child;
+                                        return Container(
+                                          color: Colors.grey[300],
+                                          child: const Center(
+                                            child: CircularProgressIndicator(),
+                                          ),
+                                        );
+                                      },
+                                    )
+                                  : Container(
+                                      color: Colors.grey[300],
+                                      child: const Center(
+                                        child: Icon(Icons.album,
+                                            size: 48, color: Colors.grey),
+                                      ),
+                                    ),
+                            ),
+                          ),
+                          const SizedBox(height: 8),
+                          // 专辑名称
                           Text(
                             album['name'] ?? 'Unknown Album',
                             style: Theme.of(context).textTheme.titleMedium,
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
                           ),
+                          const SizedBox(height: 4),
+                          // 艺术家名称
                           Text(
                             album['artists_name'] ?? 'Unknown Artist',
                             style: Theme.of(context).textTheme.bodySmall,
@@ -155,12 +166,13 @@ class _HomePageState extends State<HomePage> {
                         ],
                       ),
                     ),
-                  ],
-                ),
-              ),
-            );
-          },
-        ),
+                  ),
+                );
+              },
+            ),
+          ),
+          const SizedBox(height: 32),
+        ],
       ),
     );
   }
