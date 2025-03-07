@@ -75,51 +75,6 @@ class AppState extends State<App> with SingleTickerProviderStateMixin {
         ),
         home: Builder(
           builder: (context) => Scaffold(
-            appBar: AppBar(
-              title: currentIndex == 0 ? Padding(
-                padding: const EdgeInsets.fromLTRB(0, 12, 0, 8),
-                child: InkWell(
-                  onTap: () {
-                    showSearch(
-                      context: context,
-                      delegate: Global.getIt<SongSearchDelegate>(),
-                    );
-                  },
-                  child: Container(
-                    height: 44,
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
-                    decoration: BoxDecoration(
-                      color: Theme.of(context).colorScheme.surfaceVariant,
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(
-                        color: Theme.of(context).colorScheme.outline.withOpacity(0.5),
-                      ),
-                    ),
-                    child: Row(
-                      children: [
-                        Icon(
-                          Icons.search,
-                          color: Theme.of(context).colorScheme.onSurfaceVariant,
-                          size: 20,
-                        ),
-                        const SizedBox(width: 12),
-                        Expanded(
-                          child: Text(
-                            'Search songs, artists, albums...',
-                            style: TextStyle(
-                              fontSize: 14,
-                              color: Theme.of(context).colorScheme.onSurfaceVariant.withOpacity(0.8),
-                            ),
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ) : null,
-              toolbarHeight: currentIndex == 0 ? kToolbarHeight : 0,
-            ),
             body: Stack(children: [
               TabBarView(
                   controller: tabController,
