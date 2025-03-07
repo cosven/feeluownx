@@ -78,19 +78,15 @@ class AppState extends State<App> with SingleTickerProviderStateMixin {
             const Positioned(
                 bottom: 0, left: 0, right: 0, child: SmallPlayerWidget())
           ]),
-          bottomNavigationBar: BottomNavigationBar(
-            items: const [
-              BottomNavigationBarItem(icon: Icon(Icons.home), label: "Home"),
-              BottomNavigationBarItem(icon: Icon(Icons.play_arrow), label: "Player"),
-              BottomNavigationBarItem(icon: Icon(Icons.list), label: "Playing"),
-              BottomNavigationBarItem(icon: Icon(Icons.settings), label: "Settings")
+          bottomNavigationBar: NavigationBar(
+            destinations: const [
+              NavigationDestination(icon: Icon(Icons.home), label: "Home"),
+              NavigationDestination(icon: Icon(Icons.play_arrow), label: "Player"),
+              NavigationDestination(icon: Icon(Icons.list), label: "Playing"),
+              NavigationDestination(icon: Icon(Icons.settings), label: "Settings")
             ],
-            currentIndex: currentIndex,
-            onTap: onTabChange,
-            type: BottomNavigationBarType.fixed,
-            selectedItemColor: Theme.of(context).colorScheme.primary,
-            unselectedItemColor: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
-            backgroundColor: Theme.of(context).colorScheme.surface,
+            selectedIndex: currentIndex,
+            onDestinationSelected: onTabChange,
           ),
           floatingActionButton: Builder(
               builder: (context) => FloatingActionButton(

@@ -52,19 +52,28 @@ class SmallPlayerState extends State<StatefulWidget> {
                     .push(slideFromBottom(const FullscreenPlayerPage()));
               },
               child: Container(
-                  decoration:
-                      BoxDecoration(color: Theme.of(context).cardColor),
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).colorScheme.surfaceVariant,
+                    boxShadow: [
+                      BoxShadow(
+                        color: Theme.of(context).colorScheme.shadow.withOpacity(0.1),
+                        blurRadius: 4,
+                        offset: const Offset(0, -1),
+                      ),
+                    ],
+                  ),
+                  padding: const EdgeInsets.symmetric(vertical: 8),
                   child: Row(
                       mainAxisAlignment: MainAxisAlignment.start,
-                      crossAxisAlignment: CrossAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
                         const SizedBox(width: 20),
                         Hero(
                             tag: "artworkImg",
                             child: artwork.isNotEmpty
                                 ? Image.network(
-                                    width: 60,
-                                    height: 60,
+                                    width: 48,
+                                    height: 48,
                                     artwork,
                                     errorBuilder:
                                         (context, exception, stackTrack) =>
@@ -73,24 +82,28 @@ class SmallPlayerState extends State<StatefulWidget> {
                                                 semanticsLabel:
                                                     'Fetch artwork error',
                                                 alignment: Alignment.center,
-                                                width: 60,
-                                                height: 60))
+                                                width: 48,
+                                                height: 48))
                                 : SvgPicture.asset('assets/music-square.svg',
                                     semanticsLabel: 'No artwork',
                                     alignment: Alignment.center,
-                                    width: 60,
-                                    height: 60)),
-                        const SizedBox(width: 10),
-                        Column(
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            crossAxisAlignment: CrossAxisAlignment.start,
+                                    width: 48,
+                                    height: 48)),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: Row(
                             children: [
-                              Text(
-                                  handler.playerState.metadata?['title'] ?? ''),
-                              Text(handler
-                                      .playerState.metadata?['artists_name'] ??
-                                  ''),
-                            ])
+                              Flexible(
+                                child: Text(
+                                  '${handler.playerState.metadata?['title'] ?? ''} - ${handler.playerState.metadata?['artists_name'] ?? ''}',
+                                  style: Theme.of(context).textTheme.titleSmall,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(width: 20),
                       ])));
         }));
   }
