@@ -41,7 +41,6 @@ class AppState extends State<App> with SingleTickerProviderStateMixin {
   int currentIndex = 0;
   final List<Widget> children = [
     const HomePage(),
-    const PlayerControlPage(),
     const PlaylistView(),
     const ConfigurationPage(),
   ];
@@ -57,7 +56,7 @@ class AppState extends State<App> with SingleTickerProviderStateMixin {
   @override
   void initState() {
     super.initState();
-    tabController = TabController(length: children.length, vsync: this);
+    tabController = TabController(length: 3, vsync: this);
   }
 
   @override
@@ -77,7 +76,7 @@ class AppState extends State<App> with SingleTickerProviderStateMixin {
         home: Builder(
           builder: (context) => Scaffold(
             appBar: AppBar(
-              title: Padding(
+              title: currentIndex == 0 ? Padding(
                 padding: const EdgeInsets.fromLTRB(0, 12, 0, 8),
                 child: InkWell(
                   onTap: () {
@@ -118,7 +117,8 @@ class AppState extends State<App> with SingleTickerProviderStateMixin {
                     ),
                   ),
                 ),
-              ),
+              ) : null,
+              toolbarHeight: currentIndex == 0 ? kToolbarHeight : 0,
             ),
             body: Stack(children: [
               TabBarView(
@@ -131,22 +131,33 @@ class AppState extends State<App> with SingleTickerProviderStateMixin {
             bottomNavigationBar: NavigationBar(
               destinations: const [
                 NavigationDestination(icon: Icon(Icons.home), label: "Home"),
-                NavigationDestination(icon: Icon(Icons.play_arrow), label: "Player"),
+                NavigationDestination(icon: Icon(Icons.search), label: "Search"),
                 NavigationDestination(icon: Icon(Icons.list), label: "Playing"),
                 NavigationDestination(icon: Icon(Icons.settings), label: "Settings")
               ],
-              selectedIndex: currentIndex,
-              onDestinationSelected: onTabChange,
+              selectedIndex: currentIndex == 0 ? 0 : currentIndex + 1,
+              onDestinationSelected: (index) {
+                if (index == 1) {
+                  showSearch(
+                    context: context,
+                    delegate: Global.getIt<SongSearchDelegate>(),
+                  );
+                } else if (index > 1) {
+                  setState(() {
+                    currentIndex = index - 1;
+                    tabController.index = index - 1;
+                  });
+                } else {
+                  setState(() {
+                    currentIndex = 0;
+                    tabController.index = 0;
+                  });
+                }
+              },
             ),
           ),
         ),
       );
-    });
-  }
-
-  void onTabChange(int index) {
-    setState(() {
-      tabController.index = currentIndex = index;
     });
   }
 }
