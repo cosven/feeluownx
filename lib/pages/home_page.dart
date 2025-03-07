@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:feeluownx/client.dart';
 import 'package:feeluownx/global.dart';
 import 'package:feeluownx/pages/album_detail_page.dart';
+import 'package:feeluownx/pages/song_list_page.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -71,12 +72,95 @@ class _HomePageState extends State<HomePage> {
       onRefresh: _loadAlbums,
       child: ListView(
         children: [
-          const SizedBox(height: 48),  // 添加顶部间距
+          // 用户信息区域
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
+            child: Row(
+              children: [
+                Expanded(
+                  child: Text(
+                    'Hi, 未登录',
+                    style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 8),
+                Container(
+                  width: 40,
+                  height: 40,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: Theme.of(context).colorScheme.primaryContainer,
+                  ),
+                  child: const Icon(Icons.person),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 8),
+          // 添加 Carousel 按钮
+          SizedBox(
+            height: 120,
+            child: PageView.builder(
+              itemCount: 3, // 可以添加更多按钮
+              controller: PageController(viewportFraction: 0.9),
+              padEnds: false,
+              itemBuilder: (context, index) {
+                return Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                  child: InkWell(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => const SongListPage()),
+                      );
+                    },
+                    borderRadius: BorderRadius.circular(12.0),
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: Theme.of(context).colorScheme.primaryContainer,
+                        borderRadius: BorderRadius.circular(12.0),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.1),
+                            blurRadius: 6,
+                            offset: const Offset(0, 3),
+                          ),
+                        ],
+                      ),
+                      child: Center(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(
+                              Icons.library_music,
+                              size: 40,
+                              color: Theme.of(context).colorScheme.onPrimaryContainer,
+                            ),
+                            const SizedBox(height: 8),
+                            Text(
+                              '我收藏的音乐',
+                              style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                                color: Theme.of(context).colorScheme.onPrimaryContainer,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                );
+              },
+            ),
+          ),
+          const SizedBox(height: 16),
           Padding(
             padding: const EdgeInsets.all(16.0),
             child: Text(
-              'Albums',
-              style: Theme.of(context).textTheme.headlineMedium,
+              'Pinned',
+              style: Theme.of(context).textTheme.titleLarge,
             ),
           ),
           SizedBox(

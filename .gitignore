@@ -44,3 +44,4 @@ app.*.map.json
 
 # app
 /app/app.zip
+.aider*
