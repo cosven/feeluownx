@@ -66,39 +66,6 @@ class AppState extends State<App> with SingleTickerProviderStateMixin {
       return MaterialApp(
         localizationsDelegates: AppLocalizations.localizationsDelegates,
         supportedLocales: AppLocalizations.supportedLocales,
-        home: Scaffold(
-          appBar: AppBar(
-            title: const Text('FeelUOwn'),
-          ),
-          body: Stack(children: [
-            TabBarView(
-                controller: tabController,
-                physics: const NeverScrollableScrollPhysics(),
-                children: children),
-            const Positioned(
-                bottom: 0, left: 0, right: 0, child: SmallPlayerWidget())
-          ]),
-          bottomNavigationBar: NavigationBar(
-            destinations: const [
-              NavigationDestination(icon: Icon(Icons.home), label: "Home"),
-              NavigationDestination(icon: Icon(Icons.play_arrow), label: "Player"),
-              NavigationDestination(icon: Icon(Icons.list), label: "Playing"),
-              NavigationDestination(icon: Icon(Icons.settings), label: "Settings")
-            ],
-            selectedIndex: currentIndex,
-            onDestinationSelected: onTabChange,
-          ),
-          floatingActionButton: Builder(
-              builder: (context) => FloatingActionButton(
-                  onPressed: () async {
-                    await showSearch(
-                        context: context,
-                        delegate: Global.getIt<SongSearchDelegate>());
-                  },
-                  child: const Icon(Icons.search))),
-        ),
-        // auto dark mode follows system settings
-        themeMode: ThemeMode.system,
         theme: ThemeData(
           colorScheme: lightColorScheme ?? _defaultLightColorScheme,
           useMaterial3: true,
@@ -106,6 +73,72 @@ class AppState extends State<App> with SingleTickerProviderStateMixin {
         darkTheme: ThemeData(
           colorScheme: darkColorScheme ?? _defaultDarkColorScheme,
           useMaterial3: true,
+        ),
+        home: Builder(
+          builder: (context) => Scaffold(
+            appBar: AppBar(
+              title: Padding(
+                padding: const EdgeInsets.fromLTRB(0, 12, 0, 8),
+                child: InkWell(
+                  onTap: () {
+                    showSearch(
+                      context: context,
+                      delegate: Global.getIt<SongSearchDelegate>(),
+                    );
+                  },
+                  child: Container(
+                    height: 44,
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    decoration: BoxDecoration(
+                      color: Theme.of(context).colorScheme.surfaceVariant,
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(
+                        color: Theme.of(context).colorScheme.outline.withOpacity(0.5),
+                      ),
+                    ),
+                    child: Row(
+                      children: [
+                        Icon(
+                          Icons.search,
+                          color: Theme.of(context).colorScheme.onSurfaceVariant,
+                          size: 20,
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: Text(
+                            'Search songs, artists, albums...',
+                            style: TextStyle(
+                              fontSize: 14,
+                              color: Theme.of(context).colorScheme.onSurfaceVariant.withOpacity(0.8),
+                            ),
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ),
+            body: Stack(children: [
+              TabBarView(
+                  controller: tabController,
+                  physics: const NeverScrollableScrollPhysics(),
+                  children: children),
+              const Positioned(
+                  bottom: 0, left: 0, right: 0, child: SmallPlayerWidget())
+            ]),
+            bottomNavigationBar: NavigationBar(
+              destinations: const [
+                NavigationDestination(icon: Icon(Icons.home), label: "Home"),
+                NavigationDestination(icon: Icon(Icons.play_arrow), label: "Player"),
+                NavigationDestination(icon: Icon(Icons.list), label: "Playing"),
+                NavigationDestination(icon: Icon(Icons.settings), label: "Settings")
+              ],
+              selectedIndex: currentIndex,
+              onDestinationSelected: onTabChange,
+            ),
+          ),
         ),
       );
     });
