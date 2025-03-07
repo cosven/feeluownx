@@ -107,6 +107,27 @@ class _HomePageState extends State<HomePage> {
               controller: PageController(viewportFraction: 0.7),
               padEnds: false,
               itemBuilder: (context, index) {
+                // 明确指定 Map 的类型
+                final List<Map<String, dynamic>> cards = [
+                  {
+                    'subtitle': '根据最近播放',
+                    'title': '为你推荐',
+                    'icon': Icons.recommend,
+                  },
+                  {
+                    'subtitle': '基于你的收藏',
+                    'title': '猜你喜欢',
+                    'icon': Icons.favorite,
+                  },
+                  {
+                    'subtitle': '全新发现',
+                    'title': '每日精选',
+                    'icon': Icons.auto_awesome,
+                  },
+                ];
+
+                final cardContent = cards[index];
+
                 return Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 6.0),
                   child: InkWell(
@@ -140,14 +161,14 @@ class _HomePageState extends State<HomePage> {
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
                                   Text(
-                                    '我的收藏',
+                                    cardContent['subtitle'] as String,
                                     style: Theme.of(context).textTheme.bodySmall?.copyWith(
                                       color: Theme.of(context).colorScheme.onPrimaryContainer.withOpacity(0.7),
                                     ),
                                   ),
                                   const SizedBox(height: 4),
                                   Text(
-                                    '收藏的音乐',
+                                    cardContent['title'] as String,
                                     style: Theme.of(context).textTheme.titleMedium?.copyWith(
                                       color: Theme.of(context).colorScheme.onPrimaryContainer,
                                       fontWeight: FontWeight.bold,
@@ -166,7 +187,7 @@ class _HomePageState extends State<HomePage> {
                                 borderRadius: BorderRadius.circular(8),
                               ),
                               child: Icon(
-                                Icons.album,
+                                cardContent['icon'] as IconData,
                                 size: 32,
                                 color: Theme.of(context).colorScheme.onPrimaryContainer.withOpacity(0.7),
                               ),
