@@ -19,6 +19,9 @@ import 'pages/home_page.dart';
 
 Future<void> main() async {
   Logger.root.level = Level.ALL;
+  Logger.root.onRecord.listen((record) {
+    print('${record.level.name}: ${record.time}: ${record.message}');
+  });
   MediaKit.ensureInitialized();
   await Global.init();
   await Settings.init(cacheProvider: SharePreferenceCache());

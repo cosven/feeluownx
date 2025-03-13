@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'dart:convert';
 
 import 'package:feeluownx/utils/websocket_utility.dart';
@@ -31,7 +32,85 @@ class Client {
     _logger.info("url: $url");
   }
 
+  Future<String> readResponse(Stream<String> stream, StringBuffer buffer) async {
+    bool gotWelcome = false;
+    bool gotHeader = false;
+    int bodyLength = 0;
+    await for (final chunk in stream) {
+      buffer.write(chunk); // 将接收到的数据块追加到缓冲区
+      // 检查缓冲区中是否有完整的行
+      if (!gotHeader){
+        final current = buffer.toString();
+        final lineEndIndex = current.indexOf('\n');
+        if (lineEndIndex != -1) {
+          if (!gotWelcome) {
+            final remain = current.substring(lineEndIndex + 1); // 保留剩余的数据
+            buffer.clear();
+            buffer.write(remain);
+            gotWelcome = true;
+            continue;
+          } else {
+            final header = current.substring(0, lineEndIndex + 1);
+            final remain = current.substring(lineEndIndex + 1); // 保留剩余的数据
+            _logger.info("response header: $header");
+            buffer.clear();
+            buffer.write(remain);
+            print('remain: $remain');
+            gotHeader = true;
+            bodyLength = int.parse(header.split(' ')[2]);
+            if (remain.length>= bodyLength) {
+              return remain;
+            }
+            continue;
+          }
+        }
+      } else {
+        if (buffer.length >= bodyLength) {
+          return buffer.toString();
+        }
+      }
+    }
+    throw Exception('incomplete response');
+  }
+
+  Future<Object?> tcpJsonRpc(String method, {List<dynamic>? args}) async {
+    String? ip = Settings.getValue(settingsKeyDaemonIp, defaultValue: "127.0.0.1");
+    int port = 23333; // Assuming the TCP server is running on port 23332
+
+    Map<String, dynamic> payload = {
+      'jsonrpc': '2.0',
+      'id': rpcRequestId,
+      'method': method,
+    };
+    rpcRequestId++;
+    if (args != null && args.isNotEmpty) {
+      payload['params'] = args;
+    }
+    String body = jsonEncode(payload);
+    String message = "jsonrpc '$body'\n";
+    try {
+      final socket = await Socket.connect(ip, port);
+      socket.write(message);
+      _logger.info('send tcp rpc request: $message');
+
+      // Read the response header.
+      final buffer = StringBuffer();
+      final stream = utf8.decoder.bind(socket);
+      final body = await readResponse(stream, buffer);
+      _logger.info('received tcp rpc response: $body');
+      socket.destroy();
+
+      Map<String, dynamic> respBody = json.decode(body);
+      return respBody['result'];
+    } catch (e) {
+      _logger.warning('tcp rpc failed, $e');
+      return null;
+    }
+  }
+
   Future<Object?> jsonRpc(String method, {List<dynamic>? args}) async {
+    return await tcpJsonRpc(method, args: args);
+
     Map<String, dynamic> payload = {
       'jsonrpc': '2.0',
       'id': rpcRequestId,
