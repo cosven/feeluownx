@@ -1,8 +1,8 @@
 import 'dart:io';
 import 'dart:convert';
+import 'dart:async';
 
 import 'package:feeluownx/utils/websocket_utility.dart';
-import 'package:flutter_settings_screens/flutter_settings_screens.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 import 'package:http/http.dart' as http;
 import 'package:logging/logging.dart';
@@ -228,6 +228,167 @@ class Client {
   }
 }
 
+class TcpPubsubClient {
+  final _logger = Logger('TcpPubsubClient');
+
+  String host = "127.0.0.1";
+  int port = 23334;
+  Socket? _socket;
+  StreamController<String>? _streamController;
+  Stream<String>? _broadcastStream;
+  bool _isConnected = false;
+
+  Function? _onMessage;
+  Function? _onError;
+
+  TcpPubsubClient(String host_) {
+    host = host_;
+  }
+
+  // FIXME: the protocol parser is hacky and not robust
+  Future<void> connect({
+    required Function onMessage,
+    required Function onError,
+  }) async {
+    if (_isConnected) {
+      await _socket!.close();
+    }
+
+    _onMessage = onMessage;
+    _onError = onError;
+
+    try {
+      // Connect to the server
+      _socket = await Socket.connect(host, port);
+
+      // Create a broadcast stream that can be listened to multiple times
+      _streamController = StreamController<String>();
+      utf8.decoder.bind(_socket!).transform(const LineSplitter()).listen(
+        (data) => _streamController!.add(data),
+        onError: (e) => _streamController!.addError(e),
+        onDone: () => _streamController!.close(),
+      );
+      _broadcastStream = _streamController!.stream.asBroadcastStream();
+      _isConnected = true;
+
+      // Process the welcome message
+      String? welcomeMessage = await _broadcastStream!.first;
+      _logger.info('Received welcome message: $welcomeMessage');
+
+      // Send version message
+      _socket?.write('set --pubsub-version 2.0\n');
+      String? versionResponse = await _broadcastStream!.first;
+      _logger.info('Received version response: $versionResponse');
+
+      // Subscribe to player.metadata_changed
+      _socket?.write('sub player.metadata_changed\n');
+
+      // Start listening for messages
+      _startListening();
+
+    } catch (e) {
+      _isConnected = false;
+      _logger.severe('Failed to connect: $e');
+      onError(e);
+    }
+  }
+
+  void _startListening() {
+    if (_broadcastStream == null) return;
+
+    _broadcastStream!.listen(
+      (data) {
+        try {
+          if (data.startsWith('MSG')) {
+            _processMessage(data);
+          } else {
+            _logger.info('Received other message: $data');
+          }
+        } catch (e) {
+          _logger.warning('Error processing message: $e');
+          if (_onError != null) {
+            _onError!(e);
+          }
+        }
+      },
+      onError: (error) {
+        _logger.severe('Stream error: $error');
+        _isConnected = false;
+        if (_onError != null) {
+          _onError!(error);
+        }
+      },
+      onDone: () {
+        _logger.info('Stream closed');
+        _isConnected = false;
+      },
+    );
+  }
+
+  Future<void> _processMessage(String headerLine) async {
+    // Parse the header line: MSG {topic} {body_length}
+    List<String> parts = headerLine.split(' ');
+    if (parts.length < 3) {
+      _logger.warning('Invalid message header: $headerLine');
+      return;
+    }
+
+    String topic = parts[1];
+    int bodyLength = int.parse(parts[2]);
+
+    // Read the body
+    String body = await _readBody(bodyLength);
+
+    // Create a message object
+    Map<String, dynamic> message = {
+      'topic': topic,
+      'data': body,
+      'format': 'json',
+    };
+
+    // Call the onMessage callback
+    if (_onMessage != null) {
+      _onMessage!(message);
+    }
+  }
+
+  Future<String> _readBody(int length) async {
+    // This is a simplified approach - in a real implementation,
+    // you would need to handle cases where the body spans multiple lines
+    // or is split across multiple TCP packets
+    String? line = await _broadcastStream?.first;
+    return line ?? '';
+  }
+
+  void close() {
+    _isConnected = false;
+    _socket?.destroy();
+    _socket = null;
+    _streamController?.close();
+    _streamController = null;
+    _broadcastStream = null;
+  }
+
+  bool get isConnected => _isConnected;
+
+  void subscribe(String topic) {
+    if (!_isConnected || _socket == null) {
+      _logger.warning('Cannot subscribe, not connected');
+      return;
+    }
+    _socket!.write('sub $topic\n');
+  }
+
+  void unsubscribe(String topic) {
+    if (!_isConnected || _socket == null) {
+      _logger.warning('Cannot unsubscribe, not connected');
+      return;
+    }
+    _socket!.write('unsub $topic\n');
+  }
+}
+
+
 class PubsubClient {
   final _logger = Logger('PubsubClient');
 
@@ -250,7 +411,16 @@ class PubsubClient {
         onOpen: () {
           WebSocketUtility().initHeartBeat();
         },
-        onMessage: onMessage,
+        onMessage: (msg) {
+          Map<String, dynamic> js = {};
+          try {
+            js = json.decode(msg);
+          } catch (e) {
+            _logger.severe('decode message failed: $e');
+          }
+          // compactible with TcpPubsubClient message
+          onMessage(js);
+        }, //onMessage,
         onError: onError);
     channel = WebSocketChannel.connect(Uri.parse(url));
   }

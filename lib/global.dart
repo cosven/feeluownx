@@ -17,6 +17,7 @@ class Global {
     final host = Settings.getValue("settings_ip_address", defaultValue: "127.0.0.1")!;
     getIt.registerSingleton<Client>(Client(host));
     getIt.registerSingleton<PubsubClient>(PubsubClient(host));
+    getIt.registerSingleton<TcpPubsubClient>(TcpPubsubClient(host));
     getIt.registerSingleton<AudioPlayerHandler>(AudioPlayerHandler());
     getIt.registerSingleton<AudioHandler>(await initAudioHandler());
     getIt.registerSingleton<SongSearchDelegate>(SongSearchDelegate());

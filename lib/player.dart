@@ -9,6 +9,7 @@ import 'client.dart';
 class AudioPlayerHandler extends BaseAudioHandler with SeekHandler {
   final Client client = Global.getIt<Client>();
   final PubsubClient pubsubClient = Global.getIt<PubsubClient>();
+  final TcpPubsubClient tcpPubsubClient = Global.getIt<TcpPubsubClient>();
 
   PlayerState playerState = PlayerState();
 
@@ -27,7 +28,7 @@ class AudioPlayerHandler extends BaseAudioHandler with SeekHandler {
   }
 
   void init() {
-    pubsubClient
+    tcpPubsubClient
         .connect(onMessage: onWebsocketData, onError: onWebsocketError)
         .then((result) {
       connectionStatus = 1;
@@ -113,13 +114,7 @@ class AudioPlayerHandler extends BaseAudioHandler with SeekHandler {
     return songListMerged;
   }
 
-  Future<void> handleMessage(message) async {
-    Map<String, dynamic> js = {};
-    try {
-      js = json.decode(message);
-    } catch (e) {
-      print('decode message failed: $e');
-    }
+  Future<void> handleMessage(Map<String, dynamic> js) async {
     if (js.isNotEmpty) {
       try {
         String topic = js['topic'];
