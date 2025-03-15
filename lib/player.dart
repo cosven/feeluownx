@@ -3,12 +3,14 @@ import 'dart:convert';
 import 'package:audio_service/audio_service.dart';
 import 'package:feeluownx/bean/player_state.dart';
 import 'package:feeluownx/global.dart';
+import 'package:flutter/material.dart';
 
 import 'client.dart';
 
 class AudioPlayerHandler extends BaseAudioHandler with SeekHandler {
   final Client client = Global.getIt<Client>();
   final PubsubClient pubsubClient = Global.getIt<PubsubClient>();
+  final TcpPubsubClient tcpPubsubClient = Global.getIt<TcpPubsubClient>();
 
   PlayerState playerState = PlayerState();
 
@@ -23,17 +25,22 @@ class AudioPlayerHandler extends BaseAudioHandler with SeekHandler {
   }
 
   AudioPlayerHandler() {
-    init();
+    trySubscribeMessages();
   }
 
-  void init() {
-    pubsubClient
-        .connect(onMessage: onWebsocketData, onError: onWebsocketError)
+  void trySubscribeMessages() {
+    tcpPubsubClient
+        .connect(onMessage: onMessage, onError: onPubsubError)
         .then((result) {
       connectionStatus = 1;
       connectionMsg = "";
       initPlaybackState();
       initFuoCurrentPlayingInfo();
+    }).catchError((error) {
+      connectionStatus = 2;
+      connectionMsg = error.toString();
+      print("Connection failed, retrying in 1 seconds...");
+      Future.delayed(Duration(seconds: 1), trySubscribeMessages);
     });
   }
 
@@ -113,13 +120,7 @@ class AudioPlayerHandler extends BaseAudioHandler with SeekHandler {
     return songListMerged;
   }
 
-  Future<void> handleMessage(message) async {
-    Map<String, dynamic> js = {};
-    try {
-      js = json.decode(message);
-    } catch (e) {
-      print('decode message failed: $e');
-    }
+  Future<void> handleMessage(Map<String, dynamic> js) async {
     if (js.isNotEmpty) {
       try {
         String topic = js['topic'];
@@ -183,12 +184,11 @@ class AudioPlayerHandler extends BaseAudioHandler with SeekHandler {
     }
   }
 
-  /// 接收 WebSocket 消息
-  Future<void> onWebsocketData(event) async {
-    return await handleMessage(event);
+  Future<void> onMessage(message) async {
+    return await handleMessage(message);
   }
 
-  onWebsocketError(Object o, StackTrace trace) {
+  onPubsubError(Object o, StackTrace trace) {
     connectionStatus = 2;
     connectionMsg = trace.toString();
     print(trace);
@@ -220,6 +220,8 @@ class AudioPlayerHandler extends BaseAudioHandler with SeekHandler {
     if (obj != null) {
       playerState.metadata = obj as Map<String, dynamic>;
       print(playerState.metadata);
+    } else {
+      print("get current song failed");
     }
   }
 }

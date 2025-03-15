@@ -9,6 +9,7 @@ import 'package:permission_handler/permission_handler.dart';
 
 import '../global.dart';
 import '../player.dart';
+import '../client.dart';
 
 class ConfigurationPage extends StatefulWidget {
   const ConfigurationPage({super.key});
@@ -19,6 +20,7 @@ class ConfigurationPage extends StatefulWidget {
 
 class ConfigurationPageState extends State<ConfigurationPage> {
   final AudioPlayerHandler handler = Global.getIt<AudioPlayerHandler>();
+  final Client client = Global.getIt<Client>();
 
   static const String settingsKeyDaemonIp = "settings_ip_address";
 
@@ -51,7 +53,7 @@ class ConfigurationPageState extends State<ConfigurationPage> {
               await Permission.notification.request();
             }
             if (handler.connectionStatus != 1) {
-              handler.init();
+              handler.trySubscribeMessages();
             }
           },
         )
