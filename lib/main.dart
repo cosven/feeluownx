@@ -23,8 +23,8 @@ Future<void> main() async {
     print('${record.level.name}: ${record.time}: ${record.message}');
   });
   MediaKit.ensureInitialized();
-  await Global.init();
   await Settings.init(cacheProvider: SharePreferenceCache());
+  await Global.init();
   // final Directory appDocumentsDir = await getApplicationDocumentsDirectory();
   // SeriousPython.run(
   //   "app/app.zip",

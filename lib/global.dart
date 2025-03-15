@@ -6,6 +6,7 @@ import 'package:feeluownx/player.dart';
 import 'package:feeluownx/search.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
+import 'package:flutter_settings_screens/flutter_settings_screens.dart';
 
 class Global {
   static final getIt = GetIt.instance;
@@ -13,8 +14,9 @@ class Global {
   static Future<void> init() async {
     // dependency injection
     WidgetsFlutterBinding.ensureInitialized();
-    getIt.registerSingleton<Client>(Client());
-    getIt.registerSingleton<PubsubClient>(PubsubClient());
+    final host = Settings.getValue("settings_ip_address", defaultValue: "127.0.0.1")!;
+    getIt.registerSingleton<Client>(Client(host));
+    getIt.registerSingleton<PubsubClient>(PubsubClient(host));
     getIt.registerSingleton<AudioPlayerHandler>(AudioPlayerHandler());
     getIt.registerSingleton<AudioHandler>(await initAudioHandler());
     getIt.registerSingleton<SongSearchDelegate>(SongSearchDelegate());

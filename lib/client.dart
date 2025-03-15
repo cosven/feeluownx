@@ -3,33 +3,26 @@ import 'dart:convert';
 
 import 'package:feeluownx/utils/websocket_utility.dart';
 import 'package:flutter_settings_screens/flutter_settings_screens.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 import 'package:http/http.dart' as http;
 import 'package:logging/logging.dart';
 
 class Client {
-  static const String settingsKeyDaemonIp = "settings_ip_address";
   final _logger = Logger('Client');
 
+  String host = "";
   String url = "";
   int rpcRequestId = 0;
 
-  Client() {
-    initClient();
+  Client(String host_) {
+    host = host_;
+    url = "http://$host:23332";
   }
 
-  Future<void> initClient() async {
-    String? ip =
-        Settings.getValue(settingsKeyDaemonIp, defaultValue: "127.0.0.1");
-    url = "http://$ip:23332";
-  }
-
-  void reloadSettings() {
-    String? ip =
-        Settings.getValue(settingsKeyDaemonIp, defaultValue: "127.0.0.1");
-    url = "http://$ip:23332";
-    _logger.info("url: $url");
+  void updateHost(String host_) {
+    host = host_;
+    url = "http://$host:23332";
+    _logger.info("RPC host updated: $host");
   }
 
   Future<String> readResponse(Stream<String> stream, StringBuffer buffer) async {
@@ -74,7 +67,6 @@ class Client {
   }
 
   Future<Object?> tcpJsonRpc(String method, {List<dynamic>? args}) async {
-    String? ip = Settings.getValue(settingsKeyDaemonIp, defaultValue: "127.0.0.1");
     int port = 23333; // Assuming the TCP server is running on port 23332
 
     Map<String, dynamic> payload = {
@@ -89,7 +81,7 @@ class Client {
     String body = jsonEncode(payload);
     String message = "jsonrpc '$body'\n";
     try {
-      final socket = await Socket.connect(ip, port);
+      final socket = await Socket.connect(host, port);
       socket.write(message);
       _logger.info('send tcp rpc request: $message');
 
@@ -237,21 +229,22 @@ class Client {
 }
 
 class PubsubClient {
-  static const String settingsKeyDaemonIp = "settings_ip_address";
   final _logger = Logger('PubsubClient');
 
-  String url = "";
+  String host = "";
   WebSocketChannel? channel;
 
-  Future<void> initClient() async {
-    String? ip =
-        Settings.getValue(settingsKeyDaemonIp, defaultValue: "127.0.0.1");
-    url = "ws://$ip:23332/signal/v1";
+  PubsubClient(String host_) {
+    host = host_;
+  }
+
+  void updateHost(String host_) async {
+    host = host_;
   }
 
   Future<void> connect(
       {required Function onMessage, required Function onError}) async {
-    await initClient();
+    final url = "ws://$host:23332/signal/v1";
     WebSocketUtility().initWebSocket(
         uri: url,
         onOpen: () {

@@ -35,7 +35,6 @@ class AudioPlayerHandler extends BaseAudioHandler with SeekHandler {
       initPlaybackState();
       initFuoCurrentPlayingInfo();
     });
-    client.initClient();
   }
 
   void initPlaybackState() {
