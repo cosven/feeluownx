@@ -79,7 +79,7 @@ class Client {
       payload['params'] = args;
     }
     String body = jsonEncode(payload);
-    String message = "jsonrpc '$body'\n";
+    String message = "jsonrpc <<EOF\n$body\nEOF\n";
     try {
       final socket = await Socket.connect(host, port);
       socket.write(message);

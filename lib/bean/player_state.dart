@@ -24,4 +24,8 @@ class PlayerState with ChangeNotifier {
     currentLyricsLine = value;
     notifyListeners();
   }
+
+  String getArtistsName() {
+    return (metadata?['artists'] ?? []).join('/');
+  }
 }

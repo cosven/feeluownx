@@ -113,7 +113,7 @@ class PlayerInfoState extends State<PlayerInfo>
                       height: 200)),
           const SizedBox(height: 30),
           Text(widget.playerState.metadata?['title'] ?? '', style: style),
-          Text(widget.playerState.metadata?['artists_name'] ?? '',
+          Text(widget.playerState.getArtistsName(),
               style: style.apply(fontSizeFactor: .8)),
           const SizedBox(height: 30),
           FutureBuilder(

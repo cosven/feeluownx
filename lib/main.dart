@@ -8,7 +8,7 @@ import 'package:feeluownx/widgets/small_player.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_settings_screens/flutter_settings_screens.dart';
-// import 'package:serious_python/serious_python.dart';
+import 'package:serious_python/serious_python.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:media_kit/media_kit.dart';
 import 'package:logging/logging.dart';
@@ -25,11 +25,11 @@ Future<void> main() async {
   MediaKit.ensureInitialized();
   await Settings.init(cacheProvider: SharePreferenceCache());
   await Global.init();
-  // final Directory appDocumentsDir = await getApplicationDocumentsDirectory();
-  // SeriousPython.run(
-  //   "app/app.zip",
-  //   environmentVariables: {"FEELUOWN_USER_HOME": appDocumentsDir.path}
-  // );
+  final Directory appDocumentsDir = await getApplicationDocumentsDirectory();
+  SeriousPython.run(
+    "app/app.zip",
+    environmentVariables: {"FEELUOWN_USER_HOME": appDocumentsDir.path},
+  );
   runApp(const App());
 }
 

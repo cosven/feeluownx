@@ -95,7 +95,7 @@ class SmallPlayerState extends State<StatefulWidget> {
                             children: [
                               Flexible(
                                 child: Text(
-                                  '${handler.playerState.metadata?['title'] ?? ''} - ${handler.playerState.metadata?['artists_name'] ?? ''}',
+                                  '${handler.playerState.metadata?['title'] ?? ''} - ${handler.playerState.getArtistsName()}',
                                   style: Theme.of(context).textTheme.titleSmall,
                                   overflow: TextOverflow.ellipsis,
                                 ),
