@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:audio_service/audio_service.dart';
 import 'package:feeluownx/bean/player_state.dart';
 import 'package:feeluownx/global.dart';
+import 'package:flutter/material.dart';
 
 import 'client.dart';
 
@@ -24,17 +25,22 @@ class AudioPlayerHandler extends BaseAudioHandler with SeekHandler {
   }
 
   AudioPlayerHandler() {
-    init();
+    trySubscribeMessages();
   }
 
-  void init() {
+  void trySubscribeMessages() {
     tcpPubsubClient
-        .connect(onMessage: onWebsocketData, onError: onWebsocketError)
+        .connect(onMessage: onMessage, onError: onPubsubError)
         .then((result) {
       connectionStatus = 1;
       connectionMsg = "";
       initPlaybackState();
       initFuoCurrentPlayingInfo();
+    }).catchError((error) {
+      connectionStatus = 2;
+      connectionMsg = error.toString();
+      print("Connection failed, retrying in 1 seconds...");
+      Future.delayed(Duration(seconds: 1), trySubscribeMessages);
     });
   }
 
@@ -178,12 +184,11 @@ class AudioPlayerHandler extends BaseAudioHandler with SeekHandler {
     }
   }
 
-  /// 接收 WebSocket 消息
-  Future<void> onWebsocketData(event) async {
-    return await handleMessage(event);
+  Future<void> onMessage(message) async {
+    return await handleMessage(message);
   }
 
-  onWebsocketError(Object o, StackTrace trace) {
+  onPubsubError(Object o, StackTrace trace) {
     connectionStatus = 2;
     connectionMsg = trace.toString();
     print(trace);

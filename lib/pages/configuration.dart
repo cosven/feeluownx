@@ -53,8 +53,7 @@ class ConfigurationPageState extends State<ConfigurationPage> {
               await Permission.notification.request();
             }
             if (handler.connectionStatus != 1) {
-              print("Pubsub reconnecting...");
-              handler.init();
+              handler.trySubscribeMessages();
             }
           },
         )

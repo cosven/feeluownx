@@ -14,7 +14,6 @@ import 'package:media_kit/media_kit.dart';
 import 'package:logging/logging.dart';
 
 import 'global.dart';
-import 'pages/player_control.dart';
 import 'pages/home_page.dart';
 
 Future<void> main() async {
