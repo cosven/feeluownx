@@ -64,10 +64,6 @@ class _HomePageState extends State<HomePage> {
       return const Center(child: CircularProgressIndicator());
     }
 
-    if (albums.isEmpty) {
-      return const Center(child: Text('No albums found'));
-    }
-
     return RefreshIndicator(
       onRefresh: _loadAlbums,
       child: ListView(
