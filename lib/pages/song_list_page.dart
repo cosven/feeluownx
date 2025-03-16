@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import 'package:feeluownx/client.dart';
 import 'package:feeluownx/global.dart';
+import 'package:logging/logging.dart';
 
 class SongListPage extends StatefulWidget {
   final String? collectionIdentifier;
@@ -29,6 +29,7 @@ class _SongListPageState extends State<SongListPage> {
   }
 
   Future<void> _loadSongs() async {
+    _logger.info("Loading songs for collection: $collectionIdentifier");
     try {
       final loadedSongs = collectionIdentifier != null
           ? await client.listCollectionSongs(collectionIdentifier!)

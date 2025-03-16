@@ -152,7 +152,7 @@ class _HomePageState extends State<HomePage> {
                     onTap: () {
                       Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (context) => const SongListPage()),
+                        MaterialPageRoute(builder: (context) => SongListPage()),
                       );
                     },
                     borderRadius: BorderRadius.circular(12.0),
@@ -236,7 +236,7 @@ class _HomePageState extends State<HomePage> {
               itemCount: albums.length,
               itemBuilder: (context, index) {
                 final album = albums[index];
-                _loadAlbumCover(album);
+                // _loadAlbumCover(album);
                 final coverUrl = albumCovers[album['identifier']];
 
                 return Padding(

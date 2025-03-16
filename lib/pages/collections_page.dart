@@ -67,7 +67,6 @@ class _CollectionsPageState extends State<CollectionsPage> {
               )
             else
               ListView.builder(
-                padding: const EdgeInsets.all(16.0),
                 shrinkWrap: true,
                 physics: const NeverScrollableScrollPhysics(),
                 itemCount: collections.length,

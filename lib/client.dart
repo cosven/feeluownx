@@ -106,7 +106,6 @@ class Client {
   }
 
   Future<Object?> httpJsonRpc(String method, {List<dynamic>? args}) async {
-
     Map<String, dynamic> payload = {
       'jsonrpc': '2.0',
       'id': rpcRequestId,
@@ -151,7 +150,7 @@ class Client {
   /// ```
   Future<List<Map<String, dynamic>>> listCollections() async {
     Object? obj = await jsonRpc(
-        "lambda: [{'id': c.identifier, 'name': c.name, 'models_count': len(c.models)}"
+        "lambda: [{'identifier': c.identifier, 'name': c.name, 'models_count': len(c.models)}"
         " for c in app.coll_mgr.listall()]");
     List<dynamic> list = obj! as List<dynamic>;
     return list.map((item) => item as Map<String, dynamic>).toList();
@@ -202,9 +201,9 @@ class Client {
   ///    "__type__": "feeluown.library.BriefSongModel" // Type identifier
   /// }
   /// ```
-  Future<List<Map<String, dynamic>>> listCollectionSongs(String identifier) async {
-    Object? obj =
-        await jsonRpc("lambda: app.coll_mgr.get($identifier).models");
+  Future<List<Map<String, dynamic>>> listCollectionSongs(
+      String identifier) async {
+    Object? obj = await jsonRpc("lambda: app.coll_mgr.get($identifier).models");
     return _filterSongs(obj! as List<dynamic>);
   }
 
