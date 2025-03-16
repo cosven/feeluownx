@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:dynamic_color/dynamic_color.dart';
 import 'package:feeluownx/pages/configuration.dart';
 import 'package:feeluownx/pages/playlist_ui.dart';
+import 'package:feeluownx/pages/collections_page.dart';
 import 'package:feeluownx/search.dart';
 import 'package:feeluownx/widgets/small_player.dart';
 import 'package:flutter/material.dart';
@@ -47,8 +48,8 @@ class AppState extends State<App> with SingleTickerProviderStateMixin {
   final List<Widget> children = [
     const HomePage(),
     const PlaylistView(),
-    const ConfigurationPage(),
     const CollectionsPage(),
+    const ConfigurationPage(),
   ];
 
   late TabController tabController;
@@ -62,7 +63,7 @@ class AppState extends State<App> with SingleTickerProviderStateMixin {
   @override
   void initState() {
     super.initState();
-    tabController = TabController(length: 3, vsync: this);
+    tabController = TabController(length: 4, vsync: this);
   }
 
   @override
@@ -95,9 +96,9 @@ class AppState extends State<App> with SingleTickerProviderStateMixin {
                 NavigationDestination(icon: Icon(Icons.search), label: "Search"),
                 NavigationDestination(icon: Icon(Icons.list), label: "Playing"),
                 NavigationDestination(icon: Icon(Icons.folder), label: "收藏"),
-                NavigationDestination(icon: Icon(Icons.settings), label: "Settings")
+                NavigationDestination(icon: Icon(Icons.settings), label: "Settings"),
               ],
-              selectedIndex: currentIndex == 0 ? 0 : currentIndex + 1,
+              selectedIndex: currentIndex + 1,
               onDestinationSelected: (index) {
                 if (index == 1) {
                   showSearch(

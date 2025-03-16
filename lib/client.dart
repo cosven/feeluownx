@@ -146,11 +146,13 @@ class Client {
   /// {
   ///   "identifier": 12345,
   ///   "name": "我喜欢的音乐",
+  ///   "models_count": 10
   /// }
   /// ```
   Future<List<Map<String, dynamic>>> listCollections() async {
     Object? obj = await jsonRpc(
-        "lambda: [{'id': c.identifier, 'name': c.name} for c in app.coll_mgr.listall()]");
+        "lambda: [{'id': c.identifier, 'name': c.name, 'models_count': len(c.models)}"
+        " for c in app.coll_mgr.listall()]");
     List<dynamic> list = obj! as List<dynamic>;
     return list.map((item) => item as Map<String, dynamic>).toList();
   }
@@ -200,19 +202,25 @@ class Client {
   ///    "__type__": "feeluown.library.BriefSongModel" // Type identifier
   /// }
   /// ```
+  Future<List<Map<String, dynamic>>> listCollectionSongs(String identifier) async {
+    Object? obj =
+        await jsonRpc("lambda: app.coll_mgr.get($identifier).models");
+    return _filterSongs(obj! as List<dynamic>);
+  }
+
+  List<Map<String, dynamic>> _filterSongs(List<dynamic> list) {
+    return list
+        .where((item) =>
+            item is Map<String, dynamic> &&
+            item['__type__'] == 'feeluown.library.BriefSongModel')
+        .map((item) => item as Map<String, dynamic>)
+        .toList();
+  }
+
   Future<List<Map<String, dynamic>>> listLibrarySongs() async {
     Object? obj =
         await jsonRpc("lambda: app.coll_mgr.get_coll_library().models");
-    if (obj != null) {
-      List<dynamic> list = obj as List<dynamic>;
-      return list
-          .where((item) =>
-              item is Map<String, dynamic> &&
-              item['__type__'] == 'feeluown.library.BriefSongModel')
-          .map((item) => item as Map<String, dynamic>)
-          .toList();
-    }
-    return [];
+    return _filterSongs(obj! as List<dynamic>);
   }
 
   Future<String?> getAlbumCover(Map<String, dynamic> album) async {
