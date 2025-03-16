@@ -271,6 +271,10 @@ class TcpPubsubClient {
     host = host_;
   }
 
+  updateHost(String host_) {
+    host = host_;
+  }
+
   // FIXME: the protocol parser is hacky and not robust
   Future<void> connect({
     required Function onMessage,

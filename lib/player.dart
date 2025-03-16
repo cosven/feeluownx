@@ -193,6 +193,7 @@ class AudioPlayerHandler extends BaseAudioHandler with SeekHandler {
   onPubsubError(Exception e) {
     connectionStatus = 2;
     connectionMsg = e.toString();
+    _logger.severe('Pubsub error: $e');
   }
 
   void onWebsocketDone() {
