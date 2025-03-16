@@ -1,8 +1,10 @@
 {
   "home": "首页",
   "playing": "播放列表",
-  "settings": "设置",
+  "settings": "设置", 
   "song": "歌曲",
+  "search": "搜索",
+  "collection": "收藏"
   "playlist": "歌单",
   "type": "类型",
   "copyUri": "复制URI",

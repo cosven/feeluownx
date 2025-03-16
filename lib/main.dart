@@ -91,12 +91,22 @@ class AppState extends State<App> with SingleTickerProviderStateMixin {
                   bottom: 0, left: 0, right: 0, child: SmallPlayerWidget())
             ]),
             bottomNavigationBar: NavigationBar(
-              destinations: const [
-                NavigationDestination(icon: Icon(Icons.home), label: "Home"),
-                NavigationDestination(icon: Icon(Icons.search), label: "Search"),
-                NavigationDestination(icon: Icon(Icons.list), label: "Playing"),
-                NavigationDestination(icon: Icon(Icons.folder), label: "收藏"),
-                NavigationDestination(icon: Icon(Icons.settings), label: "Settings"),
+              destinations: [
+                NavigationDestination(
+                    icon: const Icon(Icons.home), 
+                    label: AppLocalizations.of(context)!.home),
+                NavigationDestination(
+                    icon: const Icon(Icons.search),
+                    label: AppLocalizations.of(context)!.search),
+                NavigationDestination(
+                    icon: const Icon(Icons.list),
+                    label: AppLocalizations.of(context)!.playing),
+                NavigationDestination(
+                    icon: const Icon(Icons.folder),
+                    label: AppLocalizations.of(context)!.collection),
+                NavigationDestination(
+                    icon: const Icon(Icons.settings),
+                    label: AppLocalizations.of(context)!.settings),
               ],
               selectedIndex: currentIndex + 1,
               onDestinationSelected: (index) {

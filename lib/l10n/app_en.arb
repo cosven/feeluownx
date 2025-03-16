@@ -1,8 +1,10 @@
 {
   "home": "Home",
-  "playing": "Playing",
+  "playing": "Playing", 
   "settings": "Settings",
   "song": "Song",
+  "search": "Search",
+  "collection": "Collections",
   "playlist": "Playlist",
   "type": "Type",
   "copyUri": "Copy URI",
