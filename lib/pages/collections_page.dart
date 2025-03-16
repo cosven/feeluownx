@@ -65,51 +65,19 @@ class _CollectionsPageState extends State<CollectionsPage> {
                 ),
               )
             else
-              Padding(
+              ListView.builder(
                 padding: const EdgeInsets.all(16.0),
-                child: Wrap(
-                  spacing: 16,
-                  runSpacing: 16,
-                  children: collections.map((collection) {
-                    return SizedBox(
-                      width: 120,
-                      child: Column(
-                        children: [
-                          Container(
-                            padding: const EdgeInsets.all(16.0),
-                            decoration: BoxDecoration(
-                              color: Theme.of(context).colorScheme.primaryContainer,
-                              borderRadius: BorderRadius.circular(8.0),
-                            ),
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Icon(
-                                  Icons.folder,
-                                  size: 36,
-                                  color: Theme.of(context).colorScheme.onPrimaryContainer,
-                                ),
-                                const SizedBox(height: 8),
-                                Text(
-                                  collection['name'] ?? 'Unknown Collection',
-                                  style: Theme.of(context).textTheme.bodyMedium,
-                                  textAlign: TextAlign.center,
-                                  maxLines: 2,
-                                  overflow: TextOverflow.ellipsis,
-                                ),
-                              ],
-                            ),
-                          ),
-                          const SizedBox(height: 8),
-                          Text(
-                            '${collection['models_count']} items',
-                            style: Theme.of(context).textTheme.bodySmall,
-                          ),
-                        ],
-                      ),
-                    );
-                  }).toList(),
-                ),
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                itemCount: collections.length,
+                itemBuilder: (context, index) {
+                  final collection = collections[index];
+                  return ListTile(
+                    leading: const Icon(Icons.folder),
+                    title: Text(collection['name'] ?? 'Unknown Collection'),
+                    subtitle: Text('${collection['models_count']} items'),
+                  );
+                },
               ),
           ],
         ),
