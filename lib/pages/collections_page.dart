@@ -76,13 +76,42 @@ class _CollectionsPageState extends State<CollectionsPage> {
                     leading: const Icon(Icons.folder),
                     title: Text(collection['name'] ?? 'Unknown Collection'),
                     subtitle: Text('${collection['models_count']} items'),
-                    trailing: FilledButton.tonalIcon(
-                      icon: const Icon(Icons.sync),
-                      label: const Text('同步'),
-                      onPressed: () {
-                        // TODO: Implement sync functionality
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text('同步功能尚未实现')),
+                    trailing: StatefulBuilder(
+                      builder: (context, setState) {
+                        bool isSyncing = false;
+                        return FilledButton.tonalIcon(
+                          icon: isSyncing 
+                              ? const SizedBox(
+                                  width: 16,
+                                  height: 16,
+                                  child: CircularProgressIndicator(strokeWidth: 2),
+                                )
+                              : const Icon(Icons.sync),
+                          label: isSyncing ? const Text('同步中...') : const Text('同步'),
+                          onPressed: () async {
+                            if (isSyncing) return;
+                            
+                            setState(() => isSyncing = true);
+                            try {
+                              final statusCode = await client.collectionSyncToLocal(collection);
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text(
+                                    statusCode == 201 
+                                      ? '成功创建并同步收藏集'
+                                      : '成功同步收藏集'
+                                  ),
+                                ),
+                              );
+                            } catch (e) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(content: Text('同步失败: $e')),
+                              );
+                              rethrow;
+                            } finally {
+                              setState(() => isSyncing = false);
+                            }
+                          },
                         );
                       },
                     ),
