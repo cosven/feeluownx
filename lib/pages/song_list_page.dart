@@ -16,6 +16,8 @@ class _SongListPageState extends State<SongListPage> {
   List<Map<String, dynamic>> songs = [];
   bool isLoading = true;
 
+  String? get collectionIdentifier => widget.collectionIdentifier;
+
   @override
   void initState() {
     super.initState();

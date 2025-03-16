@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:feeluownx/client.dart';
 import 'package:feeluownx/global.dart';
+import 'package:feeluownx/pages/song_list_page.dart';
 
 class CollectionsPage extends StatefulWidget {
   const CollectionsPage({super.key});
