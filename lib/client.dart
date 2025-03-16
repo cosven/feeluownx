@@ -168,7 +168,7 @@ class Client {
     Object? obj = await jsonRpc("lambda: app.coll_mgr.create('$name', '$name').identifier");
     final identifier = (obj!) as int;
     // Reload the collection to make sure the data is updated
-    await jsonRpc("app.coll_mgr.get($identifier).oevewrite_with_raw_data", args: [rawData]);
+    await jsonRpc("app.coll_mgr.get($identifier).overwrite_with_raw_data", args: [rawData]);
   }
 
   /// Sync a collection from the remote server to the local server
@@ -183,7 +183,7 @@ class Client {
     final localCollections = await localClient.listCollections();
     for (final localCollection in localCollections) {
       if (localCollection['name'] == name) {
-        await localClient.collectionOverwrite(collection, rawData);
+        await localClient.collectionOverwrite(localCollection, rawData);
         return 200;
       }
     }
