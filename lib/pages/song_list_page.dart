@@ -5,8 +5,7 @@ import 'package:feeluownx/global.dart';
 
 class SongListPage extends StatefulWidget {
   final String? collectionIdentifier;
-  
-  const SongListPage({super.key, this.collectionIdentifier});
+  SongListPage({super.key, this.collectionIdentifier});
 
   @override
   State<SongListPage> createState() => _SongListPageState();
@@ -25,7 +24,7 @@ class _SongListPageState extends State<SongListPage> {
 
   Future<void> _loadSongs() async {
     try {
-      final loadedSongs = collectionIdentifier != null 
+      final loadedSongs = collectionIdentifier != null
           ? await client.listCollectionSongs(collectionIdentifier!)
           : await client.listLibrarySongs();
       setState(() {
