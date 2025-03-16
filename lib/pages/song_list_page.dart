@@ -5,7 +5,10 @@ import 'package:feeluownx/global.dart';
 
 class SongListPage extends StatefulWidget {
   final String? collectionIdentifier;
-  SongListPage({super.key, this.collectionIdentifier});
+  SongListPage({super.key, this.collectionIdentifier}) {
+    _logger.info('Creating SongListPage for collection: $collectionIdentifier');
+  }
+  final Logger _logger = Logger('SongListPage');
 
   @override
   State<SongListPage> createState() => _SongListPageState();
@@ -15,6 +18,7 @@ class _SongListPageState extends State<SongListPage> {
   final Client client = Global.getIt<Client>();
   List<Map<String, dynamic>> songs = [];
   bool isLoading = true;
+  final Logger _logger = Logger('_SongListPageState');
 
   String? get collectionIdentifier => widget.collectionIdentifier;
 
@@ -33,11 +37,13 @@ class _SongListPageState extends State<SongListPage> {
         songs = loadedSongs;
         isLoading = false;
       });
+      _logger.info('Loaded ${songs.length} songs');
     } catch (e) {
       setState(() {
         isLoading = false;
       });
       if (mounted) {
+        _logger.severe('Failed to load songs', e);
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('加载歌曲失败: $e')),
         );
