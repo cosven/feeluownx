@@ -330,6 +330,18 @@ class _HomePageState extends State<HomePage> {
           ),
           if (isLoadingCollections)
             const Center(child: CircularProgressIndicator())
+          else if (collections.isEmpty)
+            Center(
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Text(
+                  '无本地收藏集',
+                  style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                    color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
+                  ),
+                ),
+              ),
+            )
           else
             SingleChildScrollView(
               scrollDirection: Axis.horizontal,
