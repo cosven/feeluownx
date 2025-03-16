@@ -93,6 +93,11 @@ class Client {
       socket.destroy();
 
       Map<String, dynamic> respBody = json.decode(body);
+      if (respBody.containsKey('error')) {
+        final error = respBody['error'];
+        _logger.severe('RPC error response: $error');
+        throw Exception('RPC error: ${error['message']}');
+      }
       return respBody['result'];
     } catch (e) {
       _logger.severe('tcp rpc failed', e);
@@ -122,6 +127,11 @@ class Client {
     _logger.info('send rpc request: $body');
     if (response.statusCode == 200) {
       Map<String, dynamic> respBody = json.decode(response.body);
+      if (respBody.containsKey('error')) {
+        final error = respBody['error'];
+        _logger.severe('HTTP RPC error response: $error');
+        throw Exception('HTTP RPC error: ${error['message']}');
+      }
       return respBody['result'];
     } else {
       _logger.severe('HTTP RPC failed with status: ${response.statusCode}');
