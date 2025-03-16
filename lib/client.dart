@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'dart:async';
 
 import 'package:feeluownx/utils/websocket_utility.dart';
+import 'package:intl/find_locale.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 import 'package:http/http.dart' as http;
 import 'package:logging/logging.dart';
@@ -154,6 +155,40 @@ class Client {
         " for c in app.coll_mgr.listall()]");
     List<dynamic> list = obj! as List<dynamic>;
     return list.map((item) => item as Map<String, dynamic>).toList();
+  }
+
+  Future<void> collectionOverwrite(Map<String, dynamic> collection, String rawData) async {
+    final identifier = collection['identifier'];
+    await jsonRpc("app.coll_mgr.get($identifier).overwrite_with_raw_data", args: [rawData]);
+    // Reload the collection to make sure the data is updated
+    await jsonRpc("app.coll_mgr.get($identifier).load");
+  }
+
+  Future<void> collectionCreate(String name, String rawData) async {
+    Object? obj = await jsonRpc("lambda: app.coll_mgr.create('$name', '$name').identifier");
+    final identifier = (obj!) as int;
+    // Reload the collection to make sure the data is updated
+    await jsonRpc("app.coll_mgr.get($identifier).oevewrite_with_raw_data", args: [rawData]);
+  }
+
+  /// Sync a collection from the remote server to the local server
+  ///
+  Future<int> collectionSyncToLocal(Map<String, dynamic> collection) async {
+    final identifier = collection['identifier'];
+    final name = collection['name'];
+    Object? obj = await jsonRpc("app.coll_mgr.get($identifier).raw_data");
+    String rawData = (obj!) as String;
+
+    final localClient = Client('127.0.0.1');
+    final localCollections = await localClient.listCollections();
+    for (final localCollection in localCollections) {
+      if (localCollection['name'] == name) {
+        await localClient.collectionOverwrite(collection, rawData);
+        return 200;
+      }
+    }
+    await localClient.collectionCreate(name, rawData);
+    return 201;
   }
 
   /// Returns a list of albums from the library
@@ -473,5 +508,5 @@ class PubsubClient {
 
 Future<void> main() async {
   final client = Client("192.168.31.143");
-  print(client.listCollections());
+  client.collectionCreate('test', '');
 }
