@@ -76,6 +76,15 @@ class _CollectionsPageState extends State<CollectionsPage> {
                     leading: const Icon(Icons.folder),
                     title: Text(collection['name'] ?? 'Unknown Collection'),
                     subtitle: Text('${collection['models_count']} items'),
+                    trailing: IconButton(
+                      icon: const Icon(Icons.download),
+                      onPressed: () {
+                        // TODO: Implement download functionality
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(content: Text('Download not implemented yet')),
+                        );
+                      },
+                    ),
                     onTap: () {
                       Navigator.push(
                         context,
