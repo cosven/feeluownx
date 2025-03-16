@@ -38,8 +38,8 @@ class AudioPlayerHandler extends BaseAudioHandler with SeekHandler {
       initFuoCurrentPlayingInfo();
     }).catchError((error) {
       connectionStatus = 2;
-      connectionMsg = error.toString();
-      print("Connection failed, retrying in 1 seconds...");
+      final errmsg = error.toString();
+      connectionMsg = "Connection failed, retrying in 1 seconds...\n$errmsg";
       Future.delayed(Duration(seconds: 1), trySubscribeMessages);
     });
   }
@@ -188,10 +188,9 @@ class AudioPlayerHandler extends BaseAudioHandler with SeekHandler {
     return await handleMessage(message);
   }
 
-  onPubsubError(Object o, StackTrace trace) {
+  onPubsubError(Exception e) {
     connectionStatus = 2;
-    connectionMsg = trace.toString();
-    print(trace);
+    connectionMsg = e.toString();
   }
 
   void onWebsocketDone() {
