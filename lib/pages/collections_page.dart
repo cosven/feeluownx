@@ -76,7 +76,7 @@ class _CollectionsPageState extends State<CollectionsPage> {
                     leading: const Icon(Icons.folder),
                     title: Text(collection['name'] ?? 'Unknown Collection'),
                     subtitle: Text('${collection['models_count']} items'),
-                    trailing: StatefulBuilder(
+                    trailing: client.host != '127.0.0.1' ? StatefulBuilder(
                       builder: (context, setState) {
                         bool isSyncing = false;
                         return FilledButton.tonalIcon(
@@ -114,7 +114,7 @@ class _CollectionsPageState extends State<CollectionsPage> {
                           },
                         );
                       },
-                    ),
+                    ) : null,
                     onTap: () {
                       Navigator.push(
                         context,
