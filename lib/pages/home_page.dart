@@ -15,13 +15,35 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   final Client client = Global.getIt<Client>();
   List<Map<String, dynamic>> albums = [];
+  List<Map<String, dynamic>> collections = [];
   bool isLoading = true;
+  bool isLoadingCollections = true;
   final Map<String, String?> albumCovers = {};  // 用于缓存专辑封面 URL
 
   @override
   void initState() {
     super.initState();
     _loadAlbums();
+    _loadCollections();
+  }
+
+  Future<void> _loadCollections() async {
+    try {
+      final loadedCollections = await client.listCollections();
+      setState(() {
+        collections = loadedCollections;
+        isLoadingCollections = false;
+      });
+    } catch (e) {
+      setState(() {
+        isLoadingCollections = false;
+      });
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Failed to load collections: $e')),
+        );
+      }
+    }
   }
 
   Future<void> _loadAlbums() async {
@@ -298,6 +320,53 @@ class _HomePageState extends State<HomePage> {
               },
             ),
           ),
+          // 本地收藏集
+          Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Text(
+              'Local Collections',
+              style: Theme.of(context).textTheme.titleLarge,
+            ),
+          ),
+          if (isLoadingCollections)
+            const Center(child: CircularProgressIndicator())
+          else
+            SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: Row(
+                children: collections.map((collection) {
+                  return Padding(
+                    padding: const EdgeInsets.only(left: 16.0),
+                    child: Container(
+                      width: 120,
+                      padding: const EdgeInsets.all(16.0),
+                      decoration: BoxDecoration(
+                        color: Theme.of(context).colorScheme.primaryContainer,
+                        borderRadius: BorderRadius.circular(8.0),
+                      ),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(
+                            Icons.folder,
+                            size: 36,
+                            color: Theme.of(context).colorScheme.onPrimaryContainer,
+                          ),
+                          const SizedBox(height: 8),
+                          Text(
+                            collection['name'] ?? 'Unknown Collection',
+                            style: Theme.of(context).textTheme.bodyMedium,
+                            textAlign: TextAlign.center,
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ],
+                      ),
+                    ),
+                  );
+                }).toList(),
+              ),
+            ),
           const SizedBox(height: 32),
         ],
       ),
