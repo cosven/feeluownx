@@ -320,12 +320,27 @@ class _HomePageState extends State<HomePage> {
               },
             ),
           ),
-          // 本地收藏集
           Padding(
             padding: const EdgeInsets.all(16.0),
-            child: Text(
-              'Local Collections',
-              style: Theme.of(context).textTheme.titleLarge,
+            child: Row(
+              children: [
+                Text(
+                  '收藏',
+                  style: Theme.of(context).textTheme.titleLarge,
+                ),
+                const Spacer(),
+                TextButton(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const CollectionsPage(),
+                      ),
+                    );
+                  },
+                  child: const Text('查看全部'),
+                ),
+              ],
             ),
           ),
           if (isLoadingCollections)
@@ -346,7 +361,7 @@ class _HomePageState extends State<HomePage> {
             SingleChildScrollView(
               scrollDirection: Axis.horizontal,
               child: Row(
-                children: collections.map((collection) {
+                children: collections.take(3).map((collection) {
                   return Padding(
                     padding: const EdgeInsets.only(left: 16.0),
                     child: Container(
@@ -371,6 +386,11 @@ class _HomePageState extends State<HomePage> {
                             textAlign: TextAlign.center,
                             maxLines: 2,
                             overflow: TextOverflow.ellipsis,
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            '${collection['models_count']} items',
+                            style: Theme.of(context).textTheme.bodySmall,
                           ),
                         ],
                       ),

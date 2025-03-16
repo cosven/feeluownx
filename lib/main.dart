@@ -48,6 +48,7 @@ class AppState extends State<App> with SingleTickerProviderStateMixin {
     const HomePage(),
     const PlaylistView(),
     const ConfigurationPage(),
+    const CollectionsPage(),
   ];
 
   late TabController tabController;
@@ -93,6 +94,7 @@ class AppState extends State<App> with SingleTickerProviderStateMixin {
                 NavigationDestination(icon: Icon(Icons.home), label: "Home"),
                 NavigationDestination(icon: Icon(Icons.search), label: "Search"),
                 NavigationDestination(icon: Icon(Icons.list), label: "Playing"),
+                NavigationDestination(icon: Icon(Icons.folder), label: "收藏"),
                 NavigationDestination(icon: Icon(Icons.settings), label: "Settings")
               ],
               selectedIndex: currentIndex == 0 ? 0 : currentIndex + 1,
