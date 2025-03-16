@@ -76,6 +76,16 @@ class _CollectionsPageState extends State<CollectionsPage> {
                     leading: const Icon(Icons.folder),
                     title: Text(collection['name'] ?? 'Unknown Collection'),
                     subtitle: Text('${collection['models_count']} items'),
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => SongListPage(
+                            collectionIdentifier: collection['identifier'].toString(),
+                          ),
+                        ),
+                      );
+                    },
                   );
                 },
               ),

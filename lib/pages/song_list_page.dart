@@ -4,7 +4,9 @@ import 'package:feeluownx/client.dart';
 import 'package:feeluownx/global.dart';
 
 class SongListPage extends StatefulWidget {
-  const SongListPage({super.key});
+  final String? collectionIdentifier;
+  
+  const SongListPage({super.key, this.collectionIdentifier});
 
   @override
   State<SongListPage> createState() => _SongListPageState();
@@ -23,7 +25,9 @@ class _SongListPageState extends State<SongListPage> {
 
   Future<void> _loadSongs() async {
     try {
-      final loadedSongs = await client.listLibrarySongs();
+      final loadedSongs = collectionIdentifier != null 
+          ? await client.listCollectionSongs(collectionIdentifier!)
+          : await client.listLibrarySongs();
       setState(() {
         songs = loadedSongs;
         isLoading = false;
@@ -44,7 +48,7 @@ class _SongListPageState extends State<SongListPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('我收藏的音乐'),
+        title: const Text('歌曲列表'),
       ),
       body: isLoading
           ? const Center(child: CircularProgressIndicator())
