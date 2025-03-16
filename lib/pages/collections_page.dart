@@ -76,12 +76,13 @@ class _CollectionsPageState extends State<CollectionsPage> {
                     leading: const Icon(Icons.folder),
                     title: Text(collection['name'] ?? 'Unknown Collection'),
                     subtitle: Text('${collection['models_count']} items'),
-                    trailing: IconButton(
-                      icon: const Icon(Icons.download),
+                    trailing: FilledButton.tonalIcon(
+                      icon: const Icon(Icons.sync),
+                      label: const Text('同步'),
                       onPressed: () {
-                        // TODO: Implement download functionality
+                        // TODO: Implement sync functionality
                         ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text('Download not implemented yet')),
+                          const SnackBar(content: Text('同步功能尚未实现')),
                         );
                       },
                     ),
