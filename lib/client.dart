@@ -95,8 +95,8 @@ class Client {
       Map<String, dynamic> respBody = json.decode(body);
       return respBody['result'];
     } catch (e) {
-      _logger.warning('tcp rpc failed, $e');
-      return null;
+      _logger.severe('tcp rpc failed', e);
+      throw Exception('RPC call failed: $e');
     }
   }
 
@@ -124,9 +124,9 @@ class Client {
       Map<String, dynamic> respBody = json.decode(response.body);
       return respBody['result'];
     } else {
-      _logger.warning('rpc failed, $response');
+      _logger.severe('HTTP RPC failed with status: ${response.statusCode}');
+      throw Exception('HTTP RPC failed with status: ${response.statusCode}');
     }
-    return null;
   }
 
   /// Returns a list of collections
