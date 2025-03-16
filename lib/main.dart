@@ -24,11 +24,14 @@ Future<void> main() async {
   MediaKit.ensureInitialized();
   await Settings.init(cacheProvider: SharePreferenceCache());
   await Global.init();
-  final Directory appDocumentsDir = await getApplicationDocumentsDirectory();
-  SeriousPython.run(
-    "app/app.zip",
-    environmentVariables: {"FEELUOWN_USER_HOME": appDocumentsDir.path},
-  );
+  final enableFuoDaemon = const String.fromEnvironment('ENABLE_FUO_DAEMON', defaultValue: 'true') == 'true';
+  if (enableFuoDaemon) {
+    final Directory appDocumentsDir = await getApplicationDocumentsDirectory();
+    SeriousPython.run(
+      "app/app.zip",
+      environmentVariables: {"FEELUOWN_USER_HOME": appDocumentsDir.path},
+    );
+  }
   runApp(const App());
 }
 
