@@ -99,9 +99,10 @@ class _AlbumDetailPageState extends State<AlbumDetailPage> {
         title: Text(widget.album['name'] ?? 'Unknown Album'),
         actions: [
           if (songs.isNotEmpty)
-            TextButton(
+            TextButton.icon(
+              icon: const Icon(Icons.play_arrow),
+              label: const Text('播放全部'),
               onPressed: _playAll,
-              child: const Text('播放全部'),
             ),
         ],
       ),
