@@ -121,11 +121,58 @@ class SmallPlayerState extends State<StatefulWidget> {
                         const SizedBox(width: 4),
                         IconButton(
                           icon: const Icon(Icons.queue_music),
-                          onPressed: () {
-                            // TODO: Show playlist dialog
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(content: Text('播放列表功能尚未实现')),
-                            );
+                          onPressed: () async {
+                            final client = Global.getIt<Client>();
+                            try {
+                              final songs = await client.playlistList();
+                              if (!mounted) return;
+                              showModalBottomSheet(
+                                context: context,
+                                builder: (context) {
+                                  return Column(
+                                    children: [
+                                      Padding(
+                                        padding: const EdgeInsets.all(16.0),
+                                        child: Text(
+                                          '播放列表',
+                                          style: Theme.of(context).textTheme.titleLarge,
+                                        ),
+                                      ),
+                                      Expanded(
+                                        child: ListView.builder(
+                                          itemCount: songs.length,
+                                          itemBuilder: (context, index) {
+                                            final song = songs[index];
+                                            return ListTile(
+                                              leading: const Icon(Icons.music_note),
+                                              title: Text(
+                                                song['title'] ?? '未知歌曲',
+                                                maxLines: 1,
+                                                overflow: TextOverflow.ellipsis,
+                                              ),
+                                              subtitle: Text(
+                                                '${song['artists_name'] ?? '未知歌手'} - ${song['album_name'] ?? '未知专辑'}',
+                                                maxLines: 1,
+                                                overflow: TextOverflow.ellipsis,
+                                              ),
+                                              onTap: () {
+                                                client.playSong(song);
+                                                Navigator.pop(context);
+                                              },
+                                            );
+                                          },
+                                        ),
+                                      ),
+                                    ],
+                                  );
+                                },
+                              );
+                            } catch (e) {
+                              if (!mounted) return;
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(content: Text('获取播放列表失败: $e')),
+                              );
+                            }
                           },
                         ),
                         const SizedBox(width: 12),
