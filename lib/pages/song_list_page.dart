@@ -18,9 +18,24 @@ class _SongListPageState extends State<SongListPage> {
   final Client client = Global.getIt<Client>();
   List<Map<String, dynamic>> songs = [];
   bool isLoading = true;
+  String? collectionName;
   final Logger _logger = Logger('_SongListPageState');
 
   String? get collectionIdentifier => widget.collectionIdentifier;
+
+  Future<void> _playAll() async {
+    try {
+      await client.playlistSetModels(songs);
+      _logger.info('Played all ${songs.length} songs');
+    } catch (e) {
+      _logger.severe('Failed to play all songs', e);
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('播放全部失败: $e')),
+        );
+      }
+    }
+  }
 
   @override
   void initState() {
@@ -31,11 +46,21 @@ class _SongListPageState extends State<SongListPage> {
   Future<void> _loadSongs() async {
     _logger.info("Loading songs for collection: $collectionIdentifier");
     try {
-      final loadedSongs = collectionIdentifier != null
-          ? await client.listCollectionSongs(collectionIdentifier!)
-          : await client.listLibrarySongs();
+      if (collectionIdentifier != null) {
+        final collections = await client.listCollections();
+        final collection = collections.firstWhere(
+          (c) => c['identifier'].toString() == collectionIdentifier,
+          orElse: () => {},
+        );
+        if (collection.isNotEmpty) {
+          collectionName = collection['name'];
+        }
+        songs = await client.listCollectionSongs(collectionIdentifier!);
+      } else {
+        songs = await client.listLibrarySongs();
+        collectionName = '我的音乐库';
+      }
       setState(() {
-        songs = loadedSongs;
         isLoading = false;
       });
       _logger.info('Loaded ${songs.length} songs');
@@ -56,7 +81,15 @@ class _SongListPageState extends State<SongListPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('歌曲列表'),
+        title: Text(collectionName ?? '歌曲列表'),
+        actions: [
+          if (songs.isNotEmpty)
+            IconButton(
+              icon: const Icon(Icons.play_arrow),
+              tooltip: '播放全部',
+              onPressed: _playAll,
+            ),
+        ],
       ),
       body: isLoading
           ? const Center(child: CircularProgressIndicator())
