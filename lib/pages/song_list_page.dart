@@ -89,10 +89,9 @@ class _SongListPageState extends State<SongListPage> {
         title: Text(collectionName ?? '歌曲列表'),
         actions: [
           if (songs.isNotEmpty)
-            IconButton(
-              icon: const Icon(Icons.play_arrow),
-              tooltip: '播放全部',
+            TextButton(
               onPressed: _playAll,
+              child: const Text('播放全部'),
             ),
         ],
       ),
