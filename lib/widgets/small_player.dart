@@ -103,7 +103,32 @@ class SmallPlayerState extends State<StatefulWidget> {
                             ],
                           ),
                         ),
-                        const SizedBox(width: 20),
+                        const SizedBox(width: 12),
+                        IconButton(
+                          icon: Icon(
+                            playerState.isPlaying 
+                              ? Icons.pause
+                              : Icons.play_arrow,
+                          ),
+                          onPressed: () {
+                            if (playerState.isPlaying) {
+                              handler.pause();
+                            } else {
+                              handler.play();
+                            }
+                          },
+                        ),
+                        const SizedBox(width: 8),
+                        IconButton(
+                          icon: const Icon(Icons.queue_music),
+                          onPressed: () {
+                            // TODO: Show playlist dialog
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(content: Text('播放列表功能尚未实现')),
+                            );
+                          },
+                        ),
+                        const SizedBox(width: 12),
                       ])));
         }));
   }
