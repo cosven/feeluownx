@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'dart:async';
 
 import 'package:feeluownx/utils/websocket_utility.dart';
+import 'package:intl/find_locale.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 import 'package:http/http.dart' as http;
 import 'package:logging/logging.dart';
@@ -25,14 +26,15 @@ class Client {
     _logger.info("RPC host updated: $host");
   }
 
-  Future<String> readResponse(Stream<String> stream, StringBuffer buffer) async {
+  Future<String> readResponse(
+      Stream<String> stream, StringBuffer buffer) async {
     bool gotWelcome = false;
     bool gotHeader = false;
     int bodyLength = 0;
     await for (final chunk in stream) {
       buffer.write(chunk); // 将接收到的数据块追加到缓冲区
       // 检查缓冲区中是否有完整的行
-      if (!gotHeader){
+      if (!gotHeader) {
         final current = buffer.toString();
         final lineEndIndex = current.indexOf('\n');
         if (lineEndIndex != -1) {
@@ -48,10 +50,9 @@ class Client {
             _logger.info("response header: $header");
             buffer.clear();
             buffer.write(remain);
-            print('remain: $remain');
             gotHeader = true;
             bodyLength = int.parse(header.split(' ')[2]);
-            if (remain.length>= bodyLength) {
+            if (remain.length >= bodyLength) {
               return remain;
             }
             continue;
@@ -66,7 +67,7 @@ class Client {
     throw Exception('incomplete response');
   }
 
-  Future<Object?> tcpJsonRpc(String method, {List<dynamic>? args}) async {
+  Future<Object?> jsonRpc(String method, {List<dynamic>? args}) async {
     int port = 23333; // Assuming the TCP server is running on port 23332
 
     Map<String, dynamic> payload = {
@@ -93,16 +94,19 @@ class Client {
       socket.destroy();
 
       Map<String, dynamic> respBody = json.decode(body);
+      if (respBody.containsKey('error')) {
+        final error = respBody['error'];
+        _logger.severe('RPC error response: $error');
+        throw Exception('RPC error: ${error['message']}');
+      }
       return respBody['result'];
     } catch (e) {
-      _logger.warning('tcp rpc failed, $e');
-      return null;
+      _logger.severe('tcp rpc failed', e);
+      throw Exception('RPC call failed: $e');
     }
   }
 
-  Future<Object?> jsonRpc(String method, {List<dynamic>? args}) async {
-    return await tcpJsonRpc(method, args: args);
-
+  Future<Object?> httpJsonRpc(String method, {List<dynamic>? args}) async {
     Map<String, dynamic> payload = {
       'jsonrpc': '2.0',
       'id': rpcRequestId,
@@ -123,11 +127,68 @@ class Client {
     _logger.info('send rpc request: $body');
     if (response.statusCode == 200) {
       Map<String, dynamic> respBody = json.decode(response.body);
+      if (respBody.containsKey('error')) {
+        final error = respBody['error'];
+        _logger.severe('HTTP RPC error response: $error');
+        throw Exception('HTTP RPC error: ${error['message']}');
+      }
       return respBody['result'];
     } else {
-      _logger.warning('rpc failed, $response');
+      _logger.severe('HTTP RPC failed with status: ${response.statusCode}');
+      throw Exception('HTTP RPC failed with status: ${response.statusCode}');
     }
-    return null;
+  }
+
+  /// Returns a list of collections
+  ///
+  /// Each collection is represented as a Map with the following structure:
+  /// ```dart
+  /// {
+  ///   "identifier": 12345,
+  ///   "name": "我喜欢的音乐",
+  ///   "models_count": 10
+  /// }
+  /// ```
+  Future<List<Map<String, dynamic>>> listCollections() async {
+    Object? obj = await jsonRpc(
+        "lambda: [{'identifier': c.identifier, 'name': c.name, 'models_count': len(c.models)}"
+        " for c in app.coll_mgr.listall()]");
+    List<dynamic> list = obj! as List<dynamic>;
+    return list.map((item) => item as Map<String, dynamic>).toList();
+  }
+
+  Future<void> collectionOverwrite(Map<String, dynamic> collection, String rawData) async {
+    final identifier = collection['identifier'];
+    await jsonRpc("app.coll_mgr.get($identifier).overwrite_with_raw_data", args: [rawData]);
+    // Reload the collection to make sure the data is updated
+    await jsonRpc("app.coll_mgr.get($identifier).load");
+  }
+
+  Future<void> collectionCreate(String name, String rawData) async {
+    Object? obj = await jsonRpc("lambda: app.coll_mgr.create('$name', '$name').identifier");
+    final identifier = (obj!) as int;
+    // Reload the collection to make sure the data is updated
+    await jsonRpc("app.coll_mgr.get($identifier).overwrite_with_raw_data", args: [rawData]);
+  }
+
+  /// Sync a collection from the remote server to the local server
+  ///
+  Future<int> collectionSyncToLocal(Map<String, dynamic> collection) async {
+    final identifier = collection['identifier'];
+    final name = collection['name'];
+    Object? obj = await jsonRpc("app.coll_mgr.get($identifier).raw_data");
+    String rawData = (obj!) as String;
+
+    final localClient = Client('127.0.0.1');
+    final localCollections = await localClient.listCollections();
+    for (final localCollection in localCollections) {
+      if (localCollection['name'] == name) {
+        await localClient.collectionOverwrite(localCollection, rawData);
+        return 200;
+      }
+    }
+    await localClient.collectionCreate(name, rawData);
+    return 201;
   }
 
   /// Returns a list of albums from the library
@@ -145,7 +206,8 @@ class Client {
   /// }
   /// ```
   Future<List<Map<String, dynamic>>> listLibraryAlbums() async {
-    Object? obj = await jsonRpc("lambda: app.coll_mgr.get_coll_library().models");
+    Object? obj =
+        await jsonRpc("lambda: app.coll_mgr.get_coll_library().models");
     if (obj != null) {
       List<dynamic> list = obj as List<dynamic>;
       return list
@@ -174,18 +236,25 @@ class Client {
   ///    "__type__": "feeluown.library.BriefSongModel" // Type identifier
   /// }
   /// ```
+  Future<List<Map<String, dynamic>>> listCollectionSongs(
+      String identifier) async {
+    Object? obj = await jsonRpc("lambda: app.coll_mgr.get($identifier).models");
+    return _filterSongs(obj! as List<dynamic>);
+  }
+
+  List<Map<String, dynamic>> _filterSongs(List<dynamic> list) {
+    return list
+        .where((item) =>
+            item is Map<String, dynamic> &&
+            item['__type__'] == 'feeluown.library.BriefSongModel')
+        .map((item) => item as Map<String, dynamic>)
+        .toList();
+  }
+
   Future<List<Map<String, dynamic>>> listLibrarySongs() async {
-    Object? obj = await jsonRpc("lambda: app.coll_mgr.get_coll_library().models");
-    if (obj != null) {
-      List<dynamic> list = obj as List<dynamic>;
-      return list
-          .where((item) =>
-              item is Map<String, dynamic> &&
-              item['__type__'] == 'feeluown.library.BriefSongModel')
-          .map((item) => item as Map<String, dynamic>)
-          .toList();
-    }
-    return [];
+    Object? obj =
+        await jsonRpc("lambda: app.coll_mgr.get_coll_library().models");
+    return _filterSongs(obj! as List<dynamic>);
   }
 
   Future<String?> getAlbumCover(Map<String, dynamic> album) async {
@@ -212,13 +281,12 @@ class Client {
   ///    "__type__": "feeluown.library.BriefSongModel" // Type identifier
   /// }
   /// ```
-  Future<List<Map<String, dynamic>>> listAlbumSongs(Map<String, dynamic> album) async {
+  Future<List<Map<String, dynamic>>> listAlbumSongs(
+      Map<String, dynamic> album) async {
     Object? obj = await jsonRpc("app.library.album_list_songs", args: [album]);
     if (obj != null) {
       List<dynamic> list = obj as List<dynamic>;
-      return list
-          .map((item) => item as Map<String, dynamic>)
-          .toList();
+      return list.map((item) => item as Map<String, dynamic>).toList();
     }
     return [];
   }
@@ -245,6 +313,10 @@ class TcpPubsubClient {
     host = host_;
   }
 
+  updateHost(String host_) {
+    host = host_;
+  }
+
   // FIXME: the protocol parser is hacky and not robust
   Future<void> connect({
     required Function onMessage,
@@ -264,10 +336,10 @@ class TcpPubsubClient {
       // Create a broadcast stream that can be listened to multiple times
       _streamController = StreamController<String>();
       utf8.decoder.bind(_socket!).transform(const LineSplitter()).listen(
-        (data) => _streamController!.add(data),
-        onError: (e) => _streamController!.addError(e),
-        onDone: () => _streamController!.close(),
-      );
+            (data) => _streamController!.add(data),
+            onError: (e) => _streamController!.addError(e),
+            onDone: () => _streamController!.close(),
+          );
       _broadcastStream = _streamController!.stream.asBroadcastStream();
       _isConnected = true;
 
@@ -285,7 +357,6 @@ class TcpPubsubClient {
 
       // Start listening for messages
       _startListening();
-
     } catch (e) {
       _isConnected = false;
       _logger.severe('Failed to connect: $e');
@@ -388,7 +459,6 @@ class TcpPubsubClient {
   }
 }
 
-
 class PubsubClient {
   final _logger = Logger('PubsubClient');
 
@@ -434,4 +504,9 @@ class PubsubClient {
   void send(String message) {
     WebSocketUtility().sendMessage(message);
   }
+}
+
+Future<void> main() async {
+  final client = Client("192.168.31.143");
+  client.collectionCreate('test', '');
 }

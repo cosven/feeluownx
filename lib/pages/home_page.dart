@@ -15,13 +15,35 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   final Client client = Global.getIt<Client>();
   List<Map<String, dynamic>> albums = [];
+  List<Map<String, dynamic>> collections = [];
   bool isLoading = true;
+  bool isLoadingCollections = true;
   final Map<String, String?> albumCovers = {};  // 用于缓存专辑封面 URL
 
   @override
   void initState() {
     super.initState();
     _loadAlbums();
+    _loadCollections();
+  }
+
+  Future<void> _loadCollections() async {
+    try {
+      final loadedCollections = await client.listCollections();
+      setState(() {
+        collections = loadedCollections;
+        isLoadingCollections = false;
+      });
+    } catch (e) {
+      setState(() {
+        isLoadingCollections = false;
+      });
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Failed to load collections: $e')),
+        );
+      }
+    }
   }
 
   Future<void> _loadAlbums() async {
@@ -130,7 +152,7 @@ class _HomePageState extends State<HomePage> {
                     onTap: () {
                       Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (context) => const SongListPage()),
+                        MaterialPageRoute(builder: (context) => SongListPage()),
                       );
                     },
                     borderRadius: BorderRadius.circular(12.0),
@@ -214,7 +236,7 @@ class _HomePageState extends State<HomePage> {
               itemCount: albums.length,
               itemBuilder: (context, index) {
                 final album = albums[index];
-                _loadAlbumCover(album);
+                // _loadAlbumCover(album);
                 final coverUrl = albumCovers[album['identifier']];
 
                 return Padding(
@@ -298,7 +320,6 @@ class _HomePageState extends State<HomePage> {
               },
             ),
           ),
-          const SizedBox(height: 32),
         ],
       ),
     );

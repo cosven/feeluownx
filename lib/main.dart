@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:dynamic_color/dynamic_color.dart';
 import 'package:feeluownx/pages/configuration.dart';
 import 'package:feeluownx/pages/playlist_ui.dart';
+import 'package:feeluownx/pages/collections_page.dart';
 import 'package:feeluownx/search.dart';
 import 'package:feeluownx/widgets/small_player.dart';
 import 'package:flutter/material.dart';
@@ -24,11 +25,14 @@ Future<void> main() async {
   MediaKit.ensureInitialized();
   await Settings.init(cacheProvider: SharePreferenceCache());
   await Global.init();
-  final Directory appDocumentsDir = await getApplicationDocumentsDirectory();
-  SeriousPython.run(
-    "app/app.zip",
-    environmentVariables: {"FEELUOWN_USER_HOME": appDocumentsDir.path},
-  );
+  final enableFuoDaemon = const String.fromEnvironment('ENABLE_FUO_DAEMON', defaultValue: 'true') == 'true';
+  if (enableFuoDaemon) {
+    final Directory appDocumentsDir = await getApplicationDocumentsDirectory();
+    SeriousPython.run(
+      "app/app.zip",
+      environmentVariables: {"FEELUOWN_USER_HOME": appDocumentsDir.path},
+    );
+  }
   runApp(const App());
 }
 
@@ -44,6 +48,7 @@ class AppState extends State<App> with SingleTickerProviderStateMixin {
   final List<Widget> children = [
     const HomePage(),
     const PlaylistView(),
+    const CollectionsPage(),
     const ConfigurationPage(),
   ];
 
@@ -58,7 +63,7 @@ class AppState extends State<App> with SingleTickerProviderStateMixin {
   @override
   void initState() {
     super.initState();
-    tabController = TabController(length: 3, vsync: this);
+    tabController = TabController(length: 4, vsync: this);
   }
 
   @override
@@ -86,13 +91,24 @@ class AppState extends State<App> with SingleTickerProviderStateMixin {
                   bottom: 0, left: 0, right: 0, child: SmallPlayerWidget())
             ]),
             bottomNavigationBar: NavigationBar(
-              destinations: const [
-                NavigationDestination(icon: Icon(Icons.home), label: "Home"),
-                NavigationDestination(icon: Icon(Icons.search), label: "Search"),
-                NavigationDestination(icon: Icon(Icons.list), label: "Playing"),
-                NavigationDestination(icon: Icon(Icons.settings), label: "Settings")
+              destinations: [
+                NavigationDestination(
+                    icon: const Icon(Icons.home), 
+                    label: AppLocalizations.of(context)!.home),
+                NavigationDestination(
+                    icon: const Icon(Icons.search),
+                    label: AppLocalizations.of(context)!.search),
+                NavigationDestination(
+                    icon: const Icon(Icons.list),
+                    label: AppLocalizations.of(context)!.playing),
+                NavigationDestination(
+                    icon: const Icon(Icons.folder),
+                    label: AppLocalizations.of(context)!.collection),
+                NavigationDestination(
+                    icon: const Icon(Icons.settings),
+                    label: AppLocalizations.of(context)!.settings),
               ],
-              selectedIndex: currentIndex == 0 ? 0 : currentIndex + 1,
+              selectedIndex: currentIndex + 1,
               onDestinationSelected: (index) {
                 if (index == 1) {
                   showSearch(

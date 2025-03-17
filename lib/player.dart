@@ -4,10 +4,12 @@ import 'package:audio_service/audio_service.dart';
 import 'package:feeluownx/bean/player_state.dart';
 import 'package:feeluownx/global.dart';
 import 'package:flutter/material.dart';
+import 'package:logging/logging.dart';
 
 import 'client.dart';
 
 class AudioPlayerHandler extends BaseAudioHandler with SeekHandler {
+  final _logger = Logger('AudioPlayerHandler');
   final Client client = Global.getIt<Client>();
   final PubsubClient pubsubClient = Global.getIt<PubsubClient>();
   final TcpPubsubClient tcpPubsubClient = Global.getIt<TcpPubsubClient>();
@@ -38,8 +40,8 @@ class AudioPlayerHandler extends BaseAudioHandler with SeekHandler {
       initFuoCurrentPlayingInfo();
     }).catchError((error) {
       connectionStatus = 2;
-      connectionMsg = error.toString();
-      print("Connection failed, retrying in 1 seconds...");
+      final errmsg = error.toString();
+      connectionMsg = "Connection failed, retrying in 1 seconds...\n$errmsg";
       Future.delayed(Duration(seconds: 1), trySubscribeMessages);
     });
   }
@@ -137,7 +139,7 @@ class AudioPlayerHandler extends BaseAudioHandler with SeekHandler {
                 playing: true, processingState: AudioProcessingState.ready));
           }
         } else if (topic == 'player.metadata_changed') {
-          print('pubsub: player metadata changed');
+          _logger.info('Player metadata changed');
           List<dynamic> args = json.decode(data);
           Map<String, dynamic> metadata = args[0];
           playerState.setMetadata(metadata);
@@ -147,7 +149,7 @@ class AudioPlayerHandler extends BaseAudioHandler with SeekHandler {
             artHeaders['user-agent'] =
                 'Mozilla/5.0 (X11; Linux x86_64; rv:129.0) Gecko/20100101 Firefox/129.0';
           }
-          print('artwork changed to: $artwork_');
+          _logger.info('Artwork changed to: $artwork_');
           List<dynamic> artists = metadata['artists'];
           mediaItem.add(MediaItem(
             id: metadata['uri'],
@@ -167,7 +169,7 @@ class AudioPlayerHandler extends BaseAudioHandler with SeekHandler {
               duration:
                   Duration(milliseconds: (durationSeconds * 1000).round())));
         } else if (topic == 'player.seeked') {
-          print("seeked ====== $data");
+          _logger.info('Seeked to position: $data');
           List<dynamic> args = json.decode(data);
           int positionSeconds = args[0];
           playbackState.add(playbackState.value.copyWith(
@@ -176,10 +178,10 @@ class AudioPlayerHandler extends BaseAudioHandler with SeekHandler {
         } else if (topic == 'live_lyric') {
           playerState.setCurrentLyricsLine(data);
         } else {
-          print("Unhandled topic: $topic => $data");
+          _logger.info('Unhandled topic: $topic => $data');
         }
       } catch (e) {
-        print('handle message error: $e');
+        _logger.severe('Error handling message', e);
       }
     }
   }
@@ -188,16 +190,16 @@ class AudioPlayerHandler extends BaseAudioHandler with SeekHandler {
     return await handleMessage(message);
   }
 
-  onPubsubError(Object o, StackTrace trace) {
+  onPubsubError(Exception e) {
     connectionStatus = 2;
-    connectionMsg = trace.toString();
-    print(trace);
+    connectionMsg = e.toString();
+    _logger.severe('Pubsub error: $e');
   }
 
   void onWebsocketDone() {
     connectionStatus = 0;
     connectionMsg = "";
-    print("Websocket closed.");
+    _logger.info('Websocket closed');
   }
 
   List<MediaItem> mapSongToMediaItem(List<dynamic> dataList) {
@@ -219,9 +221,9 @@ class AudioPlayerHandler extends BaseAudioHandler with SeekHandler {
     Object? obj = await client.jsonRpc("lambda: app.playlist.current_song");
     if (obj != null) {
       playerState.metadata = obj as Map<String, dynamic>;
-      print(playerState.metadata);
+      _logger.info('Current song metadata: ${playerState.metadata}');
     } else {
-      print("get current song failed");
+      _logger.warning('Failed to get current song');
     }
   }
 }

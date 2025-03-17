@@ -21,6 +21,7 @@ class ConfigurationPage extends StatefulWidget {
 class ConfigurationPageState extends State<ConfigurationPage> {
   final AudioPlayerHandler handler = Global.getIt<AudioPlayerHandler>();
   final Client client = Global.getIt<Client>();
+  final TcpPubsubClient pubsubClient = Global.getIt<TcpPubsubClient>();
 
   static const String settingsKeyDaemonIp = "settings_ip_address";
 
@@ -30,11 +31,17 @@ class ConfigurationPageState extends State<ConfigurationPage> {
   Widget build(BuildContext context) {
     List<Widget> children = [
       SettingsGroup(title: "General", children: [
-        const TextInputSettingsTile(
+        TextInputSettingsTile(
           title: "Instance IP",
           helperText: "The IP Address of FeelUOwn daemon",
           settingKey: settingsKeyDaemonIp,
           initialValue: "127.0.0.1",
+          onChange: (host_) {
+            client.updateHost(host_);
+            pubsubClient.updateHost(host_);
+            pubsubClient.close();
+            handler.trySubscribeMessages();
+          },
         ),
         SimpleSettingsTile(
           title: "WebSocket status",
