@@ -126,8 +126,11 @@ class SmallPlayerState extends State<StatefulWidget> {
                               if (!mounted) return;
                               showModalBottomSheet(
                                 context: context,
+                                isScrollControlled: true,
                                 builder: (context) {
-                                  return Column(
+                                  return SizedBox(
+                                    height: MediaQuery.of(context).size.height * 0.75,
+                                    child: Column(
                                     children: [
                                       Padding(
                                         padding: const EdgeInsets.all(16.0),
