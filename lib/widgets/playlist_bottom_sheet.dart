@@ -28,9 +28,33 @@ class PlaylistBottomSheet extends StatelessWidget {
             children: [
               Padding(
                 padding: const EdgeInsets.all(16.0),
-                child: Text(
-                  '播放列表',
-                  style: Theme.of(context).textTheme.titleLarge,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      '播放列表',
+                      style: Theme.of(context).textTheme.titleLarge,
+                    ),
+                    Row(
+                      children: [
+                        TextButton.icon(
+                          icon: const Icon(Icons.radio),
+                          label: const Text('AI 电台'),
+                          onPressed: () {
+                            // TODO: Implement AI radio
+                          },
+                        ),
+                        const SizedBox(width: 8),
+                        TextButton.icon(
+                          icon: const Icon(Icons.delete),
+                          label: const Text('清空'),
+                          onPressed: () {
+                            // TODO: Implement clear playlist
+                          },
+                        ),
+                      ],
+                    ),
+                  ],
                 ),
               ),
               Expanded(
