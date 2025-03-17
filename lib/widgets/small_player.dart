@@ -160,7 +160,7 @@ class SmallPlayerState extends State<StatefulWidget> {
                                         ),
                                       ),
                                     ],
-                                  );
+                                  ));
                                 },
                               );
                             } catch (e) {
