@@ -48,8 +48,21 @@ class PlaylistBottomSheet extends StatelessWidget {
                         TextButton.icon(
                           icon: const Icon(Icons.delete),
                           label: const Text('清空'),
-                          onPressed: () {
-                            // TODO: Implement clear playlist
+                          onPressed: () async {
+                            try {
+                              await client.playlistClear();
+                              if (context.mounted) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(content: Text('播放列表已清空')),
+                                );
+                              }
+                            } catch (e) {
+                              if (context.mounted) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(content: Text('清空播放列表失败: $e')),
+                                );
+                              }
+                            }
                           },
                         ),
                       ],
