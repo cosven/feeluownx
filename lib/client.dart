@@ -167,6 +167,8 @@ class Client {
   Future<void> collectionCreate(String name, String rawData) async {
     Object? obj = await jsonRpc("lambda: app.coll_mgr.create('$name', '$name').identifier");
     final identifier = (obj!) as int;
+    // Let the collection manager know that the collection has been created.
+    await jsonRpc("app.coll_mgr.refresh");
     // Reload the collection to make sure the data is updated
     await jsonRpc("app.coll_mgr.get($identifier).overwrite_with_raw_data", args: [rawData]);
   }
@@ -353,7 +355,7 @@ class TcpPubsubClient {
       _logger.info('Received version response: $versionResponse');
 
       // Subscribe to player.metadata_changed
-      _socket?.write('sub player.metadata_changed\n');
+      _socket?.write('sub player.*\n');
 
       // Start listening for messages
       _startListening();

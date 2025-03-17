@@ -3,7 +3,6 @@ import 'dart:convert';
 import 'package:audio_service/audio_service.dart';
 import 'package:feeluownx/bean/player_state.dart';
 import 'package:feeluownx/global.dart';
-import 'package:flutter/material.dart';
 import 'package:logging/logging.dart';
 
 import 'client.dart';
