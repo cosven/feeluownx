@@ -106,7 +106,7 @@ class SmallPlayerState extends State<StatefulWidget> {
                         const SizedBox(width: 12),
                         IconButton(
                           icon: Icon(
-                            playerState.isPlaying 
+                            playerState.isPlaying
                               ? Icons.pause
                               : Icons.play_arrow,
                           ),
@@ -118,7 +118,7 @@ class SmallPlayerState extends State<StatefulWidget> {
                             }
                           },
                         ),
-                        const SizedBox(width: 8),
+                        const SizedBox(width: 4),
                         IconButton(
                           icon: const Icon(Icons.queue_music),
                           onPressed: () {
