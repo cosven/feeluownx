@@ -302,6 +302,14 @@ class Client {
     await jsonRpc("app.playlist.set_models", args: [songs, true]);
   }
 
+  Future<void> playlistClear() async {
+    await jsonRpc("app.playlist.clear");
+  }
+
+  Future<void> playlistRemove(Map<String, dynamic> song) async {
+    await jsonRpc("app.playlist.remove", args: [song]);
+  }
+
   /// Returns a list of songs
   /// The song structure is the same as the one returned by listLibrarySongs
   Future<List<Map<String, dynamic>>> playlistList() async {
