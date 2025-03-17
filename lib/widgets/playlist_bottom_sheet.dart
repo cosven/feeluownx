@@ -2,15 +2,29 @@ import 'package:flutter/material.dart';
 import '../client.dart';
 import '../global.dart';
 
-class PlaylistBottomSheet extends StatelessWidget {
+class PlaylistBottomSheet extends StatefulWidget {
   const PlaylistBottomSheet({super.key});
+
+  @override
+  State<PlaylistBottomSheet> createState() => _PlaylistBottomSheetState();
+}
+
+class _PlaylistBottomSheetState extends State<PlaylistBottomSheet> {
+  Future<List<Map<String, dynamic>>> _getPlaylist() async {
+    final client = Global.getIt<Client>();
+    return client.playlistList();
+  }
+
+  void _refresh() {
+    setState(() {});
+  }
 
   @override
   Widget build(BuildContext context) {
     final client = Global.getIt<Client>();
     
     return FutureBuilder(
-      future: client.playlistList(),
+      future: _getPlaylist(),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const Center(child: CircularProgressIndicator());
@@ -55,6 +69,7 @@ class PlaylistBottomSheet extends StatelessWidget {
                                 ScaffoldMessenger.of(context).showSnackBar(
                                   const SnackBar(content: Text('播放列表已清空')),
                                 );
+                                _refresh();
                               }
                             } catch (e) {
                               if (context.mounted) {
