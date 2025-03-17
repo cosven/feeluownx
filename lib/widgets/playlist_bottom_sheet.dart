@@ -97,6 +97,21 @@ class _PlaylistBottomSheetState extends State<PlaylistBottomSheet> {
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                       ),
+                      trailing: IconButton(
+                        icon: const Icon(Icons.delete),
+                        onPressed: () async {
+                          try {
+                            await client.playlistRemove(song);
+                            _refresh();
+                          } catch (e) {
+                            if (context.mounted) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(content: Text('删除歌曲失败: $e')),
+                              );
+                            }
+                          }
+                        },
+                      ),
                       onTap: () {
                         client.playSong(song);
                         Navigator.pop(context);
