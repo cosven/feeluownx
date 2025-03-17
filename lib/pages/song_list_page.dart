@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:feeluownx/client.dart';
 import 'package:feeluownx/global.dart';
 import 'package:logging/logging.dart';
+import '../widgets/small_player.dart';
 
 class SongListPage extends StatefulWidget {
   final String? collectionIdentifier;
@@ -80,7 +81,10 @@ class _SongListPageState extends State<SongListPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
+      body: Stack(
+        children: [
+          Scaffold(
+            appBar: AppBar(
         title: Text(collectionName ?? '歌曲列表'),
         actions: [
           if (songs.isNotEmpty)
@@ -91,7 +95,7 @@ class _SongListPageState extends State<SongListPage> {
             ),
         ],
       ),
-      body: isLoading
+            body: isLoading
           ? const Center(child: CircularProgressIndicator())
           : songs.isEmpty
               ? const Center(child: Text('没有找到歌曲'))
@@ -128,6 +132,15 @@ class _SongListPageState extends State<SongListPage> {
                     },
                   ),
                 ),
+            ),
+            const Positioned(
+              bottom: 0,
+              left: 0,
+              right: 0,
+              child: SmallPlayerWidget(),
+            ),
+          ],
+        ),
     );
   }
 }
