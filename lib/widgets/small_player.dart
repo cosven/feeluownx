@@ -7,6 +7,7 @@ import '../global.dart';
 import '../pages/fullscreen_player.dart';
 import '../player.dart';
 import '../client.dart';
+import 'playlist_bottom_sheet.dart';
 
 class SmallPlayerWidget extends StatefulWidget {
   const SmallPlayerWidget({super.key});
@@ -119,56 +120,12 @@ class SmallPlayerState extends State<StatefulWidget> {
                         const SizedBox(width: 4),
                         IconButton(
                           icon: const Icon(Icons.queue_music),
-                          onPressed: () async {
-                            final client = Global.getIt<Client>();
-                            try {
-                              final songs = await client.playlistList();
-                              if (!mounted) return;
-                              showModalBottomSheet(
-                                context: context,
-                                isScrollControlled: true,
-                                builder: (context) {
-                                  return SizedBox(
-                                    height: MediaQuery.of(context).size.height * 0.75,
-                                    child: Column(
-                                    children: [
-                                      Padding(
-                                        padding: const EdgeInsets.all(16.0),
-                                        child: Text(
-                                          '播放列表',
-                                          style: Theme.of(context).textTheme.titleLarge,
-                                        ),
-                                      ),
-                                      Expanded(
-                                        child: ListView.builder(
-                                          itemCount: songs.length,
-                                          itemBuilder: (context, index) {
-                                            final song = songs[index];
-                                            return ListTile(
-                                              leading: const Icon(Icons.music_note),
-                                              title: Text(
-                                                '${song['title'] ?? '未知歌曲'} • ${song['artists_name'] ?? '未知歌手'}',
-                                                maxLines: 1,
-                                                overflow: TextOverflow.ellipsis,
-                                              ),
-                                              onTap: () {
-                                                client.playSong(song);
-                                                Navigator.pop(context);
-                                              },
-                                            );
-                                          },
-                                        ),
-                                      ),
-                                    ],
-                                  ));
-                                },
-                              );
-                            } catch (e) {
-                              if (!mounted) return;
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(content: Text('获取播放列表失败: $e')),
-                              );
-                            }
+                          onPressed: () {
+                            showModalBottomSheet(
+                              context: context,
+                              isScrollControlled: true,
+                              builder: (context) => const PlaylistBottomSheet(),
+                            );
                           },
                         ),
                         const SizedBox(width: 12),
