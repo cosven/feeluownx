@@ -28,6 +28,7 @@ class _SongListPageState extends State<SongListPage> {
     try {
       await client.playlistSetModels(songs);
       _logger.info('Played all ${songs.length} songs');
+      await client.playerResume();
     } catch (e) {
       _logger.severe('Failed to play all songs', e);
       if (mounted) {

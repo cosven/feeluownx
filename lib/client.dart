@@ -316,6 +316,15 @@ class Client {
     Object? obj = await jsonRpc("app.playlist.list");
     return (obj! as List<dynamic>).map((item) => item as Map<String, dynamic>).toList();
   }
+
+  /* ---------------------- */
+  /* Player control methods */
+  /* ---------------------- */
+
+  Future<void> playerResume() async {
+    await jsonRpc("app.player.resume");
+  }
+
 }
 
 class TcpPubsubClient {
