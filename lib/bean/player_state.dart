@@ -25,6 +25,8 @@ class PlayerState with ChangeNotifier {
     notifyListeners();
   }
 
+  bool get isPlaying => playState == 2;
+
   String getArtistsName() {
     return (metadata?['artists'] ?? []).join('/');
   }

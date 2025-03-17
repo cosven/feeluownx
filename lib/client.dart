@@ -301,6 +301,13 @@ class Client {
   Future<void> playlistSetModels(List<Map<String, dynamic>> songs) async {
     await jsonRpc("app.playlist.set_models", args: [songs, true]);
   }
+
+  /// Returns a list of songs
+  /// The song structure is the same as the one returned by listLibrarySongs
+  Future<List<Map<String, dynamic>>> playlistList() async {
+    Object? obj = await jsonRpc("app.playlist.list");
+    return (obj! as List<dynamic>).map((item) => item as Map<String, dynamic>).toList();
+  }
 }
 
 class TcpPubsubClient {

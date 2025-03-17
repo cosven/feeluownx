@@ -1,7 +1,4 @@
-import 'dart:ui';
-
 import 'package:feeluownx/bean/player_state.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:provider/provider.dart';
@@ -9,6 +6,7 @@ import 'package:provider/provider.dart';
 import '../global.dart';
 import '../pages/fullscreen_player.dart';
 import '../player.dart';
+import '../client.dart';
 
 class SmallPlayerWidget extends StatefulWidget {
   const SmallPlayerWidget({super.key});
@@ -146,12 +144,7 @@ class SmallPlayerState extends State<StatefulWidget> {
                                             return ListTile(
                                               leading: const Icon(Icons.music_note),
                                               title: Text(
-                                                song['title'] ?? '未知歌曲',
-                                                maxLines: 1,
-                                                overflow: TextOverflow.ellipsis,
-                                              ),
-                                              subtitle: Text(
-                                                '${song['artists_name'] ?? '未知歌手'} - ${song['album_name'] ?? '未知专辑'}',
+                                                '${song['title'] ?? '未知歌曲'} • ${song['artists_name'] ?? '未知歌手'}',
                                                 maxLines: 1,
                                                 overflow: TextOverflow.ellipsis,
                                               ),
