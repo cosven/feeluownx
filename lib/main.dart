@@ -2,7 +2,6 @@ import 'dart:io';
 
 import 'package:dynamic_color/dynamic_color.dart';
 import 'package:feeluownx/pages/configuration.dart';
-import 'package:feeluownx/pages/playlist_ui.dart';
 import 'package:feeluownx/pages/collections_page.dart';
 import 'package:feeluownx/search.dart';
 import 'package:feeluownx/widgets/small_player.dart';
@@ -47,7 +46,6 @@ class AppState extends State<App> with SingleTickerProviderStateMixin {
   int currentIndex = 0;
   final List<Widget> children = [
     const HomePage(),
-    const PlaylistView(),
     const CollectionsPage(),
     const ConfigurationPage(),
   ];
@@ -63,7 +61,7 @@ class AppState extends State<App> with SingleTickerProviderStateMixin {
   @override
   void initState() {
     super.initState();
-    tabController = TabController(length: 4, vsync: this);
+    tabController = TabController(length: 3, vsync: this);
   }
 
   @override
@@ -93,14 +91,11 @@ class AppState extends State<App> with SingleTickerProviderStateMixin {
             bottomNavigationBar: NavigationBar(
               destinations: [
                 NavigationDestination(
-                    icon: const Icon(Icons.home), 
+                    icon: const Icon(Icons.home),
                     label: AppLocalizations.of(context)!.home),
                 NavigationDestination(
                     icon: const Icon(Icons.search),
                     label: AppLocalizations.of(context)!.search),
-                NavigationDestination(
-                    icon: const Icon(Icons.list),
-                    label: AppLocalizations.of(context)!.playing),
                 NavigationDestination(
                     icon: const Icon(Icons.folder),
                     label: AppLocalizations.of(context)!.collection),
@@ -108,7 +103,7 @@ class AppState extends State<App> with SingleTickerProviderStateMixin {
                     icon: const Icon(Icons.settings),
                     label: AppLocalizations.of(context)!.settings),
               ],
-              selectedIndex: currentIndex + 1,
+              selectedIndex: currentIndex == 0 ? 0 : currentIndex + 1,
               onDestinationSelected: (index) {
                 if (index == 1) {
                   showSearch(

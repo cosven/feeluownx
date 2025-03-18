@@ -1,7 +1,4 @@
-import 'dart:ui';
-
 import 'package:feeluownx/bean/player_state.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:provider/provider.dart';
@@ -9,6 +6,8 @@ import 'package:provider/provider.dart';
 import '../global.dart';
 import '../pages/fullscreen_player.dart';
 import '../player.dart';
+import '../client.dart';
+import 'playlist_bottom_sheet.dart';
 
 class SmallPlayerWidget extends StatefulWidget {
   const SmallPlayerWidget({super.key});
@@ -95,7 +94,7 @@ class SmallPlayerState extends State<StatefulWidget> {
                             children: [
                               Flexible(
                                 child: Text(
-                                  '${handler.playerState.metadata?['title'] ?? ''} - ${handler.playerState.getArtistsName()}',
+                                  '${handler.playerState.metadata?['title'] ?? ''} • ${handler.playerState.getArtistsName()}',
                                   style: Theme.of(context).textTheme.titleSmall,
                                   overflow: TextOverflow.ellipsis,
                                 ),
@@ -103,7 +102,33 @@ class SmallPlayerState extends State<StatefulWidget> {
                             ],
                           ),
                         ),
-                        const SizedBox(width: 20),
+                        const SizedBox(width: 12),
+                        IconButton(
+                          icon: Icon(
+                            playerState.isPlaying
+                              ? Icons.pause
+                              : Icons.play_arrow,
+                          ),
+                          onPressed: () {
+                            if (playerState.isPlaying) {
+                              handler.pause();
+                            } else {
+                              handler.play();
+                            }
+                          },
+                        ),
+                        const SizedBox(width: 4),
+                        IconButton(
+                          icon: const Icon(Icons.queue_music),
+                          onPressed: () {
+                            showModalBottomSheet(
+                              context: context,
+                              isScrollControlled: true,
+                              builder: (context) => const PlaylistBottomSheet(),
+                            );
+                          },
+                        ),
+                        const SizedBox(width: 12),
                       ])));
         }));
   }

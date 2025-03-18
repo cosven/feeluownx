@@ -50,6 +50,19 @@ class _AlbumDetailPageState extends State<AlbumDetailPage> {
     }
   }
 
+  Future<void> _playAll() async {
+    try {
+      await client.playlistSetModels(songs);
+      await client.playerResume();
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('播放全部失败: $e')),
+        );
+      }
+    }
+  }
+
   Future<void> _playSong(int index) async {
     try {
       await client.playSong(songs[index]);
@@ -84,6 +97,14 @@ class _AlbumDetailPageState extends State<AlbumDetailPage> {
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.album['name'] ?? 'Unknown Album'),
+        actions: [
+          if (songs.isNotEmpty)
+            TextButton.icon(
+              icon: const Icon(Icons.play_arrow),
+              label: const Text('播放全部'),
+              onPressed: _playAll,
+            ),
+        ],
       ),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,

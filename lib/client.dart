@@ -82,7 +82,8 @@ class Client {
     String body = jsonEncode(payload);
     String message = "jsonrpc <<EOF\n$body\nEOF\n";
     try {
-      final socket = await Socket.connect(host, port);
+      // timeout is hardcoded to 3 seconds temporarily
+      final socket = await Socket.connect(host, port, timeout: const Duration(seconds: 3));
       socket.write(message);
       _logger.info('send tcp rpc request: $message');
 
@@ -296,6 +297,34 @@ class Client {
   Future<void> playSong(Map<String, dynamic> song) async {
     await jsonRpc("app.playlist.play_model", args: [song]);
   }
+
+  Future<void> playlistSetModels(List<Map<String, dynamic>> songs) async {
+    await jsonRpc("app.playlist.set_models", args: [songs, true]);
+  }
+
+  Future<void> playlistClear() async {
+    await jsonRpc("app.playlist.clear");
+  }
+
+  Future<void> playlistRemove(Map<String, dynamic> song) async {
+    await jsonRpc("app.playlist.remove", args: [song]);
+  }
+
+  /// Returns a list of songs
+  /// The song structure is the same as the one returned by listLibrarySongs
+  Future<List<Map<String, dynamic>>> playlistList() async {
+    Object? obj = await jsonRpc("app.playlist.list");
+    return (obj! as List<dynamic>).map((item) => item as Map<String, dynamic>).toList();
+  }
+
+  /* ---------------------- */
+  /* Player control methods */
+  /* ---------------------- */
+
+  Future<void> playerResume() async {
+    await jsonRpc("app.player.resume");
+  }
+
 }
 
 class TcpPubsubClient {
@@ -509,6 +538,6 @@ class PubsubClient {
 }
 
 Future<void> main() async {
-  final client = Client("192.168.31.143");
+  final client = Client("192.168.31.144");
   client.collectionCreate('test', '');
 }
