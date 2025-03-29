@@ -11,14 +11,14 @@ class SongCard extends StatelessWidget {
   final bool showIndex;
   final int? index;
   final AudioPlayerHandler handler = Global.getIt<AudioPlayerHandler>();
+  final bool isPlaying;
+  
   SongCard({
     super.key,
     required this.song,
     this.showIndex = false,
     this.index,
-  });
-
-  bool get isPlaying => handler.playerState.sameAsCurrentSong(song);
+  }) : isPlaying = handler.playerState.sameAsCurrentSong(song);
 
   String _formatDuration(String durationStr) {
     // If already in mm:ss format, return as is
