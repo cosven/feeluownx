@@ -44,13 +44,11 @@ class TcpPubsubClient {
       _logger.info("Already connected or connecting, skipping reconnect");
       return;
     }
-    _setConnectionState(ConnectionState.connecting);
 
     int retryCount = 0;
     while (retryCount < maxRetries) {
       try {
         await _connectInternal();
-        _setConnectionState(ConnectionState.connected);
         _logger.info("Connected!");
         return;
       } catch (error) {
@@ -66,9 +64,7 @@ class TcpPubsubClient {
   }
 
   Future<void> _connectInternal() async {
-    assert(_connectionState != ConnectionState.connected);
-    close(); // Clean up any existing connection
-
+    _setConnectionState(ConnectionState.connecting);
     // Connect to the server
     try {
       _socket = await Socket.connect(host, port, timeout: const Duration(seconds: 1));
@@ -117,7 +113,7 @@ class TcpPubsubClient {
       },
       onError: (error) {
         _logger.severe('Stream error: $error');
-        _connectionState = ConnectionState.disconnected;
+        _setConnectionState(ConnectionState.disconnected);
         for (var callback in _onErrorCallbacks) {
           callback(error);
         }
@@ -172,9 +168,6 @@ class TcpPubsubClient {
     _streamController = null;
     _broadcastStream = null;
   }
-
-  /// Returns whether the client is currently connected to the server
-  bool get isConnected => _connectionState == ConnectionState.connected;
 
   /// Returns the current connection status as a string for display purposes
   String get connectionStatus {

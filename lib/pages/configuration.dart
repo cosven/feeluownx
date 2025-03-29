@@ -1,6 +1,5 @@
 import 'dart:io';
 
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_settings_screens/flutter_settings_screens.dart';
@@ -33,10 +32,7 @@ class ConfigurationPageState extends State<ConfigurationPage> {
   @override
   void initState() {
     super.initState();
-    pubsubClient.addConnectionStateListener((connected) {
-      // Use the connectionStatus getter which handles all states
-      updateConnectionStatus(pubsubClient.connectionStatus);
-    });
+    pubsubClient.addConnectionStateListener(updateConnectionStatus);
     // Initialize with current status
     updateConnectionStatus(pubsubClient.connectionStatus);
   }
@@ -49,10 +45,10 @@ class ConfigurationPageState extends State<ConfigurationPage> {
     super.dispose();
   }
 
-  void updateConnectionStatus(String status) {
+  void updateConnectionStatus(_) {
     if (!mounted) return;
     setState(() {
-      connectionStatus = status;
+      connectionStatus = pubsubClient.connectionStatus;
     });
   }
 
@@ -73,8 +69,8 @@ class ConfigurationPageState extends State<ConfigurationPage> {
         ),
         SimpleSettingsTile(
           title: "Connection Status",
-          subtitle: connectionStatus.isEmpty 
-              ? "Loading..." 
+          subtitle: connectionStatus.isEmpty
+              ? "Loading..."
               : "$connectionStatus (Click to reconnect)",
           leading: const Icon(Icons.private_connectivity),
           onTap: () async {
@@ -87,10 +83,6 @@ class ConfigurationPageState extends State<ConfigurationPage> {
             }
             if (await Permission.notification.isDenied) {
               await Permission.notification.request();
-            }
-            if (context.mounted) {
-              ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-                content: Text("Try connecting...")));
             }
             pubsubClient.connect();
           },
