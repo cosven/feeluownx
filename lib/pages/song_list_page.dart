@@ -84,47 +84,47 @@ class _SongListPageState extends State<SongListPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        title: Text(collectionName ?? '歌曲列表'),
+        actions: [
+          if (songs.isNotEmpty)
+            TextButton.icon(
+              icon: const Icon(Icons.play_arrow),
+              label: const Text('播放全部'),
+              onPressed: _playAll,
+            ),
+        ],
+      ),
       body: Stack(
         children: [
-          Scaffold(
-            appBar: AppBar(
-              title: Text(collectionName ?? '歌曲列表'),
-              actions: [
-                if (songs.isNotEmpty)
-                  TextButton.icon(
-                    icon: const Icon(Icons.play_arrow),
-                    label: const Text('播放全部'),
-                    onPressed: _playAll,
-                  ),
-              ],
-            ),
-            body: isLoading ? const Center(child: CircularProgressIndicator())
-              : songs.isEmpty ? const Center(child: Text('没有找到歌曲')) : RefreshIndicator(
-                  onRefresh: _loadSongs,
-                  child: ListView.separated(
-                    padding: const EdgeInsets.all(16),
-                    itemCount: songs.length,
-                    separatorBuilder: (context, index) => const Divider(height: 16),
-                    itemBuilder: (context, index) {
-                      final song = songs[index];
-                      return SongCard(
-                          song: song,
-                          showIndex: true,
-                          index: index,
-                        );
-                    },
+          isLoading 
+              ? const Center(child: CircularProgressIndicator())
+              : songs.isEmpty 
+                  ? const Center(child: Text('没有找到歌曲')) 
+                  : RefreshIndicator(
+                      onRefresh: _loadSongs,
+                      child: ListView.separated(
+                        padding: const EdgeInsets.all(16),
+                        itemCount: songs.length,
+                        separatorBuilder: (context, index) => const Divider(height: 16),
+                        itemBuilder: (context, index) {
+                          final song = songs[index];
+                          return SongCard(
+                            song: song,
+                            showIndex: true,
+                            index: index,
+                          );
+                        },
+                      ),
                     ),
-                  ),
-                ),
-            ),
-            const Positioned(
-              bottom: 0,
-              left: 0,
-              right: 0,
-              child: SmallPlayerWidget(),
-            ),
-          ],
-        ),
+          const Positioned(
+            bottom: 0,
+            left: 0,
+            right: 0,
+            child: SmallPlayerWidget(),
+          ),
+        ],
+      ),
     );
   }
 }
