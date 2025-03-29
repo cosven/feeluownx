@@ -14,8 +14,8 @@ class TcpPubsubClient {
   Stream<String>? _broadcastStream;
   bool _isConnected = false;
 
-  Function? _onMessage;
-  Function? _onError;
+  final List<Function> _onMessageCallbacks = [];
+  final List<Function> _onErrorCallbacks = [];
 
   TcpPubsubClient(String host_) {
     host = host_;
@@ -65,8 +65,8 @@ class TcpPubsubClient {
       await _socket!.close();
     }
 
-    _onMessage = onMessage;
-    _onError = onError;
+    _onMessageCallbacks.add(onMessage);
+    _onErrorCallbacks.add(onError);
 
     // Connect to the server
     _socket = await Socket.connect(host, port, timeout: const Duration(seconds: 1));
@@ -104,16 +104,16 @@ class TcpPubsubClient {
           }
         } catch (e) {
           _logger.warning('Error processing message: $e');
-          if (_onError != null) {
-            _onError!(e);
+          for (var callback in _onErrorCallbacks) {
+            callback(e);
           }
         }
       },
       onError: (error) {
         _logger.severe('Stream error: $error');
         _isConnected = false;
-        if (_onError != null) {
-          _onError!(error);
+        for (var callback in _onErrorCallbacks) {
+          callback(error);
         }
       },
       onDone: () {
@@ -144,9 +144,9 @@ class TcpPubsubClient {
       'format': 'json',
     };
 
-    // Call the onMessage callback
-    if (_onMessage != null) {
-      _onMessage!(message);
+    // Call all onMessage callbacks
+    for (var callback in _onMessageCallbacks) {
+      callback(message);
     }
   }
 
@@ -175,6 +175,22 @@ class TcpPubsubClient {
       return;
     }
     _socket!.write('sub $topic\n');
+  }
+
+  void addMessageListener(Function callback) {
+    _onMessageCallbacks.add(callback);
+  }
+
+  void removeMessageListener(Function callback) {
+    _onMessageCallbacks.remove(callback);
+  }
+
+  void addErrorListener(Function callback) {
+    _onErrorCallbacks.add(callback);
+  }
+
+  void removeErrorListener(Function callback) {
+    _onErrorCallbacks.remove(callback);
   }
 
   void unsubscribe(String topic) {
