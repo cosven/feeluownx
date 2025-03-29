@@ -54,10 +54,9 @@ class TcpPubsubClient {
   }
 
   Future<void> _connectInternal() async {
-    if (!_isConnected) {
-      close(); // Clean up any existing connection
-      _notifyConnectionState(false); // Notify disconnection first
-    }
+    assert(!_isConnected);
+    close(); // Clean up any existing connection
+    _notifyConnectionState(false); // Notify disconnection first
 
     // Connect to the server
     try {
@@ -203,13 +202,5 @@ class TcpPubsubClient {
     for (var callback in _onConnectionStateCallbacks) {
       callback(connected);
     }
-  }
-
-  void unsubscribe(String topic) {
-    if (!_isConnected || _socket == null) {
-      _logger.warning('Cannot unsubscribe, not connected');
-      return;
-    }
-    _socket!.write('unsub $topic\n');
   }
 }
