@@ -123,7 +123,6 @@ class SongSearchDelegate extends SearchDelegate<String> {
               itemBuilder: (context, index) {
                 return SongCard(
                   song: songList[index],
-                  isPlaying: handler.playerState.sameAsCurrentSong(songList[index]),
                 );
               });
         });

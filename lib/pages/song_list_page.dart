@@ -114,7 +114,6 @@ class _SongListPageState extends State<SongListPage> {
                         contentPadding: const EdgeInsets.symmetric(horizontal: 8),
                         title: SongCard(
                           song: song,
-                          isPlaying: Global.getIt<PlayerState>().sameAsCurrentSong(song),
                           showIndex: true,
                           index: index,
                         ),

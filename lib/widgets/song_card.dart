@@ -8,18 +8,19 @@ import '../models.dart';
 
 class SongCard extends StatelessWidget {
   final BriefSongModel song;
-  final bool isPlaying;
   final bool showIndex;
   final int? index;
   final AudioPlayerHandler handler = Global.getIt<AudioPlayerHandler>();
+  final PlayerState playerState = Global.getIt<PlayerState>();
 
   SongCard({
     super.key,
     required this.song,
-    this.isPlaying = false,
     this.showIndex = false,
     this.index,
   });
+
+  bool get isPlaying => playerState.sameAsCurrentSong(song);
 
   String _formatDuration(String durationStr) {
     // If already in mm:ss format, return as is
