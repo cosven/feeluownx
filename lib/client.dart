@@ -3,26 +3,11 @@ import 'dart:convert';
 import 'dart:async';
 
 import 'package:feeluownx/utils/websocket_utility.dart';
+import 'models.dart';
 import 'package:intl/find_locale.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 import 'package:http/http.dart' as http;
 import 'package:logging/logging.dart';
-
-/// Represents a song model with the following structure:
-/// ```dart
-/// {
-///    "identifier": "235474087",    // Unique identifier of the song
-///    "source": "xxx",          // Source platform of the song
-///    "title": "公路之歌 (Live)",     // Title of the song
-///    "artists_name": "痛仰乐队",     // Name of the artist(s)
-///    "album_name": "乐队的夏天 第11期", // Name of the album
-///    "duration_ms": "05:07",       // Duration of the song
-///    "provider": "xxx",        // Provider of the song
-///    "uri": "fuo://xxx/songs/1111", // URI to access the song
-///    "__type__": "feeluown.library.BriefSongModel" // Type identifier
-/// }
-/// ```
-typedef SongModel = Map<String, dynamic>;
 
 class Client {
   final _logger = Logger('Client');
@@ -241,13 +226,13 @@ class Client {
   }
 
   /// Returns a list of songs from the collection.
-  Future<List<SongModel>> listCollectionSongs(
+  Future<List<BriefSongModel>> listCollectionSongs(
       String identifier) async {
     Object? obj = await jsonRpc("lambda: app.coll_mgr.get($identifier).models");
     return _filterSongs(obj! as List<dynamic>);
   }
 
-  List<SongModel> _filterSongs(List<dynamic> list) {
+  List<BriefSongModel> _filterSongs(List<dynamic> list) {
     return list
         .where((item) =>
             item is Map<String, dynamic> &&
@@ -256,7 +241,7 @@ class Client {
         .toList();
   }
 
-  Future<List<SongModel>> listLibrarySongs() async {
+  Future<List<BriefSongModel>> listLibrarySongs() async {
     Object? obj =
         await jsonRpc("lambda: app.coll_mgr.get_coll_library().models");
     return _filterSongs(obj! as List<dynamic>);
@@ -271,7 +256,7 @@ class Client {
   }
 
   /// Returns a list of songs from the given album
-  Future<List<SongModel>> listAlbumSongs(
+  Future<List<BriefSongModel>> listAlbumSongs(
       Map<String, dynamic> album) async {
     Object? obj = await jsonRpc("app.library.album_list_songs", args: [album]);
     if (obj != null) {
@@ -281,11 +266,11 @@ class Client {
     return [];
   }
 
-  Future<void> playSong(SongModel song) async {
+  Future<void> playSong(BriefSongModel song) async {
     await jsonRpc("app.playlist.play_model", args: [song]);
   }
 
-  Future<void> playlistSetModels(List<SongModel> songs) async {
+  Future<void> playlistSetModels(List<BriefSongModel> songs) async {
     await jsonRpc("app.playlist.set_models", args: [songs, true]);
   }
 
@@ -293,12 +278,12 @@ class Client {
     await jsonRpc("app.playlist.clear");
   }
 
-  Future<void> playlistRemove(SongModel song) async {
+  Future<void> playlistRemove(BriefSongModel song) async {
     await jsonRpc("app.playlist.remove", args: [song]);
   }
 
   /// Returns a list of songs in the current playlist
-  Future<List<SongModel>> playlistList() async {
+  Future<List<BriefSongModel>> playlistList() async {
     Object? obj = await jsonRpc("app.playlist.list");
     return (obj! as List<dynamic>).map((item) => item as Map<String, dynamic>).toList();
   }
