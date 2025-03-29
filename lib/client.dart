@@ -85,13 +85,14 @@ class Client {
       // timeout is hardcoded to 3 seconds temporarily
       final socket = await Socket.connect(host, port, timeout: const Duration(seconds: 3));
       socket.write(message);
-      _logger.info('send tcp rpc request: $message');
+      _logger.info('Send RPC request: $message');
 
       // Read the response header.
       final buffer = StringBuffer();
       final stream = utf8.decoder.bind(socket);
+      _logger.info('Waiting for response...');
       final body = await readResponse(stream, buffer);
-      _logger.info('received tcp rpc response: $body');
+      _logger.info('Received RPC response: $body');
       socket.destroy();
 
       Map<String, dynamic> respBody = json.decode(body);
@@ -102,8 +103,8 @@ class Client {
       }
       return respBody['result'];
     } catch (e) {
-      _logger.severe('tcp rpc failed', e);
-      throw Exception('RPC call failed: $e');
+      _logger.severe('RPC failed', e);
+      throw Exception('RPC failed: $e');
     }
   }
 
@@ -360,44 +361,32 @@ class TcpPubsubClient {
     _onMessage = onMessage;
     _onError = onError;
 
-    try {
-      // Connect to the server
-      _socket = await Socket.connect(host, port);
+    // Connect to the server
+    _socket = await Socket.connect(host, port, timeout: const Duration(seconds: 1));
 
-      // Create a broadcast stream that can be listened to multiple times
-      _streamController = StreamController<String>();
-      utf8.decoder.bind(_socket!).transform(const LineSplitter()).listen(
-            (data) => _streamController!.add(data),
-            onError: (e) => _streamController!.addError(e),
-            onDone: () => _streamController!.close(),
-          );
-      _broadcastStream = _streamController!.stream.asBroadcastStream();
-      _isConnected = true;
+    // Create a broadcast stream that can be listened to multiple times
+    _streamController = StreamController<String>();
+    utf8.decoder.bind(_socket!).transform(const LineSplitter()).listen(
+          (data) => _streamController!.add(data),
+          onError: (e) => _streamController!.addError(e),
+          onDone: () => _streamController!.close(),
+        );
+    _broadcastStream = _streamController!.stream.asBroadcastStream();
+    _isConnected = true;
 
-      // Process the welcome message
-      String? welcomeMessage = await _broadcastStream!.first;
-      _logger.info('Received welcome message: $welcomeMessage');
+    // Process the welcome message
+    String? welcomeMessage = await _broadcastStream!.first;
+    _logger.info('Received welcome message: $welcomeMessage');
 
-      // Send version message
-      _socket?.write('set --pubsub-version 2.0\n');
-      String? versionResponse = await _broadcastStream!.first;
-      _logger.info('Received version response: $versionResponse');
+    // Send version message
+    _socket?.write('set --pubsub-version 2.0\n');
+    String? versionResponse = await _broadcastStream!.first;
+    _logger.info('Received version response: $versionResponse');
 
-      // Subscribe to player.metadata_changed
-      _socket?.write('sub player.*\n');
+    // Subscribe to player.metadata_changed
+    _socket?.write('sub player.*\n');
 
-      // Start listening for messages
-      _startListening();
-    } catch (e) {
-      _isConnected = false;
-      _logger.severe('Failed to connect: $e');
-      onError(e);
-    }
-  }
-
-  void _startListening() {
-    if (_broadcastStream == null) return;
-
+    // Start listening for messages
     _broadcastStream!.listen(
       (data) {
         try {

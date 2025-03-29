@@ -38,7 +38,6 @@ class PlayerInfoState extends State<PlayerInfo>
   }
 
   Future<Object?> getCurrentSongLrc() async {
-    print("Song upgrade: ${handler.playerState.metadata}");
     String identify = handler.playerState.metadata?['uri'] ?? '';
     if (identify.isEmpty) {
       return null;
@@ -50,12 +49,10 @@ class PlayerInfoState extends State<PlayerInfo>
     params['identifier'] = uri.split('/').last ?? '';
     Object? result =
         await client.jsonRpc("app.library.song_get_lyric", args: [params]);
-    print("Song upgrade: $result");
     return result;
   }
 
   Future<Object?> getCurrentSongWebLink() async {
-    print("Song upgrade: ${handler.playerState.metadata}");
     String identify = handler.playerState.metadata?['uri'] ?? '';
     if (identify.isEmpty) {
       return null;
@@ -67,7 +64,6 @@ class PlayerInfoState extends State<PlayerInfo>
     params['identifier'] = uri.split('/').last ?? '';
     Object? result =
         await client.jsonRpc("app.library.song_get_web_url", args: [params]);
-    print("Song upgrade: $result");
     return result;
   }
 
@@ -111,8 +107,16 @@ class PlayerInfoState extends State<PlayerInfo>
                       alignment: Alignment.topCenter,
                       width: 200,
                       height: 200)),
-          const SizedBox(height: 30),
-          Text(widget.playerState.metadata?['title'] ?? '', style: style),
+          const SizedBox(height: 20),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16.0),
+            child: Text(
+              widget.playerState.metadata?['title'] ?? '',
+              style: style,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
+          const SizedBox(height: 5),
           Text(widget.playerState.getArtistsName(),
               style: style.apply(fontSizeFactor: .8)),
           const SizedBox(height: 30),

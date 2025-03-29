@@ -27,6 +27,20 @@ class ConfigurationPageState extends State<ConfigurationPage> {
 
   static const startInTermux = MethodChannel('channel.feeluown/termux');
 
+  String connectionStatus = "";
+
+  @override
+  void initState() {
+    super.initState();
+  }
+
+  void subCallback(String msg) {
+    if (!mounted) return;
+    setState(() {
+      connectionStatus = msg;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     List<Widget> children = [
@@ -40,13 +54,13 @@ class ConfigurationPageState extends State<ConfigurationPage> {
             client.updateHost(host_);
             pubsubClient.updateHost(host_);
             pubsubClient.close();
-            handler.trySubscribeMessages();
+            handler.trySubscribeMessages(subCallback);
           },
         ),
         SimpleSettingsTile(
-          title: "WebSocket status",
+          title: "Connection Status",
           subtitle:
-              "${handler.getConnectionStatusMsg()} ${handler.connectionMsg} (Click to reconnect)",
+              "$connectionStatus (Click to reconnect)",
           leading: const Icon(Icons.private_connectivity),
           onTap: () async {
             if (await Permission.notification.isPermanentlyDenied) {
@@ -59,9 +73,11 @@ class ConfigurationPageState extends State<ConfigurationPage> {
             if (await Permission.notification.isDenied) {
               await Permission.notification.request();
             }
-            if (handler.connectionStatus != 1) {
-              handler.trySubscribeMessages();
+            if (context.mounted) {
+              ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                content: Text("Try connecting...")));
             }
+            handler.trySubscribeMessages(subCallback);
           },
         )
       ]),

@@ -1,7 +1,7 @@
 import 'package:flutter/foundation.dart';
 
 class PlayerState with ChangeNotifier {
-  /// 当前歌曲信息
+  /// Corresponding to player.metadata
   Map<String, dynamic>? metadata;
 
   /// 当前播放状态  0: stopped, 1:paused, 2:playing
