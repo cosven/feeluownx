@@ -38,7 +38,7 @@ class TcpPubsubClient {
       return;
     }
     _connectionState = ConnectionState.connecting;
-    _notifyConnectionState(false);
+    _notifyConnectionState(ConnectionState.disconnected);
 
     int retryCount = 0;
     while (retryCount < maxRetries) {
@@ -84,7 +84,7 @@ class TcpPubsubClient {
         );
     _broadcastStream = _streamController!.stream.asBroadcastStream();
     _connectionState = ConnectionState.connected;
-    _notifyConnectionState(true);
+    _notifyConnectionState(ConnectionState.connected);
 
     // Process the welcome message
     String? welcomeMessage = await _broadcastStream!.first;
@@ -121,7 +121,7 @@ class TcpPubsubClient {
       onDone: () {
         _logger.info('Stream closed');
         _connectionState = ConnectionState.disconnected;
-        _notifyConnectionState(false);
+        _notifyConnectionState(ConnectionState.disconnected);
       },
     );
   }
@@ -217,12 +217,12 @@ class TcpPubsubClient {
     _onConnectionStateCallbacks.remove(callback);
   }
 
-  void _notifyConnectionState(bool connected) {
+  void _notifyConnectionState(ConnectionState state) {
     // Only notify when transition between connected/disconnected states
-    if (_connectionState == ConnectionState.connected || 
-        _connectionState == ConnectionState.disconnected) {
+    if (state == ConnectionState.connected || 
+        state == ConnectionState.disconnected) {
       for (var callback in _onConnectionStateCallbacks) {
-        callback(_connectionState == ConnectionState.connected);
+        callback(state == ConnectionState.connected);
       }
     }
   }
