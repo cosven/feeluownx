@@ -60,7 +60,7 @@ class TcpPubsubClient {
   }
 
   Future<void> _connectInternal() async {
-    assert(_connectionState == ConnectionState.disconnected);
+    assert(_connectionState != ConnectionState.connected);
     close(); // Clean up any existing connection
     _notifyConnectionState(false); // Notify disconnection first
 
@@ -186,7 +186,7 @@ class TcpPubsubClient {
   }
 
   void subscribe(String topic) {
-    if (!_isConnected || _socket == null) {
+    if (_connectionState != ConnectionState.connected || _socket == null) {
       _logger.warning('Cannot subscribe, not connected');
       return;
     }
@@ -218,13 +218,8 @@ class TcpPubsubClient {
   }
 
   void _notifyConnectionState(bool connected) {
-    // Only notify actual connection state changes (connected/disconnected)
-    // Skip notifying when in connecting state
-    if (_connectionState == ConnectionState.connected || 
-        _connectionState == ConnectionState.disconnected) {
-      for (var callback in _onConnectionStateCallbacks) {
-        callback(connected);
-      }
+    for (var callback in _onConnectionStateCallbacks) {
+      callback(connected);
     }
   }
 }
