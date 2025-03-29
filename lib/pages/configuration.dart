@@ -35,24 +35,24 @@ class ConfigurationPageState extends State<ConfigurationPage> {
     super.initState();
     pubsubClient.addConnectionStateListener((connected) {
       // Use the connectionStatus getter which handles all states
-      subCallback(pubsubClient.connectionStatus);
+      updateConnectionStatus(pubsubClient.connectionStatus);
     });
     // Initialize with current status
-    subCallback(pubsubClient.connectionStatus);
+    updateConnectionStatus(pubsubClient.connectionStatus);
   }
 
   @override
   void dispose() {
     pubsubClient.removeConnectionStateListener((connected) {
-      subCallback(connected ? 'Connected' : 'Disconnected');
+      updateConnectionStatus(connected ? 'Connected' : 'Disconnected');
     });
     super.dispose();
   }
 
-  void subCallback(String msg) {
+  void updateConnectionStatus(String status) {
     if (!mounted) return;
     setState(() {
-      connectionStatus = msg;
+      connectionStatus = status;
     });
   }
 
