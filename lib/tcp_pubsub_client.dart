@@ -119,7 +119,7 @@ class TcpPubsubClient {
       },
       onDone: () {
         _logger.info('Stream closed');
-        _isConnected = false;
+        _connectionState = ConnectionState.disconnected;
         _notifyConnectionState(false);
       },
     );
