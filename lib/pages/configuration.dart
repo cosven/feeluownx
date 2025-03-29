@@ -10,6 +10,7 @@ import 'package:permission_handler/permission_handler.dart';
 import '../global.dart';
 import '../player.dart';
 import '../client.dart';
+import '../tcp_pubsub_client.dart';
 
 class ConfigurationPage extends StatefulWidget {
   const ConfigurationPage({super.key});

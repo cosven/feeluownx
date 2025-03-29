@@ -11,47 +11,13 @@ class AudioPlayerHandler extends BaseAudioHandler with SeekHandler {
   final _logger = Logger('AudioPlayerHandler');
   final Client client = Global.getIt<Client>();
   final PubsubClient pubsubClient = Global.getIt<PubsubClient>();
-  final TcpPubsubClient tcpPubsubClient = Global.getIt<TcpPubsubClient>();
 
   PlayerState playerState = PlayerState();
 
   AudioPlayerHandler() {
     trySubscribeMessages();
-  }
-
-  // FIXME: this method should be moved into the TcpPubsubClient class
-  void trySubscribeMessages([void Function(String)? callback]) {
-    tcpPubsubClient.close();
-    if (callback != null) {
-      callback("Connecting...");
-    }
-    _logger.info('Trying to subscribe messages');
-    tcpPubsubClient.connect(onMessage: (message) async {
-      await handleMessage(message);
-    }, onError: (e) {
-      final connectionMsg = "Error: ${e.toString()}";
-      if (callback != null) {
-        callback(connectionMsg);
-      }
-      _logger.severe('Pubsub error: $e');
-    }).then((_) {
-      const connectionMsg = "Connected!";
-      if (callback != null) {
-        callback(connectionMsg);
-      }
-      _logger.info(connectionMsg);
-      initPlaybackState();
-      initFuoCurrentPlayingInfo();
-    }).catchError((error) {
-      final errmsg = error.toString();
-      final connectionMsg = "Connection failed, retrying in 2 second...\n$errmsg";
-      if (callback != null) {
-        callback(connectionMsg);
-      }
-      _logger.severe('Pubsub connection failed: $error');
-      Future.delayed(
-          Duration(seconds: 2), () => trySubscribeMessages(callback));
-    });
+    initPlaybackState();
+    initFuoCurrentPlayingInfo();
   }
 
   void initPlaybackState() {

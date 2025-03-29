@@ -93,10 +93,7 @@ class TcpPubsubClient {
             _logger.info('Received other message: $data');
           }
         } catch (e) {
-          _logger.warning('Error processing message: $e');
-          for (var callback in _onErrorCallbacks) {
-            callback(e);
-          }
+          _logger.severe('Error processing message: $e');
         }
       },
       onError: (error) {

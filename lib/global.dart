@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:audio_service/audio_service.dart';
 import 'package:feeluownx/client.dart';
+import 'package:feeluownx/tcp_pubsub_client.dart';
 import 'package:feeluownx/player.dart';
 import 'package:feeluownx/search.dart';
 import 'package:flutter/material.dart';
@@ -16,7 +17,7 @@ class Global {
     WidgetsFlutterBinding.ensureInitialized();
     final host = Settings.getValue("settings_ip_address", defaultValue: "127.0.0.1")!;
     getIt.registerSingleton<Client>(Client(host));
-    getIt.registerSingleton<PubsubClient>(PubsubClient(host));
+    // getIt.registerSingleton<PubsubClient>(PubsubClient(host));
     getIt.registerSingleton<TcpPubsubClient>(TcpPubsubClient(host));
     getIt.registerSingleton<AudioPlayerHandler>(AudioPlayerHandler());
     getIt.registerSingleton<AudioHandler>(await initAudioHandler());
