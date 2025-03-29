@@ -120,9 +120,4 @@ class SongSearchDelegate extends SearchDelegate<String> {
               });
         });
   }
-
-  @override
-  Widget buildSuggestions(BuildContext context) {
-    return ListView();
-  }
 }

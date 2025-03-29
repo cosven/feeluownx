@@ -10,7 +10,7 @@ class SongCard extends StatelessWidget {
   final MediaItem mediaItem;
   final bool isPlaying;
 
-  const SongCard({
+  SongCard({
     super.key,
     required this.mediaItem,
     this.isPlaying = false,
