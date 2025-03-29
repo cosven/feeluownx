@@ -88,21 +88,18 @@ class _SongListPageState extends State<SongListPage> {
         children: [
           Scaffold(
             appBar: AppBar(
-        title: Text(collectionName ?? '歌曲列表'),
-        actions: [
-          if (songs.isNotEmpty)
-            TextButton.icon(
-              icon: const Icon(Icons.play_arrow),
-              label: const Text('播放全部'),
-              onPressed: _playAll,
+              title: Text(collectionName ?? '歌曲列表'),
+              actions: [
+                if (songs.isNotEmpty)
+                  TextButton.icon(
+                    icon: const Icon(Icons.play_arrow),
+                    label: const Text('播放全部'),
+                    onPressed: _playAll,
+                  ),
+              ],
             ),
-        ],
-      ),
-            body: isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : songs.isEmpty
-              ? const Center(child: Text('没有找到歌曲'))
-              : RefreshIndicator(
+            body: isLoading ? const Center(child: CircularProgressIndicator())
+              : songs.isEmpty ? const Center(child: Text('没有找到歌曲')) : RefreshIndicator(
                   onRefresh: _loadSongs,
                   child: ListView.separated(
                     padding: const EdgeInsets.all(16),
@@ -110,18 +107,13 @@ class _SongListPageState extends State<SongListPage> {
                     separatorBuilder: (context, index) => const Divider(height: 16),
                     itemBuilder: (context, index) {
                       final song = songs[index];
-                      return ListTile(
-                        contentPadding: const EdgeInsets.symmetric(horizontal: 8),
-                        title: SongCard(
+                      return SongCard(
                           song: song,
                           showIndex: true,
                           index: index,
-                        ),
-                        onTap: () {
-                          client.playSong(song);
-                        },
-                      );
+                        );
                     },
+                    ),
                   ),
                 ),
             ),
