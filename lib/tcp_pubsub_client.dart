@@ -4,6 +4,8 @@ import 'dart:async';
 
 import 'package:logging/logging.dart';
 
+enum ConnectionState { disconnected, connecting, connected }
+
 class TcpPubsubClient {
   final _logger = Logger('TcpPubsubClient');
 
@@ -12,7 +14,6 @@ class TcpPubsubClient {
   Socket? _socket;
   StreamController<String>? _streamController;
   Stream<String>? _broadcastStream;
-  enum ConnectionState { disconnected, connecting, connected }
   ConnectionState _connectionState = ConnectionState.disconnected;
 
   final List<Function> _onMessageCallbacks = [];
