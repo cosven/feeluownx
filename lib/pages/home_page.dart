@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import 'package:feeluownx/client.dart';
 import 'package:feeluownx/global.dart';
 import 'package:feeluownx/pages/album_detail_page.dart';
 import 'package:feeluownx/pages/song_list_page.dart';
+import 'package:feeluownx/models.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -14,8 +14,8 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   final Client client = Global.getIt<Client>();
-  List<Map<String, dynamic>> albums = [];
-  List<Map<String, dynamic>> collections = [];
+  List<BriefAlbumModel> albums = [];
+  List<Collection> collections = [];
   bool isLoading = true;
   bool isLoadingCollections = true;
   final Map<String, String?> albumCovers = {};  // 用于缓存专辑封面 URL
@@ -65,7 +65,7 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
-  Future<void> _loadAlbumCover(Map<String, dynamic> album) async {
+  Future<void> _loadAlbumCover(BriefAlbumModel album) async {
     if (albumCovers.containsKey(album['identifier'])) return;
 
     try {
