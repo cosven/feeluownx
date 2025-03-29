@@ -25,45 +25,37 @@ class TcpPubsubClient {
     host = host_;
   }
 
-  void tryConnect() {
-    tcpPubsubClient.close();
-    _logger.info('Trying to subscribe messages');
-    tcpPubsubClient.connect(onMessage: (message) async {
-      await handleMessage(message);
-    }, onError: (e) {
-      final connectionMsg = "Error: ${e.toString()}";
-      if (callback != null) {
-        callback(connectionMsg);
-      }
-      _logger.severe('Pubsub error: $e');
-    }).then((_) {
-      const connectionMsg = "Connected!";
-      if (callback != null) {
-        callback(connectionMsg);
-      }
-      _logger.info(connectionMsg);
-      initPlaybackState();
-      initFuoCurrentPlayingInfo();
-    }).catchError((error) {
-      final errmsg = error.toString();
-      final connectionMsg = "Connection failed, retrying in 2 second...\n$errmsg";
-      if (callback != null) {
-        callback(connectionMsg);
-      }
-      _logger.severe('Pubsub connection failed: $error');
-      Future.delayed(
-          Duration(seconds: 2), () => trySubscribeMessages(callback));
-    });
-  }
-
   // FIXME: the protocol parser is hacky and not robust
   Future<void> connect({
     required Function onMessage,
     required Function onError,
+    Function(String)? connectionStatusCallback,
+    int maxRetries = 5,
+    Duration retryDelay = const Duration(seconds: 2),
   }) async {
-    if (_isConnected) {
-      await _socket!.close();
+    int retryCount = 0;
+    while (retryCount < maxRetries) {
+      try {
+        await _connectInternal(onMessage, onError);
+        connectionStatusCallback?.call("Connected!");
+        _logger.info("Connected!");
+        return;
+      } catch (error) {
+        retryCount++;
+        final errmsg = error.toString();
+        final connectionMsg = "Connection failed (attempt $retryCount/$maxRetries), retrying in ${retryDelay.inSeconds} seconds...\n$errmsg";
+        connectionStatusCallback?.call(connectionMsg);
+        _logger.severe('Pubsub connection failed: $error');
+        if (retryCount < maxRetries) {
+          await Future.delayed(retryDelay);
+        }
+      }
     }
+    throw Exception('Failed to connect after $maxRetries attempts');
+  }
+
+  Future<void> _connectInternal(Function onMessage, Function onError) async {
+    close(); // Clean up any existing connection
 
     _onMessageCallbacks.add(onMessage);
     _onErrorCallbacks.add(onError);
