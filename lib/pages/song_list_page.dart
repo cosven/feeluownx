@@ -3,6 +3,8 @@ import 'package:feeluownx/client.dart';
 import 'package:feeluownx/global.dart';
 import 'package:logging/logging.dart';
 import '../widgets/small_player.dart';
+import '../widgets/song_card.dart';
+import '../bean/player_state.dart';
 
 class SongListPage extends StatefulWidget {
   final String? collectionIdentifier;
@@ -110,21 +112,11 @@ class _SongListPageState extends State<SongListPage> {
                       final song = songs[index];
                       return ListTile(
                         contentPadding: const EdgeInsets.symmetric(horizontal: 8),
-                        leading: const Icon(Icons.music_note),
-                        title: Text(
-                          song['title'] ?? '未知歌曲',
-                          style: Theme.of(context).textTheme.titleMedium,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                        subtitle: Text(
-                          '${song['artists_name'] ?? '未知歌手'} - ${song['album_name'] ?? '未知专辑'}',
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                        trailing: Text(
-                          song['duration_ms'] ?? '',
-                          style: Theme.of(context).textTheme.bodySmall,
+                        title: SongCard(
+                          song: song,
+                          isPlaying: Global.getIt<PlayerState>().sameAsCurrentSong(song),
+                          showIndex: true,
+                          index: index,
                         ),
                         onTap: () {
                           client.playSong(song);
