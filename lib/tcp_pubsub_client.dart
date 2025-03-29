@@ -16,6 +16,13 @@ class TcpPubsubClient {
   Stream<String>? _broadcastStream;
   ConnectionState _connectionState = ConnectionState.disconnected;
 
+  void _setConnectionState(ConnectionState newState) {
+    if (_connectionState != newState) {
+      _connectionState = newState;
+      _notifyConnectionState(newState);
+    }
+  }
+
   final List<Function> _onMessageCallbacks = [];
   final List<Function> _onErrorCallbacks = [];
   final List<Function(bool)> _onConnectionStateCallbacks = [];
@@ -37,14 +44,13 @@ class TcpPubsubClient {
       _logger.info("Already connected or connecting, skipping reconnect");
       return;
     }
-    _connectionState = ConnectionState.connecting;
-    _notifyConnectionState(ConnectionState.disconnected);
+    _setConnectionState(ConnectionState.connecting);
 
     int retryCount = 0;
     while (retryCount < maxRetries) {
       try {
         await _connectInternal();
-        _connectionState = ConnectionState.connected;
+        _setConnectionState(ConnectionState.connected);
         _logger.info("Connected!");
         return;
       } catch (error) {
@@ -55,8 +61,7 @@ class TcpPubsubClient {
         }
       }
     }
-    _connectionState = ConnectionState.disconnected;
-    _notifyConnectionState(_connectionState);
+    _setConnectionState(ConnectionState.disconnected);
     throw Exception('Failed to connect after $maxRetries attempts');
   }
 
@@ -83,8 +88,7 @@ class TcpPubsubClient {
           onDone: () => _streamController!.close(),
         );
     _broadcastStream = _streamController!.stream.asBroadcastStream();
-    _connectionState = ConnectionState.connected;
-    _notifyConnectionState(ConnectionState.connected);
+    _setConnectionState(ConnectionState.connected);
 
     // Process the welcome message
     String? welcomeMessage = await _broadcastStream!.first;
@@ -120,8 +124,7 @@ class TcpPubsubClient {
       },
       onDone: () {
         _logger.info('Stream closed');
-        _connectionState = ConnectionState.disconnected;
-        _notifyConnectionState(ConnectionState.disconnected);
+        _setConnectionState(ConnectionState.disconnected);
       },
     );
   }
@@ -162,7 +165,7 @@ class TcpPubsubClient {
   }
 
   void close() {
-    _connectionState = ConnectionState.disconnected;
+    _setConnectionState(ConnectionState.disconnected);
     _socket?.destroy();
     _socket = null;
     _streamController?.close();
