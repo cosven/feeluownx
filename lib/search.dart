@@ -8,44 +8,58 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'client.dart';
 import 'global.dart';
 
-class SongSearchDelegate extends SearchDelegate<String> {
+class SongSearchDelegate extends SearchDelegate<String> with TickerProviderStateMixin {
   final Client client = Global.getIt<Client>();
   final AudioPlayerHandler handler = Global.getIt<AudioPlayerHandler>();
 
   String searchType = "song";
 
+  late TabController _tabController;
+
+  @override
+  void initState() {
+    super.initState();
+    _tabController = TabController(length: 2, vsync: Scaffold.of(context));
+    _tabController.addListener(() {
+      if (!_tabController.indexIsChanging) {
+        searchType = _tabController.index == 0 ? "song" : "playlist";
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _tabController.dispose();
+    super.dispose();
+  }
+
   @override
   List<Widget>? buildActions(BuildContext context) {
     return [
-      DropdownMenu(
-          dropdownMenuEntries: [
-            DropdownMenuEntry(
-                value: "song",
-                label: AppLocalizations.of(context)!.song,
-                leadingIcon: const Icon(Icons.music_note)),
-            DropdownMenuEntry(
-                value: "playlist",
-                label: AppLocalizations.of(context)!.playlist,
-                leadingIcon: const Icon(Icons.playlist_play_sharp)),
+      SizedBox(
+        width: 200,
+        child: TabBar(
+          controller: _tabController,
+          tabs: [
+            Tab(
+              icon: const Icon(Icons.music_note),
+              text: AppLocalizations.of(context)!.song,
+            ),
+            Tab(
+              icon: const Icon(Icons.playlist_play_sharp),
+              text: AppLocalizations.of(context)!.playlist,
+            ),
           ],
-          initialSelection: searchType,
-          enableSearch: false,
-          enableFilter: false,
-          requestFocusOnTap: false,
-          leadingIcon: const Icon(Icons.filter_alt),
-          label: Text(AppLocalizations.of(context)!.type),
-          inputDecorationTheme: const InputDecorationTheme(
-            filled: true,
-            contentPadding: EdgeInsets.symmetric(vertical: 5.0),
-          ),
-          onSelected: (value) {
-            searchType = value ?? "song";
-          }),
+          isScrollable: true,
+          labelColor: Theme.of(context).primaryColor,
+          unselectedLabelColor: Colors.grey,
+          indicatorSize: TabBarIndicatorSize.tab,
+        ),
+      ),
       IconButton(
         icon: const Icon(Icons.clear),
         onPressed: () {
           query = '';
-          // When pressed here the query will be cleared from the search bar.
         },
       ),
     ];
