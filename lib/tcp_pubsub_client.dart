@@ -13,6 +13,7 @@ class TcpPubsubClient {
   StreamController<String>? _streamController;
   Stream<String>? _broadcastStream;
   bool _isConnected = false;
+  bool _isConnecting = false;
 
   final List<Function> _onMessageCallbacks = [];
   final List<Function> _onErrorCallbacks = [];
@@ -31,15 +32,18 @@ class TcpPubsubClient {
     int maxRetries = 5,
     Duration retryDelay = const Duration(seconds: 2),
   }) async {
-    if (_isConnected) {
-      _logger.info("Already connected, skipping reconnect");
+    if (_isConnected || _isConnecting) {
+      _logger.info("Already connected or connecting, skipping reconnect");
       return;
     }
+    _isConnecting = true;
+    _notifyConnectionState(false);
 
     int retryCount = 0;
     while (retryCount < maxRetries) {
       try {
         await _connectInternal();
+        _isConnecting = false;
         _logger.info("Connected!");
         return;
       } catch (error) {
@@ -50,6 +54,7 @@ class TcpPubsubClient {
         }
       }
     }
+    _isConnecting = false;
     throw Exception('Failed to connect after $maxRetries attempts');
   }
 
@@ -157,6 +162,7 @@ class TcpPubsubClient {
 
   void close() {
     _isConnected = false;
+    _isConnecting = false;
     _socket?.destroy();
     _socket = null;
     _streamController?.close();
@@ -168,7 +174,9 @@ class TcpPubsubClient {
   bool get isConnected => _isConnected;
 
   /// Returns the current connection status as a string for display purposes
-  String get connectionStatus => _isConnected ? 'Connected' : 'Disconnected';
+  String get connectionStatus => _isConnecting 
+      ? 'Connecting...' 
+      : _isConnected ? 'Connected' : 'Disconnected';
 
   void subscribe(String topic) {
     if (!_isConnected || _socket == null) {
