@@ -11,8 +11,6 @@ class SongCard extends StatelessWidget {
   final bool showIndex;
   final int? index;
   final AudioPlayerHandler handler = Global.getIt<AudioPlayerHandler>();
-  final PlayerState playerState = Global.getIt<PlayerState>();
-
   SongCard({
     super.key,
     required this.song,
@@ -20,7 +18,7 @@ class SongCard extends StatelessWidget {
     this.index,
   });
 
-  bool get isPlaying => playerState.sameAsCurrentSong(song);
+  bool get isPlaying => handler.playerState.sameAsCurrentSong(song);
 
   String _formatDuration(String durationStr) {
     // If already in mm:ss format, return as is
