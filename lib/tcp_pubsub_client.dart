@@ -27,25 +27,18 @@ class TcpPubsubClient {
 
   // FIXME: the protocol parser is hacky and not robust
   Future<void> connect({
-    required Function onMessage,
-    required Function onError,
-    Function(String)? connectionStatusCallback,
     int maxRetries = 5,
     Duration retryDelay = const Duration(seconds: 2),
   }) async {
     int retryCount = 0;
     while (retryCount < maxRetries) {
       try {
-        await _connectInternal(onMessage, onError);
-        connectionStatusCallback?.call("Connected!");
+        await _connectInternal();
         _logger.info("Connected!");
         return;
       } catch (error) {
         retryCount++;
-        final errmsg = error.toString();
-        final connectionMsg = "Connection failed (attempt $retryCount/$maxRetries), retrying in ${retryDelay.inSeconds} seconds...\n$errmsg";
-        connectionStatusCallback?.call(connectionMsg);
-        _logger.severe('Pubsub connection failed: $error');
+        _logger.severe('Pubsub connection failed (attempt $retryCount/$maxRetries): $error');
         if (retryCount < maxRetries) {
           await Future.delayed(retryDelay);
         }
@@ -54,11 +47,8 @@ class TcpPubsubClient {
     throw Exception('Failed to connect after $maxRetries attempts');
   }
 
-  Future<void> _connectInternal(Function onMessage, Function onError) async {
+  Future<void> _connectInternal() async {
     close(); // Clean up any existing connection
-
-    _onMessageCallbacks.add(onMessage);
-    _onErrorCallbacks.add(onError);
 
     // Connect to the server
     try {
