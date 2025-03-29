@@ -112,21 +112,13 @@ class SongSearchDelegate extends SearchDelegate<String> {
                   return PlaylistCard(model: playlists[index]);
                 });
           }
-          List<MediaItem> songList = snapshot.data!;
+          List<Map<String, dynamic>> songList = snapshot.data!;
           return ListView.builder(
               itemCount: songList.length,
               itemBuilder: (context, index) {
-                final song = {
-                  'id': songList[index].id,
-                  'title': songList[index].title,
-                  'artists_name': songList[index].artist,
-                  'duration_ms': songList[index].duration?.inMilliseconds.toString(),
-                  'uri': songList[index].extras?['uri'],
-                  'provider': songList[index].extras?['provider'],
-                };
                 return SongCard(
-                  song: song,
-                  isPlaying: handler.playerState.metadata?['id'] == songList[index].id,
+                  song: songList[index],
+                  isPlaying: handler.playerState.metadata?['id'] == songList[index]['id'],
                 );
               });
         });

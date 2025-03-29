@@ -65,7 +65,7 @@ class _AlbumDetailPageState extends State<AlbumDetailPage> {
 
   Future<void> _playSong(int index) async {
     try {
-      await client.playSong(songs[index]);
+      await handler.playSong(songs[index]);
       setState(() {
         playingIndex = index;
       });
