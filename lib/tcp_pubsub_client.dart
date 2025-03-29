@@ -218,8 +218,13 @@ class TcpPubsubClient {
   }
 
   void _notifyConnectionState(bool connected) {
-    for (var callback in _onConnectionStateCallbacks) {
-      callback(connected);
+    // Only notify actual connection state changes (connected/disconnected)
+    // Skip notifying when in connecting state
+    if (_connectionState == ConnectionState.connected || 
+        _connectionState == ConnectionState.disconnected) {
+      for (var callback in _onConnectionStateCallbacks) {
+        callback(connected);
+      }
     }
   }
 }

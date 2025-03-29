@@ -34,7 +34,8 @@ class ConfigurationPageState extends State<ConfigurationPage> {
   void initState() {
     super.initState();
     pubsubClient.addConnectionStateListener((connected) {
-      subCallback(connected ? 'Connected' : 'Disconnected');
+      // Use the connectionStatus getter which handles all states
+      subCallback(pubsubClient.connectionStatus);
     });
     // Initialize with current status
     subCallback(pubsubClient.connectionStatus);
