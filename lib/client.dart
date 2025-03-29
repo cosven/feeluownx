@@ -143,16 +143,7 @@ class Client {
   }
 
   /// Returns a list of collections
-  ///
-  /// Each collection is represented as a Map with the following structure:
-  /// ```dart
-  /// {
-  ///   "identifier": 12345,
-  ///   "name": "我喜欢的音乐",
-  ///   "models_count": 10
-  /// }
-  /// ```
-  Future<List<Map<String, dynamic>>> listCollections() async {
+  Future<List<Collection>> listCollections() async {
     Object? obj = await jsonRpc(
         "lambda: [{'identifier': c.identifier, 'name': c.name, 'models_count': len(c.models)}"
         " for c in app.coll_mgr.listall()]");
@@ -160,7 +151,7 @@ class Client {
     return list.map((item) => item as Map<String, dynamic>).toList();
   }
 
-  Future<void> collectionOverwrite(Map<String, dynamic> collection, String rawData) async {
+  Future<void> collectionOverwrite(Collection collection, String rawData) async {
     final identifier = collection['identifier'];
     await jsonRpc("app.coll_mgr.get($identifier).overwrite_with_raw_data", args: [rawData]);
     // Reload the collection to make sure the data is updated
@@ -178,7 +169,7 @@ class Client {
 
   /// Sync a collection from the remote server to the local server
   ///
-  Future<int> collectionSyncToLocal(Map<String, dynamic> collection) async {
+  Future<int> collectionSyncToLocal(Collection collection) async {
     final identifier = collection['identifier'];
     final name = collection['name'];
     Object? obj = await jsonRpc("app.coll_mgr.get($identifier).raw_data");

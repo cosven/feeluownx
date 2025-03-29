@@ -27,3 +27,13 @@ typedef BriefSongModel = Map<String, dynamic>;
 /// }
 /// ```
 typedef BriefAlbumModel = Map<String, dynamic>;
+
+/// Represents a collection model with the following structure:
+/// ```dart
+/// {
+///   "identifier": 12345,
+///   "name": "我喜欢的音乐",
+///   "models_count": 10
+/// }
+/// ```
+typedef Collection = Map<String, dynamic>;
