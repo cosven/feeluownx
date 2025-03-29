@@ -18,32 +18,6 @@ class SongSearchDelegate extends SearchDelegate<String> {
   @override
   List<Widget>? buildActions(BuildContext context) {
     return [
-      DefaultTabController(
-        length: 2,
-        child: SizedBox(
-          width: 200,
-          child: TabBar(
-            tabs: [
-              Tab(
-                icon: const Icon(Icons.music_note),
-                text: AppLocalizations.of(context)!.song,
-              ),
-              Tab(
-                icon: const Icon(Icons.playlist_play_sharp),
-                text: AppLocalizations.of(context)!.playlist,
-              ),
-            ],
-            isScrollable: true,
-            labelColor: Theme.of(context).primaryColor,
-            unselectedLabelColor: Colors.grey,
-            indicatorSize: TabBarIndicatorSize.tab,
-            onTap: (index) {
-              _currentTabIndex = index;
-              searchType = index == 0 ? "song" : "playlist";
-            },
-          ),
-        ),
-      ),
       IconButton(
         icon: const Icon(Icons.clear),
         onPressed: () {
@@ -51,6 +25,51 @@ class SongSearchDelegate extends SearchDelegate<String> {
         },
       ),
     ];
+  }
+
+  @override
+  Widget buildLeading(BuildContext context) {
+    return IconButton(
+      icon: const Icon(Icons.arrow_back),
+      onPressed: () => Navigator.of(context).pop(),
+    );
+  }
+
+  @override
+  Widget buildSuggestions(BuildContext context) {
+    return Column(
+      children: [
+        DefaultTabController(
+          length: 2,
+          child: Column(
+            children: [
+              const SizedBox(height: 8),
+              TabBar(
+                tabs: [
+                  Tab(
+                    icon: const Icon(Icons.music_note),
+                    text: AppLocalizations.of(context)!.song,
+                  ),
+                  Tab(
+                    icon: const Icon(Icons.playlist_play_sharp),
+                    text: AppLocalizations.of(context)!.playlist,
+                  ),
+                ],
+                isScrollable: true,
+                labelColor: Theme.of(context).primaryColor,
+                unselectedLabelColor: Colors.grey,
+                indicatorSize: TabBarIndicatorSize.tab,
+                onTap: (index) {
+                  _currentTabIndex = index;
+                  searchType = index == 0 ? "song" : "playlist";
+                },
+              ),
+            ],
+          ),
+        ),
+        Expanded(child: ListView()),
+      ],
+    );
   }
 
   Future<dynamic> search(String query, String searchType) {
@@ -61,14 +80,6 @@ class SongSearchDelegate extends SearchDelegate<String> {
     return handler.search(query);
   }
 
-  @override
-  Widget? buildLeading(BuildContext context) {
-    return IconButton(
-      icon: const Icon(Icons.arrow_back),
-      onPressed: () => Navigator.of(context).pop(),
-      // Exit from the search screen.
-    );
-  }
 
   @override
   Widget buildResults(BuildContext context) {
