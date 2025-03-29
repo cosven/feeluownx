@@ -116,8 +116,16 @@ class SongSearchDelegate extends SearchDelegate<String> {
           return ListView.builder(
               itemCount: songList.length,
               itemBuilder: (context, index) {
+                final song = {
+                  'id': songList[index].id,
+                  'title': songList[index].title,
+                  'artists_name': songList[index].artist,
+                  'duration_ms': songList[index].duration?.inMilliseconds.toString(),
+                  'uri': songList[index].extras?['uri'],
+                  'provider': songList[index].extras?['provider'],
+                };
                 return SongCard(
-                  mediaItem: songList[index],
+                  song: song,
                   isPlaying: handler.playerState.metadata?['id'] == songList[index].id,
                 );
               });

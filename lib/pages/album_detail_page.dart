@@ -186,20 +186,7 @@ class _AlbumDetailPageState extends State<AlbumDetailPage> {
                           final isPlaying = index == playingIndex;
 
                           return SongCard(
-                            mediaItem: MediaItem(
-                              id: song['id']?.toString() ?? '',
-                              title: song['title'] ?? 'Unknown Title',
-                              artist: song['artists_name'] ?? 'Unknown Artist',
-                              duration: Duration(
-                                milliseconds: int.tryParse(
-                                        song['duration_ms']?.toString() ?? '0') ??
-                                    0,
-                              ),
-                              extras: {
-                                'uri': song['uri']?.toString() ?? '',
-                                'provider': song['provider']?.toString() ?? '',
-                              },
-                            ),
+                            song: song,
                             isPlaying: isPlaying,
                             showIndex: true,
                             index: index,

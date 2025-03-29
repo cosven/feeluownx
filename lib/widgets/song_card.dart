@@ -7,26 +7,32 @@ import '../global.dart';
 import '../player.dart';
 
 class SongCard extends StatelessWidget {
-  final MediaItem mediaItem;
+  final Map<String, dynamic> song;
   final bool isPlaying;
   final bool showIndex;
   final int? index;
+  final AudioPlayerHandler handler = Global.getIt<AudioPlayerHandler>();
 
   SongCard({
     super.key,
-    required this.mediaItem,
+    required this.song,
     this.isPlaying = false,
     this.showIndex = false,
     this.index,
   });
 
-  final AudioPlayerHandler handler = Global.getIt<AudioPlayerHandler>();
-
-  String _formatDuration(Duration? duration) {
-    if (duration == null) return '';
-    final minutes = duration.inMinutes;
-    final seconds = (duration.inSeconds % 60).toString().padLeft(2, '0');
-    return '$minutes:$seconds';
+  String _formatDuration(String durationStr) {
+    // If already in mm:ss format, return as is
+    if (durationStr.contains(':')) return durationStr;
+    // Otherwise try to convert from milliseconds
+    try {
+      final duration = Duration(milliseconds: int.parse(durationStr));
+      final minutes = duration.inMinutes;
+      final seconds = (duration.inSeconds % 60).toString().padLeft(2, '0');
+      return '$minutes:$seconds';
+    } catch (e) {
+      return durationStr;
+    }
   }
 
   @override
@@ -45,16 +51,16 @@ class SongCard extends StatelessWidget {
                 : const Icon(Icons.music_note)),
       ),
       title: Text(
-        mediaItem.title,
+        song['title'] ?? 'Unknown Title',
         style: TextStyle(
           color: isPlaying ? Colors.blue : null,
           fontWeight: isPlaying ? FontWeight.bold : null,
         ),
       ),
-      subtitle: Text(mediaItem.artist ?? 'Unknown Artist'),
-      trailing: Text(_formatDuration(mediaItem.duration)),
+      subtitle: Text(song['artists_name'] ?? 'Unknown Artist'),
+      trailing: Text(_formatDuration(song['duration_ms']?.toString() ?? '0')),
       onTap: () {
-        final uri = mediaItem.extras?['uri'] ?? '';
+        final uri = song['uri']?.toString() ?? '';
         handler.playFromUri(Uri.parse(uri));
       },
       onLongPress: () async {
@@ -71,7 +77,7 @@ class SongCard extends StatelessWidget {
                     leading: const Icon(Icons.copy),
                     onTap: () async {
                       await Clipboard.setData(
-                        ClipboardData(text: mediaItem.extras?['uri'] ?? ''),
+                        ClipboardData(text: song['uri']?.toString() ?? ''),
                       );
                       if (context.mounted) Navigator.of(context).pop();
                     },
@@ -82,7 +88,7 @@ class SongCard extends StatelessWidget {
                     onTap: () async {
                       await Clipboard.setData(
                         ClipboardData(
-                          text: "${mediaItem.title} - ${mediaItem.artist ?? ''}",
+                          text: "${song['title']} - ${song['artists_name'] ?? ''}",
                         ),
                       );
                       if (context.mounted) Navigator.of(context).pop();
