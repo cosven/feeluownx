@@ -17,6 +17,11 @@ class AudioPlayerHandler extends BaseAudioHandler with SeekHandler {
 
   AudioPlayerHandler() {
     pubsubClient.addMessageListener(handleMessage);
+    pubsubClient.addConnectionStateListener((connected) {
+      if (connected) {
+        initFuoCurrentPlayingInfo();
+      }
+    });
     initPlaybackState();
   }
 
