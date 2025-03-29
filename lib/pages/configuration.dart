@@ -1,6 +1,5 @@
 import 'dart:io';
 
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_settings_screens/flutter_settings_screens.dart';
@@ -10,6 +9,7 @@ import 'package:permission_handler/permission_handler.dart';
 import '../global.dart';
 import '../player.dart';
 import '../client.dart';
+import '../tcp_pubsub_client.dart';
 
 class ConfigurationPage extends StatefulWidget {
   const ConfigurationPage({super.key});
@@ -27,6 +27,31 @@ class ConfigurationPageState extends State<ConfigurationPage> {
 
   static const startInTermux = MethodChannel('channel.feeluown/termux');
 
+  String connectionStatus = "";
+
+  @override
+  void initState() {
+    super.initState();
+    pubsubClient.addConnectionStateListener(updateConnectionStatus);
+    // Initialize with current status
+    updateConnectionStatus(pubsubClient.connectionStatus);
+  }
+
+  @override
+  void dispose() {
+    pubsubClient.removeConnectionStateListener((connected) {
+      updateConnectionStatus(connected ? 'Connected' : 'Disconnected');
+    });
+    super.dispose();
+  }
+
+  void updateConnectionStatus(_) {
+    if (!mounted) return;
+    setState(() {
+      connectionStatus = pubsubClient.connectionStatus;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     List<Widget> children = [
@@ -39,14 +64,14 @@ class ConfigurationPageState extends State<ConfigurationPage> {
           onChange: (host_) {
             client.updateHost(host_);
             pubsubClient.updateHost(host_);
-            pubsubClient.close();
-            handler.trySubscribeMessages();
+            pubsubClient.connect();
           },
         ),
         SimpleSettingsTile(
-          title: "WebSocket status",
-          subtitle:
-              "${handler.getConnectionStatusMsg()} ${handler.connectionMsg} (Click to reconnect)",
+          title: "Connection Status",
+          subtitle: connectionStatus.isEmpty
+              ? "Loading..."
+              : "$connectionStatus (Click to reconnect)",
           leading: const Icon(Icons.private_connectivity),
           onTap: () async {
             if (await Permission.notification.isPermanentlyDenied) {
@@ -59,9 +84,7 @@ class ConfigurationPageState extends State<ConfigurationPage> {
             if (await Permission.notification.isDenied) {
               await Permission.notification.request();
             }
-            if (handler.connectionStatus != 1) {
-              handler.trySubscribeMessages();
-            }
+            pubsubClient.connect();
           },
         )
       ]),

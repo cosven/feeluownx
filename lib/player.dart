@@ -6,43 +6,23 @@ import 'package:feeluownx/global.dart';
 import 'package:logging/logging.dart';
 
 import 'client.dart';
+import 'tcp_pubsub_client.dart';
 
 class AudioPlayerHandler extends BaseAudioHandler with SeekHandler {
   final _logger = Logger('AudioPlayerHandler');
   final Client client = Global.getIt<Client>();
-  final PubsubClient pubsubClient = Global.getIt<PubsubClient>();
-  final TcpPubsubClient tcpPubsubClient = Global.getIt<TcpPubsubClient>();
+  final TcpPubsubClient pubsubClient = Global.getIt<TcpPubsubClient>();
 
   PlayerState playerState = PlayerState();
 
-  final Map<int, String> connectionStatusMap = {0: "已断开", 1: "已连接", 2: "异常"};
-
-  /// 0: 断开 1: 已连接 2: 错误
-  int connectionStatus = 0;
-  String connectionMsg = "";
-
-  String getConnectionStatusMsg() {
-    return connectionStatusMap[connectionStatus] ?? "";
-  }
-
   AudioPlayerHandler() {
-    trySubscribeMessages();
-  }
-
-  void trySubscribeMessages() {
-    tcpPubsubClient
-        .connect(onMessage: onMessage, onError: onPubsubError)
-        .then((result) {
-      connectionStatus = 1;
-      connectionMsg = "";
-      initPlaybackState();
-      initFuoCurrentPlayingInfo();
-    }).catchError((error) {
-      connectionStatus = 2;
-      final errmsg = error.toString();
-      connectionMsg = "Connection failed, retrying in 1 seconds...\n$errmsg";
-      Future.delayed(Duration(seconds: 1), trySubscribeMessages);
+    pubsubClient.addMessageListener(handleMessage);
+    pubsubClient.addConnectionStateListener((connected) {
+      if (connected) {
+        initFuoCurrentPlayingInfo();
+      }
     });
+    initPlaybackState();
   }
 
   void initPlaybackState() {
@@ -133,7 +113,8 @@ class AudioPlayerHandler extends BaseAudioHandler with SeekHandler {
           if (state == 1) {
             playbackState.add(playbackState.value.copyWith(playing: false));
           } else if (state == 2) {
-            // currently there is no buffering state change event, so we assume media is ready when player state changed to playing.
+            // currently there is no buffering state change event,
+            // so we assume media is ready when player state changed to playing.
             playbackState.add(playbackState.value.copyWith(
                 playing: true, processingState: AudioProcessingState.ready));
           }
@@ -185,22 +166,6 @@ class AudioPlayerHandler extends BaseAudioHandler with SeekHandler {
     }
   }
 
-  Future<void> onMessage(message) async {
-    return await handleMessage(message);
-  }
-
-  onPubsubError(Exception e) {
-    connectionStatus = 2;
-    connectionMsg = e.toString();
-    _logger.severe('Pubsub error: $e');
-  }
-
-  void onWebsocketDone() {
-    connectionStatus = 0;
-    connectionMsg = "";
-    _logger.info('Websocket closed');
-  }
-
   List<MediaItem> mapSongToMediaItem(List<dynamic> dataList) {
     List<MediaItem> items = [];
     for (dynamic value in dataList) {
@@ -217,12 +182,7 @@ class AudioPlayerHandler extends BaseAudioHandler with SeekHandler {
   }
 
   Future<void> initFuoCurrentPlayingInfo() async {
-    Object? obj = await client.jsonRpc("lambda: app.playlist.current_song");
-    if (obj != null) {
-      playerState.metadata = obj as Map<String, dynamic>;
-      _logger.info('Current song metadata: ${playerState.metadata}');
-    } else {
-      _logger.warning('Failed to get current song');
-    }
+    Object? obj = await client.jsonRpc("lambda: app.player.current_metadata");
+    playerState.setMetadata(obj! as Map<String, dynamic>);
   }
 }
