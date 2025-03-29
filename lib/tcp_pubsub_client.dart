@@ -31,6 +31,11 @@ class TcpPubsubClient {
     int maxRetries = 5,
     Duration retryDelay = const Duration(seconds: 2),
   }) async {
+    if (_isConnected) {
+      _logger.info("Already connected, skipping reconnect");
+      return;
+    }
+
     int retryCount = 0;
     while (retryCount < maxRetries) {
       try {
@@ -49,8 +54,10 @@ class TcpPubsubClient {
   }
 
   Future<void> _connectInternal() async {
-    close(); // Clean up any existing connection
-    _notifyConnectionState(false); // Notify disconnection first
+    if (!_isConnected) {
+      close(); // Clean up any existing connection
+      _notifyConnectionState(false); // Notify disconnection first
+    }
 
     // Connect to the server
     try {
