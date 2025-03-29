@@ -33,6 +33,19 @@ class ConfigurationPageState extends State<ConfigurationPage> {
   @override
   void initState() {
     super.initState();
+    pubsubClient.addConnectionStateListener((connected) {
+      subCallback(connected ? 'Connected' : 'Disconnected');
+    });
+    // Initialize with current status
+    subCallback(pubsubClient.connectionStatus);
+  }
+
+  @override
+  void dispose() {
+    pubsubClient.removeConnectionStateListener((connected) {
+      subCallback(connected ? 'Connected' : 'Disconnected');
+    });
+    super.dispose();
   }
 
   void subCallback(String msg) {
@@ -59,8 +72,9 @@ class ConfigurationPageState extends State<ConfigurationPage> {
         ),
         SimpleSettingsTile(
           title: "Connection Status",
-          subtitle:
-              "$connectionStatus (Click to reconnect)",
+          subtitle: connectionStatus.isEmpty 
+              ? "Loading..." 
+              : "$connectionStatus (Click to reconnect)",
           leading: const Icon(Icons.private_connectivity),
           onTap: () async {
             if (await Permission.notification.isPermanentlyDenied) {
