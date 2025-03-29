@@ -13,3 +13,17 @@
 /// }
 /// ```
 typedef BriefSongModel = Map<String, dynamic>;
+
+/// Represents a brief album model with the following structure:
+/// ```dart
+/// {
+///   "identifier": "8220",
+///   "source": "xxx",
+///   "name": "叶惠美",
+///   "artists_name": "周杰伦",
+///   "provider": "qqmusic",
+///   "uri": "fuo://xxx/albums/8220",
+///   "__type__": "feeluown.library.BriefAlbumModel"
+/// }
+/// ```
+typedef BriefAlbumModel = Map<String, dynamic>;

@@ -197,20 +197,7 @@ class Client {
   }
 
   /// Returns a list of albums from the library
-  ///
-  /// Each album is represented as a Map with the following structure:
-  /// ```dart
-  /// {
-  ///   "identifier": "8220",
-  ///   "source": "xxx",
-  ///   "name": "叶惠美",
-  ///   "artists_name": "周杰伦",
-  ///   "provider": "qqmusic",
-  ///   "uri": "fuo://xxx/albums/8220",
-  ///   "__type__": "feeluown.library.BriefAlbumModel"
-  /// }
-  /// ```
-  Future<List<Map<String, dynamic>>> listLibraryAlbums() async {
+  Future<List<BriefAlbumModel>> listLibraryAlbums() async {
     Object? obj =
         await jsonRpc("lambda: app.coll_mgr.get_coll_library().models");
     if (obj != null) {
@@ -247,7 +234,7 @@ class Client {
     return _filterSongs(obj! as List<dynamic>);
   }
 
-  Future<String?> getAlbumCover(Map<String, dynamic> album) async {
+  Future<String?> getAlbumCover(BriefAlbumModel album) async {
     Object? obj = await jsonRpc("app.library.album_upgrade", args: [album]);
     if (obj != null) {
       return (obj as Map<String, dynamic>)['cover'];
@@ -257,7 +244,7 @@ class Client {
 
   /// Returns a list of songs from the given album
   Future<List<BriefSongModel>> listAlbumSongs(
-      Map<String, dynamic> album) async {
+      BriefAlbumModel album) async {
     Object? obj = await jsonRpc("app.library.album_list_songs", args: [album]);
     if (obj != null) {
       List<dynamic> list = obj as List<dynamic>;
