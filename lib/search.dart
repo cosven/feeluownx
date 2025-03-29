@@ -8,52 +8,40 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'client.dart';
 import 'global.dart';
 
-class SongSearchDelegate extends SearchDelegate<String> with TickerProviderStateMixin {
+class SongSearchDelegate extends SearchDelegate<String> {
   final Client client = Global.getIt<Client>();
   final AudioPlayerHandler handler = Global.getIt<AudioPlayerHandler>();
 
   String searchType = "song";
-
-  late TabController _tabController;
-
-  @override
-  void initState() {
-    super.initState();
-    _tabController = TabController(length: 2, vsync: Scaffold.of(context));
-    _tabController.addListener(() {
-      if (!_tabController.indexIsChanging) {
-        searchType = _tabController.index == 0 ? "song" : "playlist";
-      }
-    });
-  }
-
-  @override
-  void dispose() {
-    _tabController.dispose();
-    super.dispose();
-  }
+  int _currentTabIndex = 0;
 
   @override
   List<Widget>? buildActions(BuildContext context) {
     return [
-      SizedBox(
-        width: 200,
-        child: TabBar(
-          controller: _tabController,
-          tabs: [
-            Tab(
-              icon: const Icon(Icons.music_note),
-              text: AppLocalizations.of(context)!.song,
-            ),
-            Tab(
-              icon: const Icon(Icons.playlist_play_sharp),
-              text: AppLocalizations.of(context)!.playlist,
-            ),
-          ],
-          isScrollable: true,
-          labelColor: Theme.of(context).primaryColor,
-          unselectedLabelColor: Colors.grey,
-          indicatorSize: TabBarIndicatorSize.tab,
+      DefaultTabController(
+        length: 2,
+        child: SizedBox(
+          width: 200,
+          child: TabBar(
+            tabs: [
+              Tab(
+                icon: const Icon(Icons.music_note),
+                text: AppLocalizations.of(context)!.song,
+              ),
+              Tab(
+                icon: const Icon(Icons.playlist_play_sharp),
+                text: AppLocalizations.of(context)!.playlist,
+              ),
+            ],
+            isScrollable: true,
+            labelColor: Theme.of(context).primaryColor,
+            unselectedLabelColor: Colors.grey,
+            indicatorSize: TabBarIndicatorSize.tab,
+            onTap: (index) {
+              _currentTabIndex = index;
+              searchType = index == 0 ? "song" : "playlist";
+            },
+          ),
         ),
       ),
       IconButton(
