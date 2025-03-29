@@ -69,7 +69,15 @@ class TcpPubsubClient {
     _onErrorCallbacks.add(onError);
 
     // Connect to the server
-    _socket = await Socket.connect(host, port, timeout: const Duration(seconds: 1));
+    try {
+      _socket = await Socket.connect(host, port, timeout: const Duration(seconds: 1));
+    } catch (e) {
+      _logger.severe('Failed to connect to $host:$port: $e');
+      for (var callback in _onErrorCallbacks) {
+        callback(e);
+      }
+      rethrow;
+    }
 
     // Create a broadcast stream that can be listened to multiple times
     _streamController = StreamController<String>();
