@@ -6,18 +6,18 @@ import 'package:feeluownx/global.dart';
 import 'package:logging/logging.dart';
 
 import 'client.dart';
+import 'tcp_pubsub_client.dart';
 
 class AudioPlayerHandler extends BaseAudioHandler with SeekHandler {
   final _logger = Logger('AudioPlayerHandler');
   final Client client = Global.getIt<Client>();
-  final PubsubClient pubsubClient = Global.getIt<PubsubClient>();
+  final TcpPubsubClient pubsubClient = Global.getIt<TcpPubsubClient>();
 
   PlayerState playerState = PlayerState();
 
   AudioPlayerHandler() {
-    trySubscribeMessages();
+    pubsubClient.addMessageListener(handleMessage);
     initPlaybackState();
-    initFuoCurrentPlayingInfo();
   }
 
   void initPlaybackState() {
