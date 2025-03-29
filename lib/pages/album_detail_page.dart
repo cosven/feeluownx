@@ -185,28 +185,24 @@ class _AlbumDetailPageState extends State<AlbumDetailPage> {
                           final song = songs[index];
                           final isPlaying = index == playingIndex;
 
-                          return ListTile(
-                            leading: SizedBox(
-                              width: 32,
-                              child: isPlaying
-                                  ? const Icon(Icons.play_arrow, color: Colors.blue)
-                                  : Text(
-                                      '${index + 1}',
-                                      style: Theme.of(context).textTheme.bodyLarge,
-                                      textAlign: TextAlign.center,
-                                    ),
-                            ),
-                            title: Text(
-                              song['title'] ?? 'Unknown Title',
-                              style: TextStyle(
-                                color: isPlaying ? Colors.blue : null,
-                                fontWeight: isPlaying ? FontWeight.bold : null,
+                          return SongCard(
+                            mediaItem: MediaItem(
+                              id: song['id']?.toString() ?? '',
+                              title: song['title'] ?? 'Unknown Title',
+                              artist: song['artists_name'] ?? 'Unknown Artist',
+                              duration: Duration(
+                                milliseconds: int.tryParse(
+                                        song['duration_ms']?.toString() ?? '0') ??
+                                    0,
                               ),
+                              extras: {
+                                'uri': song['uri']?.toString() ?? '',
+                                'provider': song['provider']?.toString() ?? '',
+                              },
                             ),
-                            subtitle: Text(song['artists_name'] ?? 'Unknown Artist'),
-                            trailing: Text(_formatDuration(
-                                song['duration_ms']?.toString() ?? '')),
-                            onTap: () => _playSong(index),
+                            isPlaying: isPlaying,
+                            showIndex: true,
+                            index: index,
                           );
                         },
                       ),

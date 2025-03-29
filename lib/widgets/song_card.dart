@@ -9,11 +9,15 @@ import '../player.dart';
 class SongCard extends StatelessWidget {
   final MediaItem mediaItem;
   final bool isPlaying;
+  final bool showIndex;
+  final int? index;
 
   SongCard({
     super.key,
     required this.mediaItem,
     this.isPlaying = false,
+    this.showIndex = false,
+    this.index,
   });
 
   final AudioPlayerHandler handler = Global.getIt<AudioPlayerHandler>();
@@ -30,9 +34,15 @@ class SongCard extends StatelessWidget {
     return ListTile(
       leading: SizedBox(
         width: 32,
-        child: isPlaying
-            ? const Icon(Icons.play_arrow, color: Colors.blue)
-            : const Icon(Icons.music_note),
+        child: showIndex
+            ? Text(
+                '${index != null ? index + 1 : ''}',
+                style: Theme.of(context).textTheme.bodyLarge,
+                textAlign: TextAlign.center,
+              )
+            : (isPlaying
+                ? const Icon(Icons.play_arrow, color: Colors.blue)
+                : const Icon(Icons.music_note)),
       ),
       title: Text(
         mediaItem.title,
