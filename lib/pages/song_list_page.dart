@@ -97,16 +97,15 @@ class _SongListPageState extends State<SongListPage> {
       ),
       body: Stack(
         children: [
-          isLoading 
+          isLoading
               ? const Center(child: CircularProgressIndicator())
-              : songs.isEmpty 
-                  ? const Center(child: Text('没有找到歌曲')) 
+              : songs.isEmpty
+                  ? const Center(child: Text('没有找到歌曲'))
                   : RefreshIndicator(
                       onRefresh: _loadSongs,
-                      child: ListView.separated(
+                      child: ListView.builder(
                         padding: const EdgeInsets.all(16),
                         itemCount: songs.length,
-                        separatorBuilder: (context, index) => const Divider(height: 16),
                         itemBuilder: (context, index) {
                           final song = songs[index];
                           return SongCard(

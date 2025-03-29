@@ -23,7 +23,6 @@ class _AlbumDetailPageState extends State<AlbumDetailPage> {
   final Client client = Global.getIt<Client>();
   List<Map<String, dynamic>> songs = [];
   bool isLoading = true;
-  int? playingIndex;
 
   @override
   void initState() {
@@ -68,9 +67,6 @@ class _AlbumDetailPageState extends State<AlbumDetailPage> {
   Future<void> _playSong(int index) async {
     try {
       await client.playSong(songs[index]);
-      setState(() {
-        playingIndex = index;
-      });
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -185,11 +181,9 @@ class _AlbumDetailPageState extends State<AlbumDetailPage> {
                         itemCount: songs.length,
                         itemBuilder: (context, index) {
                           final song = songs[index];
-                          final isPlaying = index == playingIndex;
 
                           return SongCard(
                             song: song,
-                            isPlaying: isPlaying,
                             showIndex: true,
                             index: index,
                           );
