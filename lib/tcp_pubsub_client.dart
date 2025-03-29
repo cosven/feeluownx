@@ -16,6 +16,7 @@ class TcpPubsubClient {
 
   final List<Function> _onMessageCallbacks = [];
   final List<Function> _onErrorCallbacks = [];
+  final List<Function(bool)> _onConnectionStateCallbacks = [];
 
   TcpPubsubClient(String host_) {
     host = host_;
@@ -49,6 +50,7 @@ class TcpPubsubClient {
 
   Future<void> _connectInternal() async {
     close(); // Clean up any existing connection
+    _notifyConnectionState(false); // Notify disconnection first
 
     // Connect to the server
     try {
@@ -70,6 +72,7 @@ class TcpPubsubClient {
         );
     _broadcastStream = _streamController!.stream.asBroadcastStream();
     _isConnected = true;
+    _notifyConnectionState(true);
 
     // Process the welcome message
     String? welcomeMessage = await _broadcastStream!.first;
@@ -106,6 +109,7 @@ class TcpPubsubClient {
       onDone: () {
         _logger.info('Stream closed');
         _isConnected = false;
+        _notifyConnectionState(false);
       },
     );
   }
@@ -178,6 +182,20 @@ class TcpPubsubClient {
 
   void removeErrorListener(Function callback) {
     _onErrorCallbacks.remove(callback);
+  }
+
+  void addConnectionStateListener(Function(bool) callback) {
+    _onConnectionStateCallbacks.add(callback);
+  }
+
+  void removeConnectionStateListener(Function(bool) callback) {
+    _onConnectionStateCallbacks.remove(callback);
+  }
+
+  void _notifyConnectionState(bool connected) {
+    for (var callback in _onConnectionStateCallbacks) {
+      callback(connected);
+    }
   }
 
   void unsubscribe(String topic) {
