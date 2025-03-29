@@ -54,8 +54,7 @@ class ConfigurationPageState extends State<ConfigurationPage> {
           onChange: (host_) {
             client.updateHost(host_);
             pubsubClient.updateHost(host_);
-            pubsubClient.close();
-            handler.trySubscribeMessages(subCallback);
+            pubsubClient.connect();
           },
         ),
         SimpleSettingsTile(
@@ -78,7 +77,7 @@ class ConfigurationPageState extends State<ConfigurationPage> {
               ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
                 content: Text("Try connecting...")));
             }
-            handler.trySubscribeMessages(subCallback);
+            pubsubClient.connect();
           },
         )
       ]),
