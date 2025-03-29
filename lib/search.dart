@@ -73,13 +73,9 @@ class SongSearchDelegate extends SearchDelegate<String> {
   }
 
   Future<dynamic> search(String query, String searchType) {
-    if (searchType == 'playlist') {
-      return client.jsonRpc(
-          "lambda: list(app.library.search('$query', type_in='$searchType'))");
-    }
-    return handler.search(query);
+    return client.jsonRpc(
+        "lambda: list(app.library.search('$query', type_in='$searchType'))");
   }
-
 
   @override
   Widget buildResults(BuildContext context) {
@@ -112,13 +108,22 @@ class SongSearchDelegate extends SearchDelegate<String> {
                   return PlaylistCard(model: playlists[index]);
                 });
           }
-          List<Map<String, dynamic>> songList = snapshot.data!;
+          List<Map<String, dynamic>> songList = [];
+          List<dynamic> dataList = snapshot.data!;
+          for (dynamic data in dataList) {
+            Map<String, dynamic> dataMap = data as Map<String, dynamic>;
+            if (dataMap['songs'] == null) {
+              continue;
+            }
+            songList.addAll((dataMap['songs'] as List<dynamic>)
+                .cast<Map<String, dynamic>>());
+          }
           return ListView.builder(
               itemCount: songList.length,
               itemBuilder: (context, index) {
                 return SongCard(
                   song: songList[index],
-                  isPlaying: handler.playerState.metadata?['id'] == songList[index]['id'],
+                  isPlaying: handler.playerState.sameAsCurrentSong(songList[index]),
                 );
               });
         });

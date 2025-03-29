@@ -30,4 +30,9 @@ class PlayerState with ChangeNotifier {
   String getArtistsName() {
     return (metadata?['artists'] ?? []).join('/');
   }
+
+  bool sameAsCurrentSong(Map<String, dynamic> song) {
+    if (metadata == null) return false;
+    return song['uri'] == metadata!['uri'];
+  }
 }

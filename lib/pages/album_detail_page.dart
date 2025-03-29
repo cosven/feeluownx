@@ -3,6 +3,8 @@ import 'package:provider/provider.dart';
 import 'package:feeluownx/client.dart';
 import 'package:feeluownx/global.dart';
 
+import '../widgets/song_card.dart';
+
 class AlbumDetailPage extends StatefulWidget {
   final Map<String, dynamic> album;
   final String? coverUrl;
@@ -65,7 +67,7 @@ class _AlbumDetailPageState extends State<AlbumDetailPage> {
 
   Future<void> _playSong(int index) async {
     try {
-      await handler.playSong(songs[index]);
+      await client.playSong(songs[index]);
       setState(() {
         playingIndex = index;
       });

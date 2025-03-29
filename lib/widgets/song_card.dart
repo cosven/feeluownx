@@ -42,7 +42,7 @@ class SongCard extends StatelessWidget {
         width: 32,
         child: showIndex
             ? Text(
-                '${index != null ? index + 1 : ''}',
+                '${index != null ? index! + 1 : ''}',
                 style: Theme.of(context).textTheme.bodyLarge,
                 textAlign: TextAlign.center,
               )
