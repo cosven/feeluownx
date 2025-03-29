@@ -164,7 +164,11 @@ class TcpPubsubClient {
     _broadcastStream = null;
   }
 
+  /// Returns whether the client is currently connected to the server
   bool get isConnected => _isConnected;
+
+  /// Returns the current connection status as a string for display purposes
+  String get connectionStatus => _isConnected ? 'Connected' : 'Disconnected';
 
   void subscribe(String topic) {
     if (!_isConnected || _socket == null) {
