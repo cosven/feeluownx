@@ -56,13 +56,13 @@ class TcpPubsubClient {
       }
     }
     _connectionState = ConnectionState.disconnected;
+    _notifyConnectionState(_connectionState);
     throw Exception('Failed to connect after $maxRetries attempts');
   }
 
   Future<void> _connectInternal() async {
     assert(_connectionState != ConnectionState.connected);
     close(); // Clean up any existing connection
-    _notifyConnectionState(false); // Notify disconnection first
 
     // Connect to the server
     try {
@@ -218,12 +218,8 @@ class TcpPubsubClient {
   }
 
   void _notifyConnectionState(ConnectionState state) {
-    // Only notify when transition between connected/disconnected states
-    if (state == ConnectionState.connected || 
-        state == ConnectionState.disconnected) {
-      for (var callback in _onConnectionStateCallbacks) {
-        callback(state == ConnectionState.connected);
-      }
+    for (var callback in _onConnectionStateCallbacks) {
+      callback(state == ConnectionState.connected);
     }
   }
 }
